@@ -77,22 +77,15 @@ class GeofluxusMap {
         });
     }
 
-    // check if layer exists by name
-    _layerExists(name) {
-        var exists = false;
-        this.map.getLayers().forEach(function(layer) {
-            if (layer.get('name') == name) {
-                exists = true;
-            }
-        })
-        return exists;
-    }
-
     // get layer by name
     _getLayer(name) {
-        if (!this._layerExists) {
-            throw Error(`Layer "${name}" does not exist!`)
-        }
+        var response;
+        this.map.getLayers().forEach(function(layer) {
+            if (layer.get('name') == name) {
+                response = layer;
+            }
+        })
+        return response;
     }
 
     // add vector layer to map
@@ -100,7 +93,7 @@ class GeofluxusMap {
         var options = options || {};
 
         // check if layer exists
-        if (this._layerExists(name)) {
+        if (this._getLayer(name) !== undefined) {
             throw Error(`Layer "${name}" already exists!`);
         }
 
@@ -134,7 +127,8 @@ class GeofluxusMap {
 
     // add geometry to vector layer
     addGeometry(layer, geometry, options) {
-        if (!this._layerExists(layer)) {
+        // check if input layer does exist
+        if (this._getLayer(layer) === undefined) {
             throw Error(`Layer "${layer}" does not exist!`)
         }
 
@@ -167,7 +161,10 @@ class GeofluxusMap {
         var feature = new Feature({
             geometry: geometry.transform(this.projection, 'EPSG:3857')
         });
-        //layer.getSource().addFeature(feature);
+
+        // get layer & add feature
+        layer = this._getLayer(layer);
+        layer.getSource().addFeature(feature);
     }
 }
 

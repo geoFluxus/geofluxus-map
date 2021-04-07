@@ -12,8 +12,8 @@ const map = new GeofluxusMap({
         zoom: 10
     },
     // map background
-    background: {
-        source: 'osm'
+    base: {
+        source: 'cartodb_light'
     }
 });
 
@@ -21,7 +21,14 @@ const map = new GeofluxusMap({
 // add data layer
 // layer name is mandatory!
 // each layer supports only one geometry type
-map.addVectorLayer('network');
+map.addVectorLayer('network', {
+    style: {
+        stroke: {
+            width: 2,
+            color: 'rgb(100, 100, 100)'
+        },
+    }
+});
 
 data.forEach(function(flow) {
     var geometry = flow.geometry;

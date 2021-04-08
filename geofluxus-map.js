@@ -122,10 +122,6 @@ class GeofluxusMap {
         var tooltip = tooltip || {},
             style = tooltip.style || {};
 
-//        tooltipStyle.color = tooltipStyle.color || 'black' ;
-//
-
-
         function displayTooltip(evt) {
             var pixel = evt.pixel;
             var feature = _this.map.forEachFeatureAtPixel(pixel, function (feature) {

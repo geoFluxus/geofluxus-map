@@ -127,19 +127,27 @@ class GeofluxusMap {
             var feature = _this.map.forEachFeatureAtPixel(pixel, function (feature) {
                 return feature;
             });
+
+            // update tooltip style
             if (feature) {
+                // set tooltip body
                 overlay.setPosition(evt.coordinate);
                 div.innerHTML = feature.get('tooltip');
+
+                // default options
                 div.style.display = 'block';
-                div.style.backgroundColor = style.backgroundColor || 'rgba(139, 138, 138, 0.8)';
-                div.style.borderRadius = style.borderRadius || '1.5rem';
-                div.style.borderStyle = style.borderStyle || 'none';
-                div.style.borderColor = style.borderColor || 'black';
-                div.style.borderWidth = style.borderWidth || '2px'
-                div.style.padding = style.padding || '0.75rem';
-                div.style.fontFamily = style.fontFamily || 'Montserrat, sans-serif';
-                div.style.fontSize = style.fontSize || '15px';
-            }
+                div.style.backgroundColor = 'rgba(139, 138, 138, 0.8)';
+                div.style.borderRadius = '1.5rem';
+                div.style.padding = '0.75rem';
+                div.style.fontFamily = 'Montserrat, sans-serif';
+                div.style.fontSize = '15px';
+
+                // change style options
+                Object.entries(style).forEach(function(pair) {
+                    var [key, value] = pair;
+                    div.style[key] = value;
+                })
+            } else div.style.display = 'none';
         };
 
         this.map.on('pointermove', displayTooltip);
@@ -264,6 +272,7 @@ class GeofluxusMap {
         // get layer & add feature
         layer.getSource().addFeature(feature);
 
+        // set tooltip text
         feature.set('tooltip', options.tooltip);
     }
 

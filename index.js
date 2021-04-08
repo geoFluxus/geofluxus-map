@@ -16,17 +16,19 @@ const map = new GeofluxusMap({
     },
     // map background
     base: {
-        source: 'cartodb_light'
+        source: 'cartodb_dark'
     },
     // enable zoom (drag) with mouse / keyboard
     // default allows zoom (drag) only with map controls
-    //enableZoom: true,
+    enableZoom: true,
     enableDrag: true,
     tooltip: {
         style: {
-            //backgroundColor: 'rgb(255, 255, 0)',
-            //fontFamily: 'MedievalSharp',
-            //borderStyle: 'dotted'
+            display: 'none',
+//            backgroundColor: 'rgb(255, 255, 0)',
+//            fontFamily: 'MedievalSharp',
+//            borderStyle: 'dotted',
+//            fontSize: '50px'
         }
     }
 });
@@ -50,7 +52,8 @@ areas.features.forEach(function(area) {
     var geometry = area.geometry,
         name = area.properties.name;
     map.addFeature('areas', geometry, {
-        tooltip: name
+        tooltip: name,
+        label: name // TODO: add labels
     });
 })
 

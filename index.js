@@ -1,6 +1,13 @@
 import GeofluxusMap from './geofluxus-map.js'
 import data from './data.js'
 
+var style = {
+    stroke: {
+        width: 5,
+        color: 'rgb(100, 100, 100)'
+    },
+    zIndex: 1000
+}
 
 // initialize map
 const map = new GeofluxusMap({
@@ -21,25 +28,20 @@ const map = new GeofluxusMap({
 // add data layer
 // layer name is mandatory!
 // each layer supports only one geometry type
-var style = {
-    stroke: {
-        width: 5,
-        color: 'rgb(100, 100, 100)'
-    },
-    zIndex: 1000
-}
 map.addVectorLayer('network', {
     style: style
 });
 
 // add data
-data.slice(0, 1).forEach(function(flow) {
+data.forEach(function(flow) {
     var geometry = flow.geometry;
-    map.addGeometry('network', geometry, {
+    map.addFeature('network', geometry, {
         style: {
             stroke: {
-                width: 100
+                width: 1
             }
         }
     });
 })
+
+map.focusOnLayer('network');

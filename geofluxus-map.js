@@ -126,8 +126,8 @@ class GeofluxusMap {
         this.map.addLayer(layer);
     }
 
-    // add geometry to vector layer
-    addGeometry(layer, geometry, options) {
+    // add feature to vector layer
+    addFeature(layer, geometry, options) {
         var options = options || {};
 
         // check if input layer does exist
@@ -194,6 +194,19 @@ class GeofluxusMap {
 
         // get layer & add feature
         layer.getSource().addFeature(feature);
+    }
+
+    // focus on layer
+    focusOnLayer(name) {
+        var layer = this._getLayer(name);
+        if (layer === undefined) {
+            throw Error(`Layer "${name}" does not exist!`)
+        }
+
+        var source = layer.getSource();
+        if (source.getFeatures().length) {
+            this.map.getView().fit(source.getExtent(), this.map.getSize());
+        }
     }
 }
 

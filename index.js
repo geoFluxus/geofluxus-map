@@ -16,12 +16,18 @@ const map = new GeofluxusMap({
     // map view: center, zoom etc.
     view: {
         center: [6, 52],
-        zoom: 10
+        //zoom: 10,
+        minZoom: 7,
+        maxZoom: 10
     },
     // map background
     base: {
         source: 'cartodb_light'
-    }
+    },
+    // enable zoom (drag) with mouse / keyboard
+    // default allows zoom (drag) only with map controls
+    //enableZoom: true,
+    enableDrag: true,
 });
 
 
@@ -31,6 +37,10 @@ const map = new GeofluxusMap({
 map.addVectorLayer('network', {
     style: style
 });
+
+// focus on layer extent
+// layer has no features yet, focus on map center
+map.focusOnLayer('network');
 
 // add data
 data.forEach(function(flow) {
@@ -44,4 +54,5 @@ data.forEach(function(flow) {
     });
 })
 
+// focus on layer extent
 map.focusOnLayer('network');

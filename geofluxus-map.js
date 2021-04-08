@@ -14,6 +14,8 @@ import LineString from 'ol/geom/LineString';
 import MultiLineString from 'ol/geom/MultiLineString';
 import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
+import * as olInteraction from 'ol/interaction';
+import {FullScreen, defaults as defaultControls} from 'ol/control';
 
 
 // map bases
@@ -68,12 +70,29 @@ class GeofluxusMap {
         this.view.zoom = this.view.zoom || 0;  // map zoom
         this.view.center = this.view.center || [0, 0];  // map view
         this.view.center = transform(this.view.center, this.projection, 'EPSG:3857');
+        this.view.minZoom = this.view.minZoom;
+        this.view.maxZoom = this.view.maxZoom;
+
+        // enable zoom & drag interactions
+        var enableZoom  = options.enableZoom || false,
+            enableDrag = options.enableDrag || false;
+        var interactionOptions = {
+            doubleClickZoom: enableZoom,
+            keyboardZoom: enableZoom,
+            mouseWheelZoom: enableZoom,
+            dragZoom: enableZoom,
+            keyboardPan: enableDrag,
+            dragPan: enableDrag
+        };
+        var interactions = olInteraction.defaults(interactionOptions);
 
         // render map
         this.map = new Map({
           target: this.target,
           layers: [baseLayer],
-          view: new View(this.view)
+          view: new View(this.view),
+          interactions: interactions,
+          controls: defaultControls().extend([new FullScreen()])
         });
     }
 

@@ -88,11 +88,11 @@ class GeofluxusMap {
 
         // render map
         this.map = new Map({
-          target: this.target,
-          layers: [baseLayer],
-          view: new View(this.view),
-          interactions: interactions,
-          controls: defaultControls().extend([new FullScreen()])
+            target: this.target,
+            layers: [baseLayer],
+            view: new View(this.view),
+            interactions: interactions,
+            controls: defaultControls().extend([new FullScreen()])
         });
     }
 
@@ -131,7 +131,6 @@ class GeofluxusMap {
             fill: new Fill({
                 color: fill.color
             }),
-            zIndex: style.zIndex
         });
 
         // create & add layer
@@ -143,6 +142,9 @@ class GeofluxusMap {
             style: layerStyle
         });
         this.map.addLayer(layer);
+
+        // define z-index
+        layer.setZIndex(style.zIndex);
     }
 
     // add feature to vector layer
@@ -153,6 +155,7 @@ class GeofluxusMap {
         if (this._getLayer(layer) === undefined) {
             throw Error(`Layer "${layer}" does not exist!`)
         }
+        layer = this._getLayer(layer);
 
         var type = geometry.type.toLowerCase();
         geometry.coordinates = geometry.coordinates || {};
@@ -187,8 +190,6 @@ class GeofluxusMap {
         // individual feature style
         var style = options.style;
         if (style !== undefined) {
-            layer = this._getLayer(layer);
-
             var defaultStyle = layer.getStyle(),
                 defaultStroke = defaultStyle.getStroke(),
                 defaultFill = defaultStyle.getFill(),

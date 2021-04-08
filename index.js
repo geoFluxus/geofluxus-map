@@ -1,13 +1,7 @@
 import GeofluxusMap from './geofluxus-map.js'
 import data from './data.js'
+import areas from './areas.js'
 
-var style = {
-    stroke: {
-        width: 5,
-        color: 'rgb(100, 100, 100)'
-    },
-    zIndex: 1000
-}
 
 // initialize map
 const map = new GeofluxusMap({
@@ -30,10 +24,34 @@ const map = new GeofluxusMap({
     enableDrag: true,
 });
 
+var areaStyle = {
+    stroke: {
+        color: 'rgba(255, 0, 0)',
+        width: 2
+    },
+    fill: {
+        color: 'rgba(0, 0, 255)'
+    },
+    zIndex: 500
+}
+map.addVectorLayer('areas', {
+    style: areaStyle
+});
+areas.features.forEach(function(area) {
+    var geometry = area.geometry;
+    map.addFeature('areas', geometry);
+})
 
 // add data layer
 // layer name is mandatory!
 // each layer supports only one geometry type
+var style = {
+    stroke: {
+        width: 5,
+        color: 'rgb(100, 100, 100)'
+    },
+    zIndex: 1000
+}
 map.addVectorLayer('network', {
     style: style
 });
@@ -48,7 +66,9 @@ data.forEach(function(flow) {
     map.addFeature('network', geometry, {
         style: {
             stroke: {
-                width: 1
+                color: `rgb(${Math.floor((Math.random()*255) + 1)},
+                ${Math.floor((Math.random()*255) + 1)},
+                ${Math.floor((Math.random()*255) + 1)})`
             }
         }
     });

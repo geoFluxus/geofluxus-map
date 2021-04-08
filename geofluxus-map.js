@@ -16,6 +16,7 @@ import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
 import * as olInteraction from 'ol/interaction';
 import {FullScreen, defaults as defaultControls} from 'ol/control';
+import Overlay from 'ol/Overlay';
 
 
 // map bases
@@ -94,6 +95,58 @@ class GeofluxusMap {
             interactions: interactions,
             controls: defaultControls().extend([new FullScreen()])
         });
+
+        // activate tooltips
+        this._getTooltip(options.tooltip);
+    }
+
+    // activate tooltips
+    _getTooltip(tooltip) {
+        var _this = this,
+            target = this.map.getTargetElement();
+
+        var div = target.querySelector('.oltooltip');
+        if (!div) {
+            div = document.createElement('div');
+            div.classList.add('oltooltip');
+            target.appendChild(div);
+        }
+        var overlay = new Overlay({
+            element: div,
+            offset: [10, 0],
+            positioning: 'bottom-center'
+        });
+        this.map.addOverlay(overlay);
+
+        // define tooltips
+        var tooltip = tooltip || {},
+            style = tooltip.style || {};
+
+//        tooltipStyle.color = tooltipStyle.color || 'black' ;
+//
+
+
+        function displayTooltip(evt) {
+            var pixel = evt.pixel;
+            var feature = _this.map.forEachFeatureAtPixel(pixel, function (feature) {
+                return feature;
+            });
+            if (feature) {
+                overlay.setPosition(evt.coordinate);
+                div.innerHTML = feature.get('tooltip');
+                div.style.display = 'block';
+                div.style.backgroundColor = style.backgroundColor || 'rgba(139, 138, 138, 0.8)';
+                div.style.borderRadius = style.borderRadius || '1.5rem';
+                div.style.borderStyle = style.borderStyle || 'none';
+                div.style.borderColor = style.borderColor || 'black';
+                div.style.borderWidth = style.borderWidth || '2px'
+                div.style.padding = style.padding || '0.75rem';
+                div.style.fontFamily = style.fontFamily || 'Montserrat, sans-serif';
+                div.style.fontSize = style.fontSize || '15px';
+            }
+        };
+
+        this.map.on('pointermove', displayTooltip);
     }
 
     // get layer by name
@@ -214,6 +267,8 @@ class GeofluxusMap {
 
         // get layer & add feature
         layer.getSource().addFeature(feature);
+
+        feature.set('tooltip', options.tooltip);
     }
 
     // focus on layer

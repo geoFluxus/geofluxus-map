@@ -22,6 +22,13 @@ const map = new GeofluxusMap({
     // default allows zoom (drag) only with map controls
     //enableZoom: true,
     enableDrag: true,
+    tooltip: {
+        style: {
+            //backgroundColor: 'rgb(255, 255, 0)',
+            //fontFamily: 'MedievalSharp',
+            //borderStyle: 'dotted'
+        }
+    }
 });
 
 var areaStyle = {
@@ -30,49 +37,54 @@ var areaStyle = {
         width: 2
     },
     fill: {
-        color: 'rgba(0, 0, 255)'
+        color: 'rgba(0, 0, 255, 0.2)'
     },
-    zIndex: 500
+    zIndex: 2000
 }
 map.addVectorLayer('areas', {
     style: areaStyle
 });
+
+
 areas.features.forEach(function(area) {
-    var geometry = area.geometry;
-    map.addFeature('areas', geometry);
-})
-
-// add data layer
-// layer name is mandatory!
-// each layer supports only one geometry type
-var style = {
-    stroke: {
-        width: 5,
-        color: 'rgb(100, 100, 100)'
-    },
-    zIndex: 1000
-}
-map.addVectorLayer('network', {
-    style: style
-});
-
-// focus on layer extent
-// layer has no features yet, focus on map center
-map.focusOnLayer('network');
-
-// add data
-data.forEach(function(flow) {
-    var geometry = flow.geometry;
-    map.addFeature('network', geometry, {
-        style: {
-            stroke: {
-                color: `rgb(${Math.floor((Math.random()*255) + 1)},
-                ${Math.floor((Math.random()*255) + 1)},
-                ${Math.floor((Math.random()*255) + 1)})`
-            }
-        }
+    var geometry = area.geometry,
+        name = area.properties.name;
+    map.addFeature('areas', geometry, {
+        tooltip: name
     });
 })
 
-// focus on layer extent
-map.focusOnLayer('network');
+//// add data layer
+//// layer name is mandatory!
+//// each layer supports only one geometry type
+//var style = {
+//    stroke: {
+//        width: 5,
+//        color: 'rgb(100, 100, 100)'
+//    },
+//    zIndex: 1000
+//}
+//map.addVectorLayer('network', {
+//    style: style
+//});
+//
+//// focus on layer extent
+//// layer has no features yet, focus on map center
+//map.focusOnLayer('network');
+//
+//// add data
+//data.forEach(function(flow) {
+//    var geometry = flow.geometry;
+//    map.addFeature('network', geometry, {
+//        style: {
+//            stroke: {
+//                color: `rgb(${Math.floor((Math.random()*255) + 1)},
+//                ${Math.floor((Math.random()*255) + 1)},
+//                ${Math.floor((Math.random()*255) + 1)})`
+//            }
+//        }
+//    });
+//})
+//
+//// focus on layer extent
+//map.focusOnLayer('network');

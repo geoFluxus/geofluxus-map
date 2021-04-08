@@ -21,16 +21,25 @@ const map = new GeofluxusMap({
 // add data layer
 // layer name is mandatory!
 // each layer supports only one geometry type
+var style = {
+    stroke: {
+        width: 5,
+        color: 'rgb(100, 100, 100)'
+    },
+    zIndex: 1000
+}
 map.addVectorLayer('network', {
-    style: {
-        stroke: {
-            width: 2,
-            color: 'rgb(100, 100, 100)'
-        },
-    }
+    style: style
 });
 
-data.forEach(function(flow) {
+// add data
+data.slice(0, 1).forEach(function(flow) {
     var geometry = flow.geometry;
-    map.addGeometry('network', geometry);
+    map.addGeometry('network', geometry, {
+        style: {
+            stroke: {
+                width: 100
+            }
+        }
+    });
 })

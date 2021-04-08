@@ -111,7 +111,8 @@ class GeofluxusMap {
             }),
             fill: new Fill({
                 color: fill.color
-            })
+            }),
+            zIndex: style.zIndex
         });
 
         // create & add layer
@@ -127,6 +128,8 @@ class GeofluxusMap {
 
     // add geometry to vector layer
     addGeometry(layer, geometry, options) {
+        var options = options || {};
+
         // check if input layer does exist
         if (this._getLayer(layer) === undefined) {
             throw Error(`Layer "${layer}" does not exist!`)
@@ -162,8 +165,34 @@ class GeofluxusMap {
             geometry: geometry.transform(this.projection, 'EPSG:3857')
         });
 
+        // individual feature style
+        var style = options.style;
+        if (style !== undefined) {
+            layer = this._getLayer(layer);
+
+            var defaultStyle = layer.getStyle(),
+                defaultStroke = defaultStyle.getStroke(),
+                defaultFill = defaultStyle.getFill(),
+                defaultZIndex = defaultStyle.getZIndex();
+
+            var stroke = style.stroke || {},
+                fill = style.fill || {},
+                zIndex = style.zIndex || {};
+
+            style = new Style({
+                stroke: new Stroke({
+                    color: stroke.color || defaultStroke.getColor(),
+                    width: stroke.width || defaultStroke.getWidth()
+                }),
+                fill: new Fill({
+                    color: fill.color || defaultFill.getColor()
+                }),
+                zIndex: style.zIndex || defaultZIndex
+            });
+            feature.setStyle(style);
+        }
+
         // get layer & add feature
-        layer = this._getLayer(layer);
         layer.getSource().addFeature(feature);
     }
 }

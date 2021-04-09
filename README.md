@@ -11,7 +11,7 @@ Then, initialize the map like so:
 
 The following image should appear on your screen:
 
-![](img/osm.png)
+![](img/osm.png){:height="100px"}
 
 Here is an overview of all available options for a map object:
 

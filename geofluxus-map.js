@@ -102,6 +102,8 @@ class GeofluxusMap {
 
     // activate tooltips
     _onHover(options) {
+        var options = options || {};
+
         var _this = this,
             target = this.map.getTargetElement();
 

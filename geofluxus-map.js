@@ -125,13 +125,15 @@ class GeofluxusMap {
         // initialize selection highlighting
         var selected = null,
             initialStyle = null,
-            highlightStyle = options.style,
-            stroke = highlightStyle.stroke,
-            fill = highlightStyle.fill;
-        highlightStyle = new Style({
-            stroke: new Stroke(stroke),
-            fill: new Fill(fill),
-        });
+            highlightStyle = options.style;
+        if (highlightStyle !== undefined) {
+            var stroke = highlightStyle.stroke,
+                fill = highlightStyle.fill;
+            highlightStyle = new Style({
+                stroke: new Stroke(stroke),
+                fill: new Fill(fill),
+            });
+        }
 
         function displayTooltip(evt) {
             // reset style of last selection

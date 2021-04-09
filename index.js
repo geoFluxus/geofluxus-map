@@ -42,7 +42,7 @@ const map = new GeofluxusMap({
         style: {
             stroke: {
                 color: 'rgb(255, 255, 0)',
-                width: 6
+                width: 2
             },
             fill: {
                 color: 'rgba(255, 0, 0, 0.6)'
@@ -51,16 +51,16 @@ const map = new GeofluxusMap({
     }
 });
 
-//var areaStyle = {
-//    stroke: {
-//        color: 'rgba(255, 255, 255)',
-//        width: 2
-//    },
-//    fill: {
-//        color: 'rgba(0, 0, 0, 0.2)'
-//    },
-//    zIndex: 2000
-//}
+var areaStyle = {
+    stroke: {
+        color: 'rgba(255, 255, 255)',
+        width: 2
+    },
+    fill: {
+        color: 'rgba(0, 0, 0, 0.2)'
+    },
+    zIndex: 2000
+}
 map.addVectorLayer('areas', {
 //    style: areaStyle
 });
@@ -96,11 +96,12 @@ map.focusOnLayer('areas')
 //            stroke: {
 //                color: `rgb(${Math.floor((Math.random()*255) + 1)},
 //                ${Math.floor((Math.random()*255) + 1)},
-//                ${Math.floor((Math.random()*255) + 1)})`
+//                ${Math.floor((Math.random()*255) + 1)})`,
+//                width: 5
 //            }
 //        }
 //    });
 //})
-//
+
 //// focus on layer extent
 //map.focusOnLayer('network');

@@ -20,27 +20,27 @@ new GeofluxusMap({\
 &emsp;&emsp; [projection](#ref2): "EPSG:4326",\
 &emsp;&emsp; [base](#ref3): {\
 &emsp;&emsp; &emsp;&emsp; [source](#ref4): "osm",\
-&emsp;&emsp; &emsp;&emsp; opacity: 1.0,\
+&emsp;&emsp; &emsp;&emsp; [opacity](#ref5): 1.0,\
 &emsp;&emsp; },\
-&emsp;&emsp; view: {\
-&emsp;&emsp; &emsp;&emsp; zoom: 0,\
-&emsp;&emsp; &emsp;&emsp; minZoom: undefined,\
-&emsp;&emsp; &emsp;&emsp; maxZoom: undefined,\
-&emsp;&emsp; &emsp;&emsp; center: [0, 0],\
+&emsp;&emsp; [view](#ref6): {\
+&emsp;&emsp; &emsp;&emsp; [zoom](#ref7): 0,\
+&emsp;&emsp; &emsp;&emsp; [minZoom](#ref8): undefined,\
+&emsp;&emsp; &emsp;&emsp; [maxZoom](#ref9): undefined,\
+&emsp;&emsp; &emsp;&emsp; [center](#ref10): [0, 0],\
 &emsp;&emsp; }\
-&emsp;&emsp; enableZoom: false,\
-&emsp;&emsp; enableDrag: false,\
-&emsp;&emsp; hover: {\
-&emsp;&emsp; &emsp;&emsp; tooltip: {\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; style: {...}\
+&emsp;&emsp; [enableZoom](#ref11): false,\
+&emsp;&emsp; [enableDrag](#ref12): false,\
+&emsp;&emsp; [hover](#ref13): {\
+&emsp;&emsp; &emsp;&emsp; [tooltip](#ref14): {\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [style](#ref15): {...}\
 &emsp;&emsp; &emsp;&emsp; },\
-&emsp;&emsp; &emsp;&emsp; style: {\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; stroke: {\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; color: 'rgba(255, 0, 0, 1)',\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; width: 10,\
+&emsp;&emsp; &emsp;&emsp; [style](#ref16): {\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [stroke](#ref17): {\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [color](#ref18): 'rgba(255, 0, 0, 1)',\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [width](#ref19): 10,\
 &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; },\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; fill: {\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; color: 'rbga(255, 0, 0, 1)',\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [fill](#ref20): {\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [color](#ref21): 'rbga(255, 0, 0, 1)',\
 &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; }\
 &emsp;&emsp; &emsp;&emsp; }\
 &emsp;&emsp; }\
@@ -52,16 +52,16 @@ new GeofluxusMap({\
 * _<a id="ref3">base</a>_: The map background
     * _<a id="ref4">source</a>_: Background provider (default='osm').\
       **Available providers**: 'osm', 'cartodb_dark', 'cartodb_light'
-    * _opacity_: The background opacity. Ranges in [0, 1] (default=1).
-* _view_: The map view
-    * _zoom_: The zoom level (default=1)
-    * _minZoom_: Minimum zoom level (default=undefined)
-    * _maxZoom_: Maximum zoom level (default=undefined)
-    * _center_: The map center. Coordinates provided in map projection (default=[0, 0])
-* _enableZoom_: Enables zoom via mouse / keyboard on top of zoom controls (default=false)
-* _enableDrag_: Enables dragging via mouse / keyboard (default=false)
-* _hover_: Enables hover interactions
-    * _tooltip_: Enables tooltip on hover over feature
+    * _<a id="ref5">opacity</a>_: The background opacity. Ranges in [0, 1] (default=1).
+* _<a id="ref6">view</a>_: The map view
+    * _<a id="ref7">zoom</a>_: The zoom level (default=1)
+    * _<a id="ref8">minZoom</a>_: Minimum zoom level (default=undefined)
+    * _<a id="ref9">maxZoom</a>_: Maximum zoom level (default=undefined)
+    * _<a id="ref10">center</a>_: The map center. Coordinates provided in map projection (default=[0, 0])
+* _<a id="ref11">enableZoom</a>_: Enables zoom via mouse / keyboard on top of zoom controls (default=false)
+* _<a id="ref12">enableDrag</a>_: Enables dragging via mouse / keyboard (default=false)
+* _<a id="ref13">hover</a>_: Enables hover interactions
+    * _<a id="ref14">tooltip</a>_: Enables tooltip on hover over feature
       * _style_: 
 
 ## Vector layers

@@ -22,15 +22,15 @@ import areas from './areas.js'
 //
 const map = new GeofluxusMap({
     target: 'map',
-    enableZoom: true,
-    enableDrag: true,
-    view: {
-        center: [5, 52],
-        zoom: 9
-    },
-    base: {
-        source: 'osm'
-    },
+//    enableZoom: true,
+//    enableDrag: true,
+//    view: {
+//        center: [5, 52],
+//        zoom: 9
+//    },
+//    base: {
+//        source: 'osm'
+//    },
 //    hover: {
 //        tooltip: {
 //            style: tooltipStyle

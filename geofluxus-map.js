@@ -97,11 +97,11 @@ class GeofluxusMap {
         });
 
         // activate tooltips
-        this._getTooltip(options.tooltip);
+        this._onHover(options.hover);
     }
 
     // activate tooltips
-    _getTooltip(tooltip) {
+    _onHover(options) {
         var _this = this,
             target = this.map.getTargetElement();
 
@@ -118,17 +118,32 @@ class GeofluxusMap {
         });
         this.map.addOverlay(overlay);
 
-        // define tooltips
-        var tooltip = tooltip || {},
-            style = tooltip.style || {};
+        // initialize tooltip
+        var tooltip = options.tooltip || {},
+            tooltipStyle = tooltip.style || {};
+
+        // initialize selection highlighting
+        var selected = null,
+            initialStyle = null,
+            highlightStyle = options.style,
+            stroke = highlightStyle.stroke,
+            fill = highlightStyle.fill;
+        highlightStyle = new Style({
+            stroke: new Stroke(stroke),
+            fill: new Fill(fill),
+        });
 
         function displayTooltip(evt) {
+            // reset style of last selection
+            if (selected) selected.setStyle(initialStyle);
+
+            // get feature by pixel
             var pixel = evt.pixel;
             var feature = _this.map.forEachFeatureAtPixel(pixel, function (feature) {
                 return feature;
             });
 
-            // update tooltip style
+            // update tooltip style & highlight
             if (feature) {
                 // set tooltip body
                 overlay.setPosition(evt.coordinate);
@@ -143,11 +158,18 @@ class GeofluxusMap {
                 div.style.fontSize = '15px';
 
                 // change style options
-                Object.entries(style).forEach(function(pair) {
+                Object.entries(tooltipStyle).forEach(function(pair) {
                     var [key, value] = pair;
                     div.style[key] = value;
                 })
-            } else div.style.display = 'none';
+
+                //  highlight feature
+                selected = feature;
+                initialStyle = feature.getStyle();
+                feature.setStyle(highlightStyle);
+            } else {
+                div.style.display = 'none';
+            }
         };
 
         this.map.on('pointermove', displayTooltip);

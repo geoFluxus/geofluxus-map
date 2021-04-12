@@ -36,15 +36,16 @@ new GeofluxusMap({\
 &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [style](#ref15): {\
 &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; borderRadius: ...\
 &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; fontFamily: ...\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; ...\
 &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; }\
 &emsp;&emsp; &emsp;&emsp; },\
 &emsp;&emsp; &emsp;&emsp; [style](#ref16): {\
 &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [stroke](#ref17): {\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [color](#ref18): 'rgba(255, 0, 0, 1)',\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [width](#ref19): 10,\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [color](#ref18): ...,\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [width](#ref19): ...,\
 &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; },\
 &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [fill](#ref20): {\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [color](#ref21): 'rbga(255, 0, 0, 1)',\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [color](#ref21): ...,\
 &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; }\
 &emsp;&emsp; &emsp;&emsp; }\
 &emsp;&emsp; }\
@@ -52,7 +53,7 @@ new GeofluxusMap({\
 
 
 * _<a id="ref1">target</a> (**Mandatory**)_: The id of the HTML element to host the map.
-* _<a id="ref2">projection</a>_: The map projection (EPSG code) for rendering geometries. The default projection for input geometries is **EPSG:4326** (WGS84) which corresponds to longitude / latitude coordinates. All input geometries are transformed to EPSG:3857 (Web Mercator).
+* _<a id="ref2">projection</a>_: The map projection (EPSG code) for rendering feature geometries. The default projection for input geometries is **EPSG:4326** (WGS84) which corresponds to longitude / latitude coordinates. All input geometries are transformed to EPSG:3857 (Web Mercator).
 * _<a id="ref3">base</a>_: The map background
     * _<a id="ref4">source</a>_: Background provider (default='osm').\
       **Available providers**: 'osm', 'cartodb_dark', 'cartodb_light'
@@ -67,11 +68,77 @@ new GeofluxusMap({\
 * _<a id="ref13">hover</a>_: Enables hover interactions
     * _<a id="ref14">tooltip</a>_: Enables HTML div tooltip on hover over feature.
       * _<a id="ref15">style</a>_: Tooltip style. Edit HTML div properties such as borderRadius, fontFamily etc.
-    * _<a id="ref16">style</a>_: Enables feature highlighting on hover, defined as OpenLayers style.
+    * _<a id="ref16">style</a>_: Enables feature highlighting on hover, defined as an OpenLayers style object.
       * _<a id="ref17">stroke</a>_: Style of feature boundary.
         * _<a id="ref18">color</a>_: Stroke color. Available formats: RGB, RGBA, HEX.
         * _<a id="ref19">width</a>_: Stroke width.
       * _<a id="ref20">fill</a>_: Style of feature surface.
         * _<a id="ref21">color</a>_: Fill color. Available formats: RGB, RGBA, HEX.
+    
+**ATTENTION!** We recommend to provide values for ALL available options when defining an OpenLayers style object.
 
 ## Vector layers
+To add features to the map, you need first to define a vector layer. You can simply do this by just providing a name for the given layer:
+```
+map.addVectorLayer('areas');
+```
+**ATTENTION!** For multiple layers, make sure each of them has a unique name. Keep in mind that each layer can host ONLY one type of geometry (see the available options for a vector layer below).
+
+Here is an overview of all available options for a vector layer:
+
+map.addVectorLayer([name](#ref22), {\
+&emsp;&emsp; [style](#ref23): {\
+&emsp;&emsp;&emsp;&emsp; [stroke](#ref24): {\
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [color](#ref25): ...,\
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [width](#ref26): ...\
+&emsp;&emsp;&emsp;&emsp; },\
+&emsp;&emsp;&emsp;&emsp; [fill](#ref27): {\
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [color](#ref28): ...\
+&emsp;&emsp;&emsp;&emsp; },\
+&emsp;&emsp;&emsp;&emsp; [zIndex](#ref29): ...\
+&emsp;&emsp; }\
+})
+
+* _<a id="ref22">name</a> (**Mandatory**)_: Layer name. Unique for each layer
+* _options_:
+  * _<a id="ref23">style</a>_: OpenLayers style for all layer features
+    * _<a id="ref24">stroke</a>_: Style of feature boundary.
+        * _<a id="ref25">color</a>_: Stroke color. Available formats: RGB, RGBA, HEX.
+        * _<a id="ref26">width</a>_: Stroke width.
+    * _<a id="ref27">fill</a>_: Style of feature surface.
+        * _<a id="ref28">color</a>_: Fill color. Available formats: RGB, RGBA, HEX.
+    * _<a id="ref29">zIndex</a>_: Layer z-index. By default, OpenLayers renders layers in Last In, FirstOut order (the last layer declared is rendered on canvas top).
+    
+Once defined, you can populate the layer with features:
+```
+map.addFeature(name, geometry);
+```
+If provided, features inherit the given layer style. Nevertheless, you can always define different styles for each individual feature if necessary.
+
+Here is an overview for all available options for vector layer features:
+
+map.addFeature([layer](#ref30), [geometry](#ref31), {\
+&emsp;&emsp; [style](#ref32): {\
+&emsp;&emsp;&emsp;&emsp; [stroke](#ref33): {\
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [color](#ref34): ...,\
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [width](#ref35): ...\
+&emsp;&emsp;&emsp;&emsp; },\
+&emsp;&emsp;&emsp;&emsp; [fill](#ref36): {\
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [color](#ref37): ...\
+&emsp;&emsp;&emsp;&emsp; },\
+&emsp;&emsp;&emsp;&emsp; [zIndex](#ref38): ...\
+&emsp;&emsp; },\
+&emsp;&emsp; [tooltip](#ref39): ...\
+})
+
+* _<a id="ref30">layer</a> (**Mandatory**)_: The layer name to which the feature belongs
+* _<a id="ref31">geometry</a> (**Mandatory**)_: The feature geometry. Should be provided from [GeoJSON](https://geojson.org/) format.
+* _options_:
+    * _<a id="ref32">style</a>_: OpenLayers style for feature
+    * _<a id="ref33">stroke</a>_: Style of feature boundary.
+        * _<a id="ref34">color</a>_: Stroke color. Available formats: RGB, RGBA, HEX.
+        * _<a id="ref35">width</a>_: Stroke width.
+    * _<a id="ref36">fill</a>_: Style of feature surface.
+        * _<a id="ref37">color</a>_: Fill color. Available formats: RGB, RGBA, HEX.
+    * _<a id="ref38">zIndex</a>_: Layer z-index. By default, OpenLayers renders features in Last In, FirstOut order (the last layer declared is rendered on canvas top).
+    * _<a id="ref39">tooltip</a>_: The tooltip info for the feature

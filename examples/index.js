@@ -1,6 +1,6 @@
-import GeofluxusMap from './geofluxus-map.js'
-import data from './data.js'
-import areas from './areas.js'
+import GeofluxusMap from '../geofluxus-map'
+import data from '../data/data'
+import areas from '../data/areas'
 
 // define tooltip, hover style
 var tooltipStyle = {
@@ -16,13 +16,12 @@ var tooltipStyle = {
         },
         fill: {
             color: 'rgba(255, 0, 0, 0.6)',
-        },
-        zIndex: 9999
+        }
     }
 
 // initialize map
 const map = new GeofluxusMap({
-    target: 'map',
+    target: 'root',
     enableZoom: true,
     enableDrag: true,
     view: {
@@ -50,7 +49,7 @@ var areaStyle = {
     fill: {
         color: 'rgba(0, 0, 0, 0.2)'
     },
-    zIndex: 2000
+    zIndex: 1000
 }
 map.addVectorLayer('areas', {
     style: areaStyle
@@ -66,15 +65,20 @@ areas.features.forEach(function(area) {
 })
 
 // focus on 'areas'
-map.focusOnLayer('areas')
+map.focusOnLayer('areas');
 
 // define MULTILINESTRING vector layer 'network'
-map.addVectorLayer('network');
+map.addVectorLayer('network', {
+    style: {
+        zIndex: 2000
+    }
+});
 
 // add features to 'network'
 // provide individual feature style
 data.forEach(function(flow) {
-    var geometry = flow.geometry;
+    var geometry = flow.geometry,
+        amount = flow.amount;
     map.addFeature('network', geometry, {
         style: {
             stroke: {
@@ -83,7 +87,8 @@ data.forEach(function(flow) {
                 ${Math.floor((Math.random()*255) + 1)})`,
                 width: 5
             }
-        }
+        },
+        tooltip: amount
     });
 })
 

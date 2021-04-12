@@ -37,6 +37,9 @@ class GeofluxusMap {
 
         // HTML element to render map
         this.target = options.target; // not optional
+        if (!this.target || this.target === undefined) {
+            throw Error('Map DOM is undefined!')
+        }
 
         // map projection
         // default: WGS84 (EPSG:4326) -> Web Mercator (EPSG:3857)

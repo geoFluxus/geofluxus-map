@@ -1,5 +1,5 @@
 # geofluxus-map
-Powered by [OpenLayers](https://openlayers.org/).
+Powered by [OpenLayers](https://openlayers.org/). Examples on index.js
 
 ## Map
 First, create a target HTML element with a defined id to host the map like:
@@ -132,7 +132,8 @@ map.addFeature([layer](#ref30), [geometry](#ref31), {\
 })
 
 * _<a id="ref30">layer</a> (**Mandatory**)_: The layer name to which the feature belongs
-* _<a id="ref31">geometry</a> (**Mandatory**)_: The feature geometry. Should be provided from [GeoJSON](https://geojson.org/) format.
+* _<a id="ref31">geometry</a> (**Mandatory**)_: The feature geometry. Should be provided from [GeoJSON](https://geojson.org/) format.\
+  **Supported geometry types**: Point, LineString, MultiLineString, Polygon, MultiPolygon
 * _options_:
     * _<a id="ref32">style</a>_: OpenLayers style for feature
     * _<a id="ref33">stroke</a>_: Style of feature boundary.
@@ -142,3 +143,8 @@ map.addFeature([layer](#ref30), [geometry](#ref31), {\
         * _<a id="ref37">color</a>_: Fill color. Available formats: RGB, RGBA, HEX.
     * _<a id="ref38">zIndex</a>_: Layer z-index. By default, OpenLayers renders features in Last In, FirstOut order (the last layer declared is rendered on canvas top).
     * _<a id="ref39">tooltip</a>_: The tooltip info for the feature
+    
+Once a layer has features, you can zoom to its extent by providing its name:
+```
+map.focusOnLayer('areas');
+```

@@ -1,5 +1,5 @@
 # geofluxus-map
-Powered by [OpenLayers](https://openlayers.org/). Examples on index.js
+Powered by [OpenLayers](https://openlayers.org/). Check examples on JS (examples) and ReactJS (react-examples).
 
 ## Map
 First, create a target HTML element with a defined id to host the map like:

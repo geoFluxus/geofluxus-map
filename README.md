@@ -1,4 +1,5 @@
 # geofluxus-map
+Powered by [OpenLayers](https://openlayers.org/).
 
 ## Map
 First, create a target HTML element with a defined id to host the map like:
@@ -32,7 +33,10 @@ new GeofluxusMap({\
 &emsp;&emsp; [enableDrag](#ref12): false,\
 &emsp;&emsp; [hover](#ref13): {\
 &emsp;&emsp; &emsp;&emsp; [tooltip](#ref14): {\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [style](#ref15): {...}\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [style](#ref15): {\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; borderRadius: ...\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; fontFamily: ...\
+&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; }\
 &emsp;&emsp; &emsp;&emsp; },\
 &emsp;&emsp; &emsp;&emsp; [style](#ref16): {\
 &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [stroke](#ref17): {\
@@ -61,7 +65,13 @@ new GeofluxusMap({\
 * _<a id="ref11">enableZoom</a>_: Enables zoom via mouse / keyboard on top of zoom controls (default=false)
 * _<a id="ref12">enableDrag</a>_: Enables dragging via mouse / keyboard (default=false)
 * _<a id="ref13">hover</a>_: Enables hover interactions
-    * _<a id="ref14">tooltip</a>_: Enables tooltip on hover over feature
-      * _style_: 
+    * _<a id="ref14">tooltip</a>_: Enables HTML div tooltip on hover over feature.
+      * _<a id="ref15">style</a>_: Tooltip style. Edit HTML div properties such as borderRadius, fontFamily etc.
+    * _<a id="ref16">style</a>_: Enables feature highlighting on hover, defined as OpenLayers style.
+      * _<a id="ref17">stroke</a>_: Style of feature boundary.
+        * _<a id="ref18">color</a>_: Stroke color. Available formats: RGB, RGBA, HEX.
+        * _<a id="ref19">width</a>_: Stroke width.
+      * _<a id="ref20">fill</a>_: Style of feature surface.
+        * _<a id="ref21">color</a>_: Fill color. Available formats: RGB, RGBA, HEX.
 
 ## Vector layers

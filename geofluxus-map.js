@@ -37,7 +37,7 @@ class GeofluxusMap {
 
         // HTML element to render map
         this.target = options.target; // not optional
-        if (!this.target || this.target === undefined) {
+        if (this.target == undefined) {
             throw Error('Map DOM is undefined!')
         }
 
@@ -131,7 +131,7 @@ class GeofluxusMap {
         var selected = null,
             initialStyle = null,
             highlightStyle = options.style;
-        if (highlightStyle !== undefined) {
+        if (highlightStyle != undefined) {
             var stroke = highlightStyle.stroke,
                 fill = highlightStyle.fill;
             highlightStyle = new Style({
@@ -198,7 +198,7 @@ class GeofluxusMap {
         var options = options || {};
 
         // check if layer exists
-        if (this._getLayer(name) !== undefined) {
+        if (this._getLayer(name) != undefined) {
             throw Error(`Layer "${name}" already exists!`);
         }
 
@@ -238,7 +238,7 @@ class GeofluxusMap {
         var options = options || {};
 
         // check if input layer does exist
-        if (this._getLayer(layer) === undefined) {
+        if (this._getLayer(layer) == undefined) {
             throw Error(`Layer "${layer}" does not exist!`)
         }
         layer = this._getLayer(layer);
@@ -275,7 +275,7 @@ class GeofluxusMap {
 
         // individual feature style
         var style = options.style;
-        if (style !== undefined) {
+        if (style != undefined) {
             var defaultStyle = layer.getStyle(),
                 defaultStroke = defaultStyle.getStroke(),
                 defaultFill = defaultStyle.getFill(),
@@ -308,7 +308,7 @@ class GeofluxusMap {
     // focus on layer
     focusOnLayer(name) {
         var layer = this._getLayer(name);
-        if (layer === undefined) {
+        if (layer == undefined) {
             throw Error(`Layer "${name}" does not exist!`)
         }
 

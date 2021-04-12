@@ -1,5 +1,5 @@
 import 'ol/ol.css';
-import {Map, View} from 'ol';
+import {Map as olMap, View} from 'ol';
 import {transform} from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
@@ -30,7 +30,7 @@ var sources = {
     cartodb_light: 'https://cartodb-basemaps-{a-d}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
 }
 
-class GeofluxusMap {
+class Map {
     constructor(options) {
         // map options //
         var options = options || {};
@@ -91,7 +91,7 @@ class GeofluxusMap {
         var interactions = olInteraction.defaults(interactionOptions);
 
         // render map
-        this.map = new Map({
+        this.map = new olMap({
             target: this.target,
             layers: [baseLayer],
             view: new View(this.view),
@@ -320,4 +320,4 @@ class GeofluxusMap {
     }
 }
 
-export default GeofluxusMap;
+export default Map;

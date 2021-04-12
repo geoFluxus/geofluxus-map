@@ -1,10 +1,10 @@
 import React from "react";
 import { render } from "react-dom";
-import Map from "./Map";
+import ReactMap from "./reactMap";
 
 const App = () => (
   <div>
-    <Map />
+    <ReactMap />
   </div>
 );
 

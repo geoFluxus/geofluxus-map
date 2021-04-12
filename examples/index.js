@@ -1,9 +1,10 @@
-import GeofluxusMap from '../geofluxus-map'
+import Map from '../src/Map'
 import data from '../data/data'
 import areas from '../data/areas'
 
 // define tooltip, hover style
 var tooltipStyle = {
+        display: 'none',
         backgroundColor: 'rgba(255, 255, 0, 1)',
         fontFamily: 'MedievalSharp',
         border: 'solid',
@@ -21,7 +22,7 @@ var tooltipStyle = {
     }
 
 // initialize map
-const map = new GeofluxusMap({
+const map = new Map({
     target: 'root',
     enableZoom: true,
     enableDrag: true,

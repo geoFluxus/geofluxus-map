@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import GeofluxusMap from '../geofluxus-map';
+import Map from '../src/Map';
 import areas from '../data/areas'
 
-class Map extends Component {
+class ReactMap extends Component {
   constructor(props) {
     super(props);
   }
@@ -27,7 +27,7 @@ class Map extends Component {
         }
 
     // initialize map
-    const map = new GeofluxusMap({
+    const map = new Map({
         target: 'map',
         enableZoom: true,
         enableDrag: true,
@@ -83,4 +83,4 @@ class Map extends Component {
   }
 }
 
-export default Map;
+export default ReactMap;

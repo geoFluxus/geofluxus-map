@@ -137,6 +137,7 @@ class GeofluxusMap {
             highlightStyle = new Style({
                 stroke: new Stroke(stroke),
                 fill: new Fill(fill),
+                zIndex: highlightStyle.zIndex
             });
         }
 

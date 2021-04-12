@@ -16,7 +16,8 @@ var tooltipStyle = {
         },
         fill: {
             color: 'rgba(255, 0, 0, 0.6)',
-        }
+        },
+        zIndex: 9999
     }
 
 // initialize map

@@ -1,6 +1,13 @@
 import NetworkMap from '../src/NetworkMap'
 import data from '../data/data'
 
+var hoverStyle = {
+        stroke: {
+            width: 10
+        },
+        zIndex: 9999
+    }
+
 // initialize map
 const map = new NetworkMap({
     target: "root",
@@ -9,5 +16,8 @@ const map = new NetworkMap({
     },
     enableDrag: true,
     enableZoom: true,
-    data: data
+    data: data,
+    hover: {
+        style: hoverStyle
+    }
 })

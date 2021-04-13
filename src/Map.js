@@ -128,28 +128,18 @@ class Map {
             tooltipStyle = tooltip.style || {};
 
         // initialize selection highlighting
-        var selected = null,
-            initialStyle = null,
-            highlightStyle = options.style;
-        if (highlightStyle != undefined) {
-            var stroke = highlightStyle.stroke,
-                fill = highlightStyle.fill;
-            highlightStyle = new Style({
-                stroke: new Stroke(stroke),
-                fill: new Fill(fill),
-                zIndex: highlightStyle.zIndex
-            });
-        }
-
+        var selected, initialStyle;
         function displayTooltip(evt) {
             // reset style of last selection
             if (selected) selected.setStyle(initialStyle);
 
-            // get feature by pixel
+            // get feature & layer by pixel
             var pixel = evt.pixel;
-            var feature = _this.map.forEachFeatureAtPixel(pixel, function (feature) {
-                return feature;
+            var res = _this.map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+                return [feature, layer];
             });
+            var feature, layer;
+            if (res != undefined) [feature, layer] = res;
 
             // update tooltip style & highlight
             if (feature) {
@@ -171,9 +161,32 @@ class Map {
                     div.style[key] = value;
                 })
 
-                //  highlight feature
+                // initialize feature highlight
                 selected = feature;
-                initialStyle = feature.getStyle();
+                initialStyle = feature.getStyle() || layer.getStyle();
+
+                // get optional styling
+                var highlightStyle = options.style || {},
+                    stroke = highlightStyle.stroke || {},
+                    fill = highlightStyle.fill || {},
+                    zIndex = highlightStyle.zIndex;
+
+                // get initial style of feature
+                var initialStroke = initialStyle.getStroke(),
+                    initialFill = initialStyle.getFill(),
+                    initialZIndex = initialStyle.getZIndex();
+
+                // define OpenLayers style
+                highlightStyle = new Style({
+                    stroke: new Stroke({
+                        color: stroke.color || initialStroke.getColor(),
+                        width: stroke.width || initialStroke.getWidth()
+                    }),
+                    fill: new Fill({
+                        color: fill.color || initialFill.getColor()
+                    }),
+                    zIndex: zIndex || initialZIndex
+                });
                 feature.setStyle(highlightStyle);
             } else {
                 div.style.display = 'none';

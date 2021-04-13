@@ -4,7 +4,6 @@ import areas from '../data/areas'
 
 // define tooltip, hover style
 var tooltipStyle = {
-        display: 'none',
         backgroundColor: 'rgba(255, 255, 0, 1)',
         fontFamily: 'MedievalSharp',
         border: 'solid',
@@ -15,9 +14,9 @@ var tooltipStyle = {
             color: 'rgba(255, 0, 0)',
             width: 6
         },
-        fill: {
-            color: 'rgba(255, 0, 0, 0.6)',
-        },
+//        fill: {
+//            color: 'rgba(255, 0, 0, 0.6)',
+//        },
         zIndex: 9999
     }
 
@@ -69,30 +68,30 @@ areas.features.forEach(function(area) {
 // focus on 'areas'
 map.focusOnLayer('areas');
 
-// define MULTILINESTRING vector layer 'network'
-map.addVectorLayer('network', {
-    style: {
-        zIndex: 2000
-    }
-});
-
-// add features to 'network'
-// provide individual feature style
-data.forEach(function(flow) {
-    var geometry = flow.geometry,
-        amount = flow.amount;
-    map.addFeature('network', geometry, {
-        style: {
-            stroke: {
-                color: `rgb(${Math.floor((Math.random()*255) + 1)},
-                ${Math.floor((Math.random()*255) + 1)},
-                ${Math.floor((Math.random()*255) + 1)})`,
-                width: 5
-            }
-        },
-        tooltip: amount
-    });
-})
-
-// focus on 'network'
-map.focusOnLayer('network');
+//// define MULTILINESTRING vector layer 'network'
+//map.addVectorLayer('network', {
+//    style: {
+//        zIndex: 2000
+//    }
+//});
+//
+//// add features to 'network'
+//// provide individual feature style
+//data.forEach(function(flow) {
+//    var geometry = flow.geometry,
+//        amount = flow.amount;
+//    map.addFeature('network', geometry, {
+//        style: {
+//            stroke: {
+//                color: `rgb(${Math.floor((Math.random()*255) + 1)},
+//                ${Math.floor((Math.random()*255) + 1)},
+//                ${Math.floor((Math.random()*255) + 1)})`,
+//                width: 5
+//            }
+//        },
+//        tooltip: amount
+//    });
+//})
+//
+//// focus on 'network'
+//map.focusOnLayer('network');

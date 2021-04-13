@@ -4,13 +4,14 @@ import Control from 'ol/control/Control';
 
 class NetworkMap extends Map {
     constructor(options) {
+        // map options
+        options.base = {source: 'cartodb_dark'};
         super(options);
 
+        // network map options
         this.data = options.data || [];
-        this.fontColor = "white";
-
-        // define colors
-        this.colors = [
+        this.fontColor = options.fontColor || 'white';
+        this.scale = options.scale || [
             'rgb(26, 152, 80)',
             'rgb(102, 189, 99)',
             'rgb(166, 217, 106)',
@@ -21,31 +22,17 @@ class NetworkMap extends Map {
             'rgb(244, 109, 67)',
             'rgb(215, 48, 39)',
             'rgb(168, 0, 0)'
-        ]
+        ];
 
         // add network layer to map
         this._drawNetwork();
+
+        // draw legend
+        this._drawLegend(options.legend);
     }
 
     _drawNetwork() {
         var _this = this;
-
-        // convert tonnes to other units if necessary
-        var max = Math.max.apply(Math, this.data.map(function(o) { return o.amount; })),
-            multiplier = 1;
-        if (max <= 10**(-3)) {
-            multiplier = 10**6;
-            this.unit = 'gr';
-        } else if (max <= 1) {
-            multiplier = 10**3;
-            this.unit = 'kg';
-        }
-
-        if (multiplier != 1) {
-            this.flows.forEach(function(f) {
-                f.amount *= multiplier;
-            })
-        }
 
         // process flows to point to amounts
         this.amounts = [];
@@ -63,10 +50,10 @@ class NetworkMap extends Map {
         function assignColor(amount) {
             for (var i = 1; i < _this.values.length; i++) {
                 if (amount <= _this.values[i]) {
-                    return _this.colors[i - 1];
+                    return _this.scale[i - 1];
                 }
             }
-            return _this.colors[_this.colors.length - 1];
+            return _this.scale[_this.scale.length - 1];
         }
 
         // create network layer
@@ -89,15 +76,12 @@ class NetworkMap extends Map {
                     },
                     zIndex: amount,
                 },
-//                tooltip: _this.getTooltipText(amount)
+                tooltip: amount
             });
         });
 
         // focus on network layer
         this.focusOnLayer('network');
-
-        // define legend
-        this._drawLegend();
     }
 
      _getScale() {
@@ -107,7 +91,7 @@ class NetworkMap extends Map {
         this.max = Math.max(...this.amounts);
         var quantile = d3.scaleQuantile()
                          .domain(this.amounts)
-                         .range(this.colors);
+                         .range(this.scale);
 
         // prettify scale intervals
         function prettify(val) {
@@ -126,60 +110,79 @@ class NetworkMap extends Map {
         this.values.push(prettify(this.max));
     }
 
-    _drawLegend() {
-        var _this = this;
+    _drawLegend(options) {
+        options = options || {};
+        var fontSize = 15;
 
-        var legend = document.getElementById('networkmap-legend');
-        if (legend) {
-            legend.parentElement.removeChild(legend);
-        }
-        var legend = document.createElement('div');
+        // legend div
+        var legend = document.getElementById('legend');
+        if (legend) legend.parentElement.removeChild(legend);
+        legend = document.createElement('div');
+
+        // default legend style
+        legend.style.position = 'relative';
+        legend.style.margin = 'auto';
+        legend.style.marginTop = '85vh';
+        legend.style.backgroundColor = 'transparent';
+        legend.style.color = 'white';
+        console.log(legend.style)
+
+        // load custom style
+        Object.entries(options).forEach(function(pair) {
+            var [key, value] = pair;
+            legend.style[key] = value;
+        })
+        var width = options.width || 400,
+            height = options.height || 30;
+        var rectWidth = width / this.scale.length;
+        legend.style.width = `${width}px`;
+
+        // create OpenLayers control for legend
         legend.className = 'ol-control-panel ol-unselectable ol-control';
-        legend.id = 'networkmap-legend';
+        legend.id = 'legend';
         var controlPanel = new Control({
             element: legend
         });
         this.map.addControl(controlPanel);
 
+        // legend title
         var title = document.createElement('div');
         title.style.textAlign = "center";
-        title.innerHTML = '<span style="color: ' + this.fontColor + '; text-align: center;">' + 'Legend' + '</span>';
+        title.innerHTML = '<span>Legend</span>';
         legend.appendChild(title);
 
         // add color scale to legend
-        var width = 30,
-            height = 30;
-        var scale = d3.select("#networkmap-legend")
-            .append("center")
-            .append("svg")
-            .attr("width", width * (this.colors.length))
-            .attr("height", 100),
+        var scale = d3.select("#legend")
+                      .append("center")
+                      .append("svg")
+                      .attr("width", width)
+                      .attr("height", height + 10 + fontSize),
             rects = scale.selectAll('rect')
-            .data(this.colors)
-            .enter()
-            .append("rect")
-            .attr("x", function (d, i) {
-                return i * width;
-            })
-            .attr("y", 10)
-            .attr("width", 30)
-            .attr("height", 30)
-            .attr("fill", function (d) {
-                return d;
-            }),
-            texts = scale.selectAll('text')
-            .data(this.values)
-            .enter()
-            .append('text')
-            .text(function (d) {
-                return d >= 1000 ? `${(d/1000)}k` : `${d}`;
-            })
-            .attr("x", function (d, i) {
-                return i * (width - 1);
-            })
-            .attr('y', 2 * height)
-            .attr('fill', _this.fontColor)
-            .attr('font-size', 10);
+                         .data(this.scale)
+                         .enter()
+                         .append("rect")
+                         .attr("x", function (d, i) {
+                            return i * rectWidth;
+                         })
+                         .attr("y", 10)
+                         .attr("width", rectWidth)
+                         .attr("height", height)
+                         .attr("fill", function (d) {
+                            return d;
+                         })
+//            texts = scale.selectAll('text')
+//                         .data(this.values)
+//                         .enter()
+//                         .append('text')
+//                         .text(function (d) {
+//                            return d >= 1000 ? `${(d/1000)}k` : `${d}`;
+//                         })
+//                         .attr("x", function (d, i) {
+//                            return i * rectWidth;
+//                         })
+//                         .attr('y', height + 10 + fontSize)
+//                         .attr('fill', 'white')
+//                         .attr('font-size', fontSize);
     }
 }
 

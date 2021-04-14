@@ -6,6 +6,14 @@ class NetworkMap extends Map {
     constructor(options) {
         // map options
         options.base = options.base || {source: 'cartodb_dark'};
+        options.hover = options.hover || {
+            style: {
+                stroke: {
+                    width: 10
+                },
+                zIndex: 9999
+            }
+        };
         super(options);
 
         // network map options
@@ -115,7 +123,6 @@ class NetworkMap extends Map {
         });
         this.values.unshift(0);
         this.values.push(prettify(this.max));
-        console.log(this.values)
     }
 
     _drawLegend(options) {

@@ -1,12 +1,7 @@
 import NetworkMap from '../src/NetworkMap'
 import data from '../data/data'
 
-var hoverStyle = {
-        stroke: {
-            width: 10
-        },
-        zIndex: 9999
-    }
+var hoverStyle = {};
 
 var scale = [
     'rgb(165,0,38)',
@@ -31,20 +26,20 @@ const map = new NetworkMap({
 //    base: {
 //        source: 'cartodb_light',
 //    },
-    enableDrag: true,
-    enableZoom: true,
+//    enableDrag: true,
+//    enableZoom: true,
     data: data,
 //    defaultColor: 'blue',
 //    scale: scale,
-    hover: {
-        style: hoverStyle
-    },
+//    hover: {
+//        style: hoverStyle
+//    },
     legend: {
-//        title: '<span>Waste (tonnes)</span>',
+//        title: '<span>CO<sub>2</sub> (kg)</span>',
 //        width: 700,
 //        height: 30,
 //        marginRight: '1vw',
-//        marginTop: '78vh',
+//        marginTop: '80vh',
 //        borderRadius: '1rem',
 //        backgroundColor: 'white',
 //        opacity: 0.8,

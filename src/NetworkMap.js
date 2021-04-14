@@ -84,7 +84,7 @@ class NetworkMap extends Map {
         this.focusOnLayer('network');
     }
 
-     _getScale() {
+    _getScale() {
         var _this = this;
 
         // scale of equal frequency intervals
@@ -112,7 +112,6 @@ class NetworkMap extends Map {
 
     _drawLegend(options) {
         options = options || {};
-        var fontSize = 15;
 
         // legend div
         var legend = document.getElementById('legend');
@@ -125,17 +124,17 @@ class NetworkMap extends Map {
         legend.style.marginTop = '85vh';
         legend.style.backgroundColor = 'transparent';
         legend.style.color = 'white';
-        console.log(legend.style)
 
         // load custom style
         Object.entries(options).forEach(function(pair) {
             var [key, value] = pair;
             legend.style[key] = value;
         })
-        var width = options.width || 400,
-            height = options.height || 30;
+        var width = options.width || 500,
+            height = options.height || 20;
         var rectWidth = width / this.scale.length;
         legend.style.width = `${width}px`;
+        var fontSize = options.fontSize || 10;
 
         // create OpenLayers control for legend
         legend.className = 'ol-control-panel ol-unselectable ol-control';
@@ -148,14 +147,14 @@ class NetworkMap extends Map {
         // legend title
         var title = document.createElement('div');
         title.style.textAlign = "center";
-        title.innerHTML = '<span>Legend</span>';
+        title.innerHTML = options.title || '<span>Legend</span>';
         legend.appendChild(title);
 
         // add color scale to legend
         var scale = d3.select("#legend")
                       .append("center")
                       .append("svg")
-                      .attr("width", width)
+                      .attr("width", width + fontSize * 3)
                       .attr("height", height + 10 + fontSize),
             rects = scale.selectAll('rect')
                          .data(this.scale)
@@ -169,20 +168,21 @@ class NetworkMap extends Map {
                          .attr("height", height)
                          .attr("fill", function (d) {
                             return d;
+                         }),
+            texts = scale.selectAll('text')
+                         .data(this.values)
+                         .enter()
+                         .append('text')
+                         .text(function (d) {
+                            var prefix = d3.format("~s")
+                            return prefix(d);
                          })
-//            texts = scale.selectAll('text')
-//                         .data(this.values)
-//                         .enter()
-//                         .append('text')
-//                         .text(function (d) {
-//                            return d >= 1000 ? `${(d/1000)}k` : `${d}`;
-//                         })
-//                         .attr("x", function (d, i) {
-//                            return i * rectWidth;
-//                         })
-//                         .attr('y', height + 10 + fontSize)
-//                         .attr('fill', 'white')
-//                         .attr('font-size', fontSize);
+                         .attr("x", function (d, i) {
+                            return i * rectWidth;
+                         })
+                         .attr('y', height + 10 + fontSize)
+                         .attr('fill', legend.style.color)
+                         .attr('font-size', fontSize);
     }
 }
 

@@ -27,15 +27,17 @@ const map = new NetworkMap({
     enableDrag: true,
     enableZoom: true,
     data: data,
-    scale: scale,
+//    scale: scale,
     hover: {
         style: hoverStyle
     },
     legend: {
-//        width: 500,
+//        fontSize: 20,
+        title: '<span>Waste (tonnes)</span>',
+//        width: 700,
 //        height: 30,
-//        marginLeft: '5vw',
-//        marginTop: '80vh',
+//        marginRight: '1vw',
+//        marginTop: '78vh',
 //        borderRadius: '1rem',
 //        backgroundColor: 'white',
 //        opacity: 0.8,

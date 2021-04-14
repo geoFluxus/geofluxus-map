@@ -23,8 +23,9 @@ var tooltipStyle = {
 // initialize map
 const map = new Map({
     target: 'root',
-    enableZoom: true,
-    enableDrag: true,
+    controls: {
+        drag: false
+    },
     view: {
         center: [5, 52],
         zoom: 9
@@ -34,10 +35,11 @@ const map = new Map({
     },
     hover: {
         tooltip: {
-            style: tooltipStyle
+//            style: tooltipStyle
         },
-        style: hoverStyle
-    }
+//        style: hoverStyle
+    },
+    reset: true
 })
 
 // define POLYGON vector layer 'areas'

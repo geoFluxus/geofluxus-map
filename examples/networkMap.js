@@ -26,8 +26,8 @@ const map = new NetworkMap({
 //    base: {
 //        source: 'cartodb_light',
 //    },
-//    enableDrag: true,
-//    enableZoom: true,
+    enableDrag: true,
+    enableZoom: true,
     data: data,
 //    defaultColor: 'blue',
 //    scale: scale,
@@ -35,7 +35,7 @@ const map = new NetworkMap({
 //        style: hoverStyle
 //    },
     legend: {
-//        title: '<span>CO<sub>2</sub> (kg)</span>',
+        title: '<span>CO<sub>2</sub> (kg)</span>',
 //        width: 700,
 //        height: 30,
 //        marginRight: '1vw',

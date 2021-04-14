@@ -15,7 +15,7 @@ import MultiLineString from 'ol/geom/MultiLineString';
 import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
 import * as olInteraction from 'ol/interaction';
-import {FullScreen, defaults as defaultControls} from 'ol/control';
+import {Control, FullScreen, defaults as defaultControls} from 'ol/control';
 import Overlay from 'ol/Overlay';
 
 
@@ -77,27 +77,32 @@ class Map {
         this.view.minZoom = this.view.minZoom;
         this.view.maxZoom = this.view.maxZoom;
 
-        // enable zoom & drag interactions
-        var enableZoom  = options.enableZoom || false,
-            enableDrag = options.enableDrag || false;
-        var interactionOptions = {
-            doubleClickZoom: enableZoom,
-            keyboardZoom: enableZoom,
-            mouseWheelZoom: enableZoom,
-            dragZoom: enableZoom,
-            keyboardPan: enableDrag,
-            dragPan: enableDrag
-        };
-        var interactions = olInteraction.defaults(interactionOptions);
-
         // render map
         this.map = new olMap({
             target: this.target,
             layers: [baseLayer],
             view: new View(this.view),
             interactions: interactions,
-            controls: defaultControls().extend([new FullScreen()])
+            controls: defaultControls()
         });
+
+        // map controls
+        var controls = options.controls || {},
+            zoom  = controls.zoom != undefined ? controls.zoom : true,
+            drag = controls.drag != undefined ? controls.drag : true,
+            fullscreen = controls.fullscreen != undefined ? controls.fullscreen : true,
+            reset = controls.reset != undefined ? controls.reset : true;
+        var interactionOptions = {
+            doubleClickZoom: zoom,
+            keyboardZoom: zoom,
+            mouseWheelZoom: zoom,
+            dragZoom: zoom,
+            keyboardPan: drag,
+            dragPan: drag
+        };
+        var interactions = olInteraction.defaults(interactionOptions);
+        if (reset) this.map.addControl(new ResetControl());
+        if (fullscreen) this.map.addControl(new FullScreen());
 
         // activate tooltips
         this._onHover(options.hover);
@@ -330,12 +335,41 @@ class Map {
         if (source.getFeatures().length) {
             this.map.getView().fit(source.getExtent(), this.map.getSize());
         }
+
+        console.log(this.map.getView().getZoom())
+        console.log(this.view.zoom)
     }
 
     // set layer visibility
     setVisible(name, visible) {
         var layer = this._getLayer(name);
         layer.setVisible(visible)
+    }
+}
+
+class ResetControl extends Control {
+    constructor(options) {
+        options = options || {};
+
+        const button = document.createElement('button');
+        button.innerHTML = '<span>&#8634</span>';
+
+        const element = document.createElement('div');
+        element.className = 'reset-map ol-unselectable ol-control';
+        element.style.top = '65px';
+        element.style.left = '.5em';
+        element.appendChild(button);
+
+        super({
+          element: element,
+          target: options.target,
+        });
+
+        button.addEventListener('click', this.reset.bind(this), false);
+    }
+
+    reset() {
+        console.log(this.map_.getView().getZoom())
     }
 }
 

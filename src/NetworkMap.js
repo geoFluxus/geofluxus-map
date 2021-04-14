@@ -5,12 +5,12 @@ import Control from 'ol/control/Control';
 class NetworkMap extends Map {
     constructor(options) {
         // map options
-        options.base = {source: 'cartodb_dark'};
+        options.base = options.base || {source: 'cartodb_dark'};
         super(options);
 
         // network map options
         this.data = options.data || [];
-        this.fontColor = options.fontColor || 'white';
+        this.defaultColor = options.defaultColor || 'white';
         this.scale = options.scale || [
             'rgb(26, 152, 80)',
             'rgb(102, 189, 99)',
@@ -64,24 +64,31 @@ class NetworkMap extends Map {
 
         // add ways to map and load with amounts
         this.data.forEach(function (flow) {
-            var layer = amount ? 'flows' : 'network',
-                geometry = flow.geometry,
-                amount = flow.amount;
+            var amount = flow.amount,
+                layer = amount ? 'flows' : 'network',
+                geometry = flow.geometry;
+
+            function getTooltip(d) {
+                var format = d3.format(".3"),
+                    prefix = d3.format(".3s");
+                return amount < 1e3 ? format(d) : prefix(d);
+            }
+
             _this.addFeature(layer, geometry, {
                 style: {
                     // color, width & zIndex based on amount
                     stroke:  {
-                        color: amount > 0 ? assignColor(amount) : _this.fontColor,
+                        color: amount > 0 ? assignColor(amount) : _this.defaultColor,
                         width: amount > 0 ? 2 * (1 + 2 * amount / _this.max) : 0.5,
                     },
                     zIndex: amount,
                 },
-                tooltip: amount
+                tooltip: getTooltip(amount)
             });
         });
 
         // focus on network layer
-        this.focusOnLayer('network');
+        this.focusOnLayer('flows');
     }
 
     _getScale() {
@@ -95,7 +102,7 @@ class NetworkMap extends Map {
 
         // prettify scale intervals
         function prettify(val) {
-            if (val < 1) return val.toFixed(2);
+            if (val < 1) return parseFloat(val.toFixed(2));
             var int = ~~(val),
                 digits = int.toString().length - 1,
                 base = 10 ** digits;
@@ -108,6 +115,7 @@ class NetworkMap extends Map {
         });
         this.values.unshift(0);
         this.values.push(prettify(this.max));
+        console.log(this.values)
     }
 
     _drawLegend(options) {
@@ -121,7 +129,7 @@ class NetworkMap extends Map {
         // default legend style
         legend.style.position = 'relative';
         legend.style.margin = 'auto';
-        legend.style.marginTop = '85vh';
+        legend.style.marginTop = '90vh';
         legend.style.backgroundColor = 'transparent';
         legend.style.color = 'white';
 
@@ -174,14 +182,14 @@ class NetworkMap extends Map {
                          .enter()
                          .append('text')
                          .text(function (d) {
-                            var prefix = d3.format("~s")
-                            return prefix(d);
+                            var prefix = d3.format("~s");
+                            return d < 1 ? d : prefix(d);
                          })
                          .attr("x", function (d, i) {
                             return i * rectWidth;
                          })
                          .attr('y', height + 10 + fontSize)
-                         .attr('fill', legend.style.color)
+                         .attr('fill', options.color || 'white')
                          .attr('font-size', fontSize);
     }
 }

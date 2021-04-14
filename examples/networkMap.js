@@ -21,19 +21,26 @@ var scale = [
     'rgb(49,54,149)'
 ].reverse()
 
+//data.forEach(function(d) {
+//    return d.amount *= 1e-3;
+//})
+
 // initialize map
 const map = new NetworkMap({
     target: "root",
+//    base: {
+//        source: 'cartodb_light',
+//    },
     enableDrag: true,
     enableZoom: true,
     data: data,
+//    defaultColor: 'blue',
 //    scale: scale,
     hover: {
         style: hoverStyle
     },
     legend: {
-//        fontSize: 20,
-        title: '<span>Waste (tonnes)</span>',
+//        title: '<span>Waste (tonnes)</span>',
 //        width: 700,
 //        height: 30,
 //        marginRight: '1vw',
@@ -42,6 +49,10 @@ const map = new NetworkMap({
 //        backgroundColor: 'white',
 //        opacity: 0.8,
 //        padding: '20px',
-//        color: 'black'
+//        color: 'black',
+//        fontSize: 20,
     }
 })
+
+map.setVisible('network', false);
+map.setVisible('network', true);

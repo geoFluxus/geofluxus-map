@@ -331,6 +331,12 @@ class Map {
             this.map.getView().fit(source.getExtent(), this.map.getSize());
         }
     }
+
+    // set layer visibility
+    setVisible(name, visible) {
+        var layer = this._getLayer(name);
+        layer.setVisible(visible)
+    }
 }
 
 export default Map;

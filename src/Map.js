@@ -17,6 +17,8 @@ import Feature from 'ol/Feature';
 import * as olInteraction from 'ol/interaction';
 import {Control, FullScreen, defaults as defaultControls} from 'ol/control';
 import Overlay from 'ol/Overlay';
+import html2canvas from 'html2canvas';
+import saveAs from 'file-saver';
 
 
 // map bases
@@ -115,10 +117,10 @@ class Map {
         var _this = this,
             target = this.map.getTargetElement();
 
-        var div = target.querySelector('.oltooltip');
+        var div = target.querySelector('.ol-tooltip');
         if (!div) {
             div = document.createElement('div');
-            div.classList.add('oltooltip');
+            div.classList.add('ol-tooltip');
             target.appendChild(div);
         }
         var overlay = new Overlay({
@@ -382,7 +384,22 @@ class ResetControl extends Control {
     }
 
     reset() {
-        this.map_.setView(new View(this.view));
+        var map = this.map_;
+            var target = map.getViewport();
+            // options for html2canvas to filter out all the 'ol-control' elements
+            var configOptions = {
+                ignoreElements: function(target) {
+                    var klasses = target.classList;
+                    return klasses.contains('ol-control') && (target.id != 'legend');
+                },
+                logging: false
+            };
+            html2canvas(target, configOptions)
+                .then(function(canvas) {
+                    canvas.toBlob(function(blob) {
+                    saveAs(blob, 'map.png');
+                    });
+            });
     }
 }
 

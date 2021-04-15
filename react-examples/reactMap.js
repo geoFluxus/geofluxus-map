@@ -29,8 +29,6 @@ class ReactMap extends Component {
     // initialize map
     const map = new Map({
         target: 'map',
-        enableZoom: true,
-        enableDrag: true,
         view: {
             center: [5, 52],
             zoom: 9

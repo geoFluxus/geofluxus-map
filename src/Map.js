@@ -101,7 +101,7 @@ class Map {
             dragPan: drag
         };
         var interactions = olInteraction.defaults(interactionOptions);
-        if (reset) this.map.addControl(new ResetControl());
+        if (reset) this.map.addControl(new ResetControl({view: this.view}));
         if (fullscreen) this.map.addControl(new FullScreen());
 
         // activate tooltips
@@ -326,18 +326,24 @@ class Map {
 
     // focus on layer
     focusOnLayer(name) {
+        // get layer
         var layer = this._getLayer(name);
         if (layer == undefined) {
             throw Error(`Layer "${name}" does not exist!`)
         }
 
+        // fit map to layer extent
         var source = layer.getSource();
         if (source.getFeatures().length) {
             this.map.getView().fit(source.getExtent(), this.map.getSize());
         }
 
-        console.log(this.map.getView().getZoom())
-        console.log(this.view.zoom)
+        // update map view
+        var currView = this.map.getView();
+        this.view.center = currView.getCenter();
+        this.view.zoom = currView.getZoom();
+        this.view.minZoom = currView.getMinZoom();
+        this.view.maxZoom = currView.getMaxZoom();
     }
 
     // set layer visibility
@@ -347,15 +353,19 @@ class Map {
     }
 }
 
+
+// custom reset map view control
 class ResetControl extends Control {
     constructor(options) {
         options = options || {};
 
+        // default button style
         const button = document.createElement('button');
         button.innerHTML = '<span>&#8634</span>';
+        button.className = 'ol-reset';
 
         const element = document.createElement('div');
-        element.className = 'reset-map ol-unselectable ol-control';
+        element.className = 'ol-reset ol-unselectable ol-control';
         element.style.top = '65px';
         element.style.left = '.5em';
         element.appendChild(button);
@@ -365,11 +375,14 @@ class ResetControl extends Control {
           target: options.target,
         });
 
+        // initial map view
+        this.view = options.view;
+
         button.addEventListener('click', this.reset.bind(this), false);
     }
 
     reset() {
-        console.log(this.map_.getView().getZoom())
+        this.map_.setView(new View(this.view));
     }
 }
 

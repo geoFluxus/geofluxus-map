@@ -26,8 +26,6 @@ const map = new NetworkMap({
 //    base: {
 //        source: 'cartodb_light',
 //    },
-    enableDrag: true,
-    enableZoom: true,
     data: data,
 //    defaultColor: 'blue',
 //    scale: scale,

@@ -136,7 +136,7 @@ class NetworkMap extends Map {
         // default legend style
         legend.style.position = 'relative';
         legend.style.margin = 'auto';
-        legend.style.marginTop = '90vh';
+        legend.style.marginTop = '89vh';
         legend.style.backgroundColor = 'transparent';
         legend.style.color = 'white';
 
@@ -148,7 +148,7 @@ class NetworkMap extends Map {
         var width = options.width || 500,
             height = options.height || 20;
         var rectWidth = width / this.scale.length;
-        legend.style.width = `${width}px`;
+        legend.style.width = `${width + rectWidth * 1.1}px`;
         var fontSize = options.fontSize || 10;
 
         // create OpenLayers control for legend
@@ -161,30 +161,44 @@ class NetworkMap extends Map {
 
         // legend title
         var title = document.createElement('div');
+        title.id = "legend-title";
         title.style.textAlign = "center";
+        title.style.padding = '10px';
         title.innerHTML = options.title || '<span>Legend</span>';
         legend.appendChild(title);
 
-        // add color scale to legend
-        var scale = d3.select("#legend")
-                      .append("center")
-                      .append("svg")
-                      .attr("width", width + fontSize * 3)
-                      .attr("height", height + 10 + fontSize),
-            rects = scale.selectAll('rect')
+        // legend palette
+        var palette = document.createElement('div');
+        palette.id = "legend-palette";
+        legend.appendChild(palette);
+
+        var rectSVG = d3.select("#legend-palette")
+                        .append("svg")
+                        .attr("width", width + rectWidth)
+                        .attr("height", height),
+            rects = rectSVG.selectAll('rect')
                          .data(this.scale)
                          .enter()
                          .append("rect")
                          .attr("x", function (d, i) {
-                            return i * rectWidth;
+                            return (i+0.45) * rectWidth;
                          })
-                         .attr("y", 10)
                          .attr("width", rectWidth)
                          .attr("height", height)
                          .attr("fill", function (d) {
                             return d;
-                         }),
-            texts = scale.selectAll('text')
+                         });
+
+        // legend axis
+        var axis = document.createElement('div');
+        axis.id = "legend-axis";
+        legend.appendChild(axis);
+
+        var textSVG = d3.select("#legend-axis")
+                        .append("svg")
+                        .attr("width", width + rectWidth * 1.1)
+                        .attr("height", height),
+            texts = textSVG.selectAll('text')
                          .data(this.values)
                          .enter()
                          .append('text')
@@ -193,9 +207,9 @@ class NetworkMap extends Map {
                             return d < 1 ? d : prefix(d);
                          })
                          .attr("x", function (d, i) {
-                            return i * rectWidth;
+                            return (i+0.45) * rectWidth;
                          })
-                         .attr('y', height + 10 + fontSize)
+                         .attr('y', fontSize)
                          .attr('fill', options.color || 'white')
                          .attr('font-size', fontSize);
     }

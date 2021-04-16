@@ -402,7 +402,7 @@ class ExportPNG extends Control {
         button.className = 'ol-reset';
 
         const element = document.createElement('div');
-        element.className = 'ol-reset ol-unselectable ol-control';
+        element.className = 'ol-export-png ol-unselectable ol-control';
         element.style.top = '105px';
         element.style.left = '.5em';
         element.appendChild(button);

@@ -3,18 +3,7 @@ import data from '../data/data'
 
 var hoverStyle = {};
 
-var scale = [
-    'rgb(165,0,38)',
-    'rgb(215,48,39)',
-    'rgb(244,109,67)',
-    'rgb(253,174,97)',
-    'rgb(254,224,144)',
-    'rgb(224,243,248)',
-    'rgb(171,217,233)',
-    'rgb(116,173,209)',
-    'rgb(69,117,180)',
-    'rgb(49,54,149)'
-].reverse()
+var scale = ['#9e0142','#d53e4f','#f46d43','#fdae61','#fee08b','#e6f598','#abdda4','#66c2a5','#3288bd','#5e4fa2'].reverse()
 
 //data.forEach(function(d) {
 //    return d.amount *= 1e-3;
@@ -23,6 +12,10 @@ var scale = [
 // initialize map
 const map = new NetworkMap({
     target: "root",
+//    view: {
+//        minZoom: 7,
+//        maxZoom: 10
+//    },
 //    base: {
 //        source: 'cartodb_light',
 //    },
@@ -33,19 +26,15 @@ const map = new NetworkMap({
 //        style: hoverStyle
 //    },
     legend: {
-        title: '<span>CO<sub>2</sub> (kg)</span>',
+//        title: '<span>CO<sub>2</sub> (kg)</span>',
 //        width: 700,
 //        height: 30,
-//        marginRight: '1vw',
-//        marginTop: '80vh',
+//        marginLeft: '1vw',
+//        marginTop: '85vh',
 //        borderRadius: '1rem',
-//        backgroundColor: 'white',
-//        opacity: 0.8,
-//        padding: '20px',
+//        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+//        paddingBottom: '10px',
 //        color: 'black',
-//        fontSize: 20,
+//        fontSize: 15,
     }
 })
-
-map.setVisible('network', false);
-map.setVisible('network', true);

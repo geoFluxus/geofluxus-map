@@ -93,7 +93,8 @@ class Map {
             zoom  = controls.zoom != undefined ? controls.zoom : true,
             drag = controls.drag != undefined ? controls.drag : true,
             fullscreen = controls.fullscreen != undefined ? controls.fullscreen : true,
-            reset = controls.reset != undefined ? controls.reset : true;
+            reset = controls.reset != undefined ? controls.reset : true,
+            exportPNG = controls.exportPNG != undefined ? controls.exportPNG : true;
         var interactionOptions = {
             doubleClickZoom: zoom,
             keyboardZoom: zoom,
@@ -105,6 +106,7 @@ class Map {
         var interactions = olInteraction.defaults(interactionOptions);
         if (reset) this.map.addControl(new ResetControl({view: this.view}));
         if (fullscreen) this.map.addControl(new FullScreen());
+        if (exportPNG) this.map.addControl(new ExportPNG());
 
         // activate tooltips
         this._onHover(options.hover);
@@ -356,19 +358,19 @@ class Map {
 }
 
 
-// custom reset map view control
+// reset map view control
 class ResetControl extends Control {
     constructor(options) {
         options = options || {};
 
         // default button style
         const button = document.createElement('button');
-        button.innerHTML = '<span>&#8634</span>';
+        button.innerHTML = '<span>&#10227</span>';
         button.className = 'ol-reset';
 
         const element = document.createElement('div');
         element.className = 'ol-reset ol-unselectable ol-control';
-        element.style.top = '65px';
+        element.style.top = '70px';
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -384,22 +386,52 @@ class ResetControl extends Control {
     }
 
     reset() {
-        var map = this.map_;
-            var target = map.getViewport();
-            // options for html2canvas to filter out all the 'ol-control' elements
-            var configOptions = {
-                ignoreElements: function(target) {
-                    var klasses = target.classList;
-                    return klasses.contains('ol-control') && (target.id != 'legend');
-                },
-                logging: false
-            };
-            html2canvas(target, configOptions)
-                .then(function(canvas) {
-                    canvas.toBlob(function(blob) {
-                    saveAs(blob, 'map.png');
-                    });
-            });
+        this.map_.setView(new View(this.view));
+    }
+}
+
+
+// export png control
+class ExportPNG extends Control {
+    constructor(options) {
+        options = options || {};
+
+        // default button style
+        const button = document.createElement('button');
+        button.innerHTML = '<span>&#128247</span>';
+        button.className = 'ol-reset';
+
+        const element = document.createElement('div');
+        element.className = 'ol-reset ol-unselectable ol-control';
+        element.style.top = '105px';
+        element.style.left = '.5em';
+        element.appendChild(button);
+
+        super({
+          element: element,
+          target: options.target,
+        });
+
+        button.addEventListener('click', this.exportPNG.bind(this), false);
+    }
+
+    exportPNG() {
+        var map = this.map_,
+            target = map.getViewport();
+        // options for html2canvas to filter out all the 'ol-control' elements
+        var configOptions = {
+            ignoreElements: function(target) {
+                var klasses = target.classList;
+                return klasses.contains('ol-control') && (target.id != 'legend');
+            },
+            logging: false
+        };
+        html2canvas(target, configOptions)
+            .then(function(canvas) {
+                canvas.toBlob(function(blob) {
+                saveAs(blob, 'map.png');
+                });
+        });
     }
 }
 

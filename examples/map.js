@@ -1,4 +1,4 @@
-import Map from '../src/Map'
+import {Map} from '../index.js'
 import data from '../data/data'
 import areas from '../data/areas'
 

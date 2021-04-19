@@ -2,7 +2,7 @@ import Map from './Map';
 import * as d3 from "d3";
 import Control from 'ol/control/Control';
 
-class NetworkMap extends Map {
+export default class NetworkMap extends Map {
     constructor(options) {
         // map options
         options.base = options.base || {source: 'cartodb_dark'};
@@ -214,5 +214,3 @@ class NetworkMap extends Map {
                          .attr('font-size', fontSize);
     }
 }
-
-export default NetworkMap;

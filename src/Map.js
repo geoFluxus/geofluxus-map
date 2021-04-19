@@ -32,7 +32,7 @@ var sources = {
     cartodb_light: 'https://cartodb-basemaps-{a-d}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
 }
 
-class Map {
+export default class Map {
     constructor(options) {
         // map options //
         var options = options || {};
@@ -434,5 +434,3 @@ class ExportPNG extends Control {
         });
     }
 }
-
-export default Map;

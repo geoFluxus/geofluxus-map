@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Map from '../src/Map';
+import {Map} from '../index.js';
 import areas from '../data/areas'
 
 class ReactMap extends Component {

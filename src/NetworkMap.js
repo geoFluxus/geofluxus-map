@@ -2,6 +2,7 @@ import Map from './Map';
 import * as d3 from "d3";
 import Control from 'ol/control/Control';
 
+
 export default class NetworkMap extends Map {
     constructor(options) {
         // map options

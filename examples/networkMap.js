@@ -1,4 +1,4 @@
-import NetworkMap from '../src/NetworkMap'
+import {NetworkMap} from '../index.js'
 import data from '../data/data'
 
 var hoverStyle = {};

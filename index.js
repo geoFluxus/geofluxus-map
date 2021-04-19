@@ -1,2 +1,2 @@
 export {Map} from "./src/Map"
-export {NetworkMap} from ".src/NetworkMap"
+export {NetworkMap} from "./src/NetworkMap"

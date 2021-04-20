@@ -1,12 +1,12 @@
 {
   "name": "geofluxus-map",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel index.html",
-    "build": "parcel build --public-url . index.html"
+    "build": "parcel build index.js --global gFMap --no-source-maps"
   },
   "repository": {
     "type": "git",

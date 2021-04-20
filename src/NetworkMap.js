@@ -135,9 +135,10 @@ export default class NetworkMap extends Map {
         legend = document.createElement('div');
 
         // default legend style
-        legend.style.position = 'relative';
-        legend.style.margin = 'auto';
-        legend.style.marginTop = '89vh';
+        legend.style.left = "0";
+        legend.style.right = "0";
+        legend.style.margin = "auto";
+        legend.style.bottom = '0';
         legend.style.backgroundColor = 'transparent';
         legend.style.color = 'white';
 

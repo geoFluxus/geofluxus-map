@@ -5,3 +5,6 @@ package-lock.json
 data.js
 areas.js
 index.html
+dist/*
+!dist/index.js
+!dist/index.css

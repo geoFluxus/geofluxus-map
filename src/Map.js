@@ -370,7 +370,7 @@ class ResetControl extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-reset ol-unselectable ol-control';
-        element.style.top = '6em';
+        element.style.top = '4.5em';
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -403,7 +403,7 @@ class ExportPNG extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-export-png ol-unselectable ol-control';
-        element.style.top = '9em';
+        element.style.top = '7em';
         element.style.left = '.5em';
         element.appendChild(button);
 

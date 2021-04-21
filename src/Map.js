@@ -19,6 +19,7 @@ import {Control, FullScreen, defaults as defaultControls} from 'ol/control';
 import Overlay from 'ol/Overlay';
 import html2canvas from 'html2canvas';
 import saveAs from 'file-saver';
+import '@fortawesome/fontawesome-free/js/all.js';
 
 
 // map bases
@@ -419,7 +420,7 @@ class ExportPNG extends Control {
 
         // default button style
         const button = document.createElement('button');
-        button.innerHTML = '<span>&#128247</span>';
+        button.innerHTML = '<i class="fas fa-camera"></i>';
         button.className = 'ol-reset';
         button.title = 'Screenshot';
 

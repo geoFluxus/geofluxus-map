@@ -1,6 +1,7 @@
 import Map from './Map';
 import * as d3 from "d3";
 import Control from 'ol/control/Control';
+import saveAs from 'file-saver';
 
 
 export default class NetworkMap extends Map {
@@ -26,10 +27,12 @@ export default class NetworkMap extends Map {
         var controls = options.controls || {},
             toggleNetwork = controls.toggleNetwork != undefined ? controls.toggleNetwork : true,
             toggleLegend = controls.toggleLegend != undefined ? controls.toggleLegend : true,
-            toggleLight = controls.toggleLight != undefined ? controls.toggleLight : true;
+            toggleLight = controls.toggleLight != undefined ? controls.toggleLight : true,
+            exportCSV = controls.exportCSV != undefined ? controls.exportCSV : true;
         if (toggleNetwork) this.map.addControl(new ToggleNetwork({target: this}));
         if (toggleLegend) this.map.addControl(new ToggleLegend({target: this}));
         if (toggleLight) this.map.addControl(new ToggleLight({target: this}));
+        if (exportCSV) this.map.addControl(new ExportCSV({target: this}));
 
         // network map options
         this.data = options.data || [];
@@ -51,7 +54,9 @@ export default class NetworkMap extends Map {
         this._drawNetwork();
 
         // draw legend
-        this._drawLegend(options.legend);
+        this.legendOptions = options.legend || {};
+        this.legendOptions.color = this.legendOptions.color || 'white';
+        this._drawLegend();
     }
 
     _drawNetwork() {
@@ -140,8 +145,8 @@ export default class NetworkMap extends Map {
         this.values.push(prettify(this.max));
     }
 
-    _drawLegend(options) {
-        options = options || {};
+    _drawLegend() {
+        var options = this.legendOptions;
         var _this = this;
 
         // legend div
@@ -239,7 +244,7 @@ class ToggleNetwork extends Control {
 
         // default button style
         const button = document.createElement('button');
-        button.innerHTML = '<span>N</span>';
+        button.innerHTML = '<i class="fas fa-road"></i>';
         button.className = 'ol-toggle-network';
         button.title = "Toggle network"
 
@@ -273,7 +278,7 @@ class ToggleLegend extends Control {
 
         // default button style
         const button = document.createElement('button');
-        button.innerHTML = '<span>L</span>';
+        button.innerHTML = '<i class="fas fa-palette"></i>';
         button.className = 'ol-toggle-legend';
         button.title = "Toggle legend"
 
@@ -307,7 +312,7 @@ class ToggleLight extends Control {
 
         // default button style
         const button = document.createElement('button');
-        button.innerHTML = '<span>D</span>';
+        button.innerHTML = '<i class="fas fa-lightbulb"></i>';
         button.className = 'ol-toggle-light';
         button.title = "Toggle light"
 
@@ -328,16 +333,16 @@ class ToggleLight extends Control {
     }
 
     toggleLight() {
-        var base = this.target.base,
-            legend = this.target.legend;
+        var base = this.target.base;
 
         // change map base layer
         base.source = base.source == 'cartodb_dark' ? 'cartodb_light' : 'cartodb_dark';
         this.target.changeBase(base);
 
         // change legend font color
-        var color = legend.style.color == 'white' ? 'black' : 'white';
-        this.target._drawLegend({color: color});
+        var color = this.target.legendOptions.color == 'white' ? 'black' : 'white';
+        this.target.legendOptions.color = color;
+        this.target._drawLegend();
 
         // change network color
         var networkLayer = this.target._getLayer('network'),
@@ -347,5 +352,64 @@ class ToggleLight extends Control {
             feature.getStyle().getStroke().setColor(color); // change feature color
         })
         networkLayer.getSource().addFeatures(features); // add features back to layer
+    }
+}
+
+
+// toggle network control
+class ExportCSV extends Control {
+    constructor(options) {
+        options = options || {};
+
+        // default button style
+        const button = document.createElement('button');
+        button.innerHTML = '<i class="fas fa-download"></i>';
+        button.className = 'ol-export-csv';
+        button.title = "Export CSV"
+
+        const element = document.createElement('div');
+        element.className = 'ol-toggle-network ol-unselectable ol-control';
+        element.style.top = '17em';
+        element.style.left = '.5em';
+        element.appendChild(button);
+
+        super({
+            element: element
+        });
+
+        // target NetworkMap
+        this.target = options.target;
+
+        button.addEventListener('click', this.exportCSV.bind(this), false);
+    }
+
+    exportCSV() {
+        var items = this.target.data.map(a => Object.assign({}, a));
+
+        // specify how you want to handle null values here
+        const replacer = (key, value) => value === null ? '' : value;
+        const header = Object.keys(items[0]);
+
+        // convert geometry to WKT
+        items.forEach(function(item) {
+            var type = item.geometry.type,
+                coords = item.geometry.coordinates;
+            var wkt = "";
+            Object.values(coords).forEach(function(point) {
+                wkt += point.join(' ') + ', ';
+            })
+            wkt = wkt.slice(0, -2);
+            wkt = type.toUpperCase() + '(' + wkt + ')';
+            item.geometry = wkt;
+        })
+
+        var csv = items.map(row => header.map(field => JSON.stringify(row[field], replacer)).join(','));
+        csv.unshift(header.join(','));
+        csv = csv.join('\r\n');
+
+        var blob = new Blob([csv], {
+            type: "text/plain;charset=utf-8"
+        });
+        saveAs(blob, "data.csv");
     }
 }

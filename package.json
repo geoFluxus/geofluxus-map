@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/geoFluxus/geofluxus-map#readme",
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.3",
     "d3": "^6.6.2",
     "file-saver": "^2.0.5",
     "html2canvas": "^1.0.0-rc.7",

@@ -13,9 +13,23 @@ export default class NetworkMap extends Map {
                     width: 10
                 },
                 zIndex: 9999
+            },
+            tooltip: {
+                style: {
+                    color: 'white'
+                }
             }
         };
         super(options);
+
+        // network map controls
+        var controls = options.controls || {},
+            toggleNetwork = controls.toggleNetwork != undefined ? controls.toggleNetwork : true,
+            toggleLegend = controls.toggleLegend != undefined ? controls.toggleLegend : true,
+            toggleLight = controls.toggleLight != undefined ? controls.toggleLight : true;
+        if (toggleNetwork) this.map.addControl(new ToggleNetwork({target: this}));
+        if (toggleLegend) this.map.addControl(new ToggleLegend({target: this}));
+        if (toggleLight) this.map.addControl(new ToggleLight({target: this}));
 
         // network map options
         this.data = options.data || [];
@@ -128,36 +142,36 @@ export default class NetworkMap extends Map {
 
     _drawLegend(options) {
         options = options || {};
+        var _this = this;
 
         // legend div
-        var legend = document.getElementById('legend');
-        if (legend) legend.parentElement.removeChild(legend);
-        legend = document.createElement('div');
+        if (this.legend != undefined) this.legend.remove();
+        this.legend = document.createElement('div');
 
         // default legend style
-        legend.style.left = "0";
-        legend.style.right = "0";
-        legend.style.margin = "auto";
-        legend.style.bottom = '0';
-        legend.style.backgroundColor = 'transparent';
-        legend.style.color = 'white';
+        this.legend.style.left = "0";
+        this.legend.style.right = "0";
+        this.legend.style.margin = "auto";
+        this.legend.style.bottom = '0';
+        this.legend.style.backgroundColor = 'transparent';
+        this.legend.style.color = 'white';
 
         // load custom style
         Object.entries(options).forEach(function(pair) {
             var [key, value] = pair;
-            legend.style[key] = value;
+            _this.legend.style[key] = value;
         })
         var width = options.width || 500,
             height = options.height || 20;
         var rectWidth = width / this.scale.length;
-        legend.style.width = `${width + rectWidth * 1.1}px`;
+        this.legend.style.width = `${width + rectWidth * 1.1}px`;
         var fontSize = options.fontSize || 10;
 
         // create OpenLayers control for legend
-        legend.className = 'ol-control-panel ol-unselectable ol-control';
-        legend.id = 'legend';
+        this.legend.className = 'ol-control-panel ol-unselectable ol-control';
+        this.legend.id = 'legend';
         var controlPanel = new Control({
-            element: legend
+            element: this.legend
         });
         this.map.addControl(controlPanel);
 
@@ -167,12 +181,12 @@ export default class NetworkMap extends Map {
         title.style.textAlign = "center";
         title.style.padding = '10px';
         title.innerHTML = options.title || '<span>Legend</span>';
-        legend.appendChild(title);
+        this.legend.appendChild(title);
 
         // legend palette
         var palette = document.createElement('div');
         palette.id = "legend-palette";
-        legend.appendChild(palette);
+        this.legend.appendChild(palette);
 
         var rectSVG = d3.select("#legend-palette")
                         .append("svg")
@@ -194,7 +208,7 @@ export default class NetworkMap extends Map {
         // legend axis
         var axis = document.createElement('div');
         axis.id = "legend-axis";
-        legend.appendChild(axis);
+        this.legend.appendChild(axis);
 
         var textSVG = d3.select("#legend-axis")
                         .append("svg")
@@ -212,7 +226,126 @@ export default class NetworkMap extends Map {
                             return (i+0.45) * rectWidth;
                          })
                          .attr('y', fontSize)
-                         .attr('fill', options.color || 'white')
+                         .attr('fill', this.legend.style.color)
                          .attr('font-size', fontSize);
+    }
+}
+
+
+// toggle network control
+class ToggleNetwork extends Control {
+    constructor(options) {
+        options = options || {};
+
+        // default button style
+        const button = document.createElement('button');
+        button.innerHTML = '<span>N</span>';
+        button.className = 'ol-toggle-network';
+        button.title = "Toggle network"
+
+        const element = document.createElement('div');
+        element.className = 'ol-toggle-network ol-unselectable ol-control';
+        element.style.top = '9.5em';
+        element.style.left = '.5em';
+        element.appendChild(button);
+
+        super({
+            element: element
+        });
+
+        // target NetworkMap
+        this.target = options.target;
+
+        button.addEventListener('click', this.toggleNetwork.bind(this), false);
+    }
+
+    toggleNetwork() {
+        this.target.setVisible('network', this.visible);
+        this.visible = !this.visible;
+    }
+}
+
+
+// toggle legend control
+class ToggleLegend extends Control {
+    constructor(options) {
+        options = options || {};
+
+        // default button style
+        const button = document.createElement('button');
+        button.innerHTML = '<span>L</span>';
+        button.className = 'ol-toggle-legend';
+        button.title = "Toggle legend"
+
+        const element = document.createElement('div');
+        element.className = 'ol-toggle-legend ol-unselectable ol-control';
+        element.style.top = '12em';
+        element.style.left = '.5em';
+        element.appendChild(button);
+
+        super({
+            element: element
+        });
+
+        // target NetworkMap
+        this.target = options.target;
+
+        button.addEventListener('click', this.toggleLegend.bind(this), false);
+    }
+
+    toggleLegend() {
+        var legend = this.target.legend;
+        legend.style.display = legend.style.display == 'none' ? 'block' : 'none';
+    }
+}
+
+
+// toggle light control
+class ToggleLight extends Control {
+    constructor(options) {
+        options = options || {};
+
+        // default button style
+        const button = document.createElement('button');
+        button.innerHTML = '<span>D</span>';
+        button.className = 'ol-toggle-light';
+        button.title = "Toggle light"
+
+        const element = document.createElement('div');
+        element.className = 'ol-toggle-light ol-unselectable ol-control';
+        element.style.top = '14.5em';
+        element.style.left = '.5em';
+        element.appendChild(button);
+
+        super({
+            element: element
+        });
+
+        // target NetworkMap
+        this.target = options.target;
+
+        button.addEventListener('click', this.toggleLight.bind(this), false);
+    }
+
+    toggleLight() {
+        var base = this.target.base,
+            legend = this.target.legend;
+
+        // change map base layer
+        base.source = base.source == 'cartodb_dark' ? 'cartodb_light' : 'cartodb_dark';
+        this.target.changeBase(base);
+
+        // change legend font color
+        var color = legend.style.color == 'white' ? 'black' : 'white';
+        this.target._drawLegend({color: color});
+
+        // change network color
+        var networkLayer = this.target._getLayer('network'),
+            features = networkLayer.getSource().getFeatures();
+        features.forEach(function(feature) {
+            networkLayer.getSource().removeFeature(feature); // remove feature from layer
+            feature.getStyle().getStroke().setColor(color); // change feature color
+        })
+        networkLayer.getSource().addFeatures(features); // add features back to layer
     }
 }

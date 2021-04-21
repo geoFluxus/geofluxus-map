@@ -24,12 +24,14 @@ import saveAs from 'file-saver';
 // map bases
 var attributions = {
     osm: '© <a style="color:#0078A8" href="https://www.openstreetmap.org/copyright">OSM</a>',
-    cartodb: '© <a style="color:#0078A8" href="http://cartodb.com/attributions">CartoDB</a>'
+    cartodb: '© <a style="color:#0078A8" href="http://cartodb.com/attributions">CartoDB</a>',
+    none: null
 }
 var sources = {
     osm: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     cartodb_dark: 'https://cartodb-basemaps-{a-d}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
     cartodb_light: 'https://cartodb-basemaps-{a-d}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
+    none: null
 }
 
 export default class Map {
@@ -49,27 +51,7 @@ export default class Map {
 
         // map base
         this.base = options.base || {};
-        this.base.source = this.base.source || 'osm';
-        if (!sources.hasOwnProperty(this.base.source)) {
-            throw Error('Unknown map base source!');
-        }
-        this.attributions = attributions[this.base.source.split('_')[0]];
-        this.base.opacity = this.base.opacity || 1.0;
-
-        var source = new XYZ({
-            url: sources[this.base.source],
-            attributions: [this.attributions],
-            crossOrigin: 'anonymous'
-        });
-        var baseLayer = new TileLayer({
-            name: 'base',
-            source: source,
-            crossOrigin: 'anonymous',
-            opacity: this.base.opacity,
-            tileOptions: {
-                crossOriginKeyword: 'anonymous'
-            },
-        });
+        var baseLayer = this._getBase();
 
         // map view
         this.view = options.view || {};
@@ -353,7 +335,46 @@ export default class Map {
     // set layer visibility
     setVisible(name, visible) {
         var layer = this._getLayer(name);
-        layer.setVisible(visible)
+        layer.setVisible(visible);
+    }
+
+    // change base layer
+    changeBase(base) {
+        // remove current base layer
+        var baseLayer = this._getLayer('base');
+        this.map.removeLayer(baseLayer);
+
+        // add new base layer
+        this.base = base;
+        baseLayer = this._getBase();
+        this.map.getLayers().insertAt(0, baseLayer);
+    }
+
+    // get base layer
+    _getBase() {
+        this.base.source = this.base.source || 'osm';
+        if (!sources.hasOwnProperty(this.base.source)) {
+            throw Error('Unknown map base source!');
+        }
+        this.attributions = attributions[this.base.source.split('_')[0]];
+        this.base.opacity = this.base.opacity || 1.0;
+
+        var source = new XYZ({
+            url: sources[this.base.source],
+            attributions: [this.attributions],
+            crossOrigin: 'anonymous'
+        });
+        var baseLayer = new TileLayer({
+            name: 'base',
+            source: source,
+            crossOrigin: 'anonymous',
+            opacity: this.base.opacity,
+            tileOptions: {
+                crossOriginKeyword: 'anonymous'
+            },
+        });
+
+        return baseLayer;
     }
 }
 
@@ -367,6 +388,7 @@ class ResetControl extends Control {
         const button = document.createElement('button');
         button.innerHTML = '<span>&#10227</span>';
         button.className = 'ol-reset';
+        button.title = 'Reset map';
 
         const element = document.createElement('div');
         element.className = 'ol-reset ol-unselectable ol-control';
@@ -375,8 +397,7 @@ class ResetControl extends Control {
         element.appendChild(button);
 
         super({
-          element: element,
-          target: options.target,
+            element: element
         });
 
         // initial map view
@@ -400,6 +421,7 @@ class ExportPNG extends Control {
         const button = document.createElement('button');
         button.innerHTML = '<span>&#128247</span>';
         button.className = 'ol-reset';
+        button.title = 'Screenshot';
 
         const element = document.createElement('div');
         element.className = 'ol-export-png ol-unselectable ol-control';
@@ -408,8 +430,7 @@ class ExportPNG extends Control {
         element.appendChild(button);
 
         super({
-          element: element,
-          target: options.target,
+            element: element,
         });
 
         button.addEventListener('click', this.exportPNG.bind(this), false);

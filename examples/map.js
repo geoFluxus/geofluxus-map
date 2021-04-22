@@ -20,6 +20,8 @@ var tooltipStyle = {
         zIndex: 9999
     }
 
+var string = "Medieval ";
+
 // initialize map
 const map = new Map({
     target: 'root',
@@ -35,6 +37,9 @@ const map = new Map({
     },
     hover: {
         tooltip: {
+            body: function(d) {
+                return string + d.get('name');
+            },
             style: tooltipStyle
         },
         style: hoverStyle
@@ -63,7 +68,9 @@ areas.features.forEach(function(area) {
     var geometry = area.geometry,
         name = area.properties.name;
     map.addFeature('areas', geometry, {
-        tooltip: name
+        props: {
+            name: name
+        }
     });
 })
 

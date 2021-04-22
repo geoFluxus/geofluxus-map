@@ -19,6 +19,27 @@ const map = new NetworkMap({
 //    base: {
 //        source: 'cartodb_light',
 //    },
+    hover: {
+        style: {
+            stroke: {
+                width: 10
+            },
+            zIndex: 9999
+        },
+        tooltip: {
+            style: {
+                color: 'white',
+                textAlign: 'center',
+                padding: '1rem'
+            },
+            body: function(d) {
+                return `
+                <span><b>CO<sub>2</sub></b></span>
+                <br>
+                <span>Amount: ${d.get('amount').toFixed(2)} kg</span>`;
+            }
+        }
+    },
     data: data,
 //    defaultColor: 'blue',
 //    scale: scale,

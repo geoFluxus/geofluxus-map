@@ -16,6 +16,12 @@ export default class NetworkMap extends Map {
                 zIndex: 9999
             },
             tooltip: {
+                body: function(d) {
+                    var format = d3.format(".3"),
+                        prefix = d3.format(".3s"),
+                        amount = d.get('amount');
+                    return amount < 1e3 ? format(amount) : prefix(amount);
+                },
                 style: {
                     color: 'white'
                 }
@@ -111,7 +117,9 @@ export default class NetworkMap extends Map {
                     },
                     zIndex: amount,
                 },
-                tooltip: getTooltip(amount)
+                props: {
+                    amount: amount
+                }
             });
         });
 

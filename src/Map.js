@@ -117,6 +117,7 @@ export default class Map {
 
         // initialize tooltip
         var tooltip = options.tooltip || {},
+            tooltipBody = tooltip.body,
             tooltipStyle = tooltip.style || {};
 
         // initialize selection highlighting
@@ -137,7 +138,7 @@ export default class Map {
             if (feature) {
                 // set tooltip body
                 overlay.setPosition(evt.coordinate);
-                div.innerHTML = feature.get('tooltip');
+                div.innerHTML = tooltip.body(feature);
 
                 // default options
                 div.style.display = 'block';
@@ -307,8 +308,12 @@ export default class Map {
         // get layer & add feature
         layer.getSource().addFeature(feature);
 
-        // set tooltip text
-        feature.set('tooltip', options.tooltip);
+        // set feature properties
+        var props = options.props || {};
+        Object.entries(props).forEach(function(pair) {
+            var [key, value] = pair;
+            feature.set(key, value);
+        })
     }
 
     // focus on layer

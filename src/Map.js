@@ -20,6 +20,7 @@ import Overlay from 'ol/Overlay';
 import html2canvas from 'html2canvas';
 import saveAs from 'file-saver';
 import '@fortawesome/fontawesome-free/js/all.js';
+import { _default } from './utils.js';
 
 
 // map bases
@@ -55,12 +56,29 @@ export default class Map {
         var baseLayer = this._getBase();
 
         // map view
-        this.view = options.view || {};
-        this.view.zoom = this.view.zoom || 0;  // map zoom
-        this.view.center = this.view.center || [0, 0];  // map view
+        this.view = _default(options.view, {
+            zoom: 0,
+            center: [0, 0]
+        });
         this.view.center = transform(this.view.center, this.projection, 'EPSG:3857');
-        this.view.minZoom = this.view.minZoom;
-        this.view.maxZoom = this.view.maxZoom;
+
+        // OpenLayers controls
+        var controls = _default(options.controls, {
+            zoom: true,
+            drag: true,
+            fullscreen: true,
+            reset: true,
+            exportPNG: true
+        });
+        var interactionOptions = {
+            doubleClickZoom: controls.zoom,
+            keyboardZoom: controls.zoom,
+            mouseWheelZoom: controls.zoom,
+            dragZoom: controls.zoom,
+            keyboardPan: controls.drag,
+            dragPan: controls.drag
+        };
+        var interactions = olInteraction.defaults(interactionOptions);
 
         // render map
         this.map = new olMap({
@@ -71,25 +89,10 @@ export default class Map {
             controls: defaultControls()
         });
 
-        // map controls
-        var controls = options.controls || {},
-            zoom  = controls.zoom != undefined ? controls.zoom : true,
-            drag = controls.drag != undefined ? controls.drag : true,
-            fullscreen = controls.fullscreen != undefined ? controls.fullscreen : true,
-            reset = controls.reset != undefined ? controls.reset : true,
-            exportPNG = controls.exportPNG != undefined ? controls.exportPNG : true;
-        var interactionOptions = {
-            doubleClickZoom: zoom,
-            keyboardZoom: zoom,
-            mouseWheelZoom: zoom,
-            dragZoom: zoom,
-            keyboardPan: drag,
-            dragPan: drag
-        };
-        var interactions = olInteraction.defaults(interactionOptions);
-        if (reset) this.map.addControl(new ResetControl({view: this.view}));
-        if (fullscreen) this.map.addControl(new FullScreen());
-        if (exportPNG) this.map.addControl(new ExportPNG());
+        // add custom controls
+        if (controls.reset) this.map.addControl(new Reset({target: this}));
+        if (controls.fullscreen) this.map.addControl(new FullScreen());
+        if (controls.exportPNG) this.map.addControl(new ExportPNG());
 
         // activate tooltips
         this._onHover(options.hover);
@@ -358,13 +361,17 @@ export default class Map {
 
     // get base layer
     _getBase() {
-        this.base.source = this.base.source || 'osm';
+        // load base options
+        this.base = _default(this.base, {
+            source: 'osm',
+            opacity: 1.0
+        });
         if (!sources.hasOwnProperty(this.base.source)) {
             throw Error('Unknown map base source!');
         }
         this.attributions = attributions[this.base.source.split('_')[0]];
-        this.base.opacity = this.base.opacity || 1.0;
 
+        // create OpenLayers TileLayer for base
         var source = new XYZ({
             url: sources[this.base.source],
             attributions: [this.attributions],
@@ -386,7 +393,7 @@ export default class Map {
 
 
 // reset map view control
-class ResetControl extends Control {
+class Reset extends Control {
     constructor(options) {
         options = options || {};
 
@@ -406,14 +413,14 @@ class ResetControl extends Control {
             element: element
         });
 
-        // initial map view
-        this.view = options.view;
+        // Map target
+        this.target = options.target;
 
         button.addEventListener('click', this.reset.bind(this), false);
     }
 
     reset() {
-        this.map_.setView(new View(this.view));
+        this.map_.setView(new View(this.target.view));
     }
 }
 

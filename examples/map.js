@@ -20,17 +20,20 @@ var tooltipStyle = {
         zIndex: 9999
     }
 
-var string = "Medieval ";
+var string = "Medieval";
 
 // initialize map
 const map = new Map({
     target: 'root',
     controls: {
-        drag: false
+//        zoom: false,
+//        drag: false,
+//        exportPNG: false,
+        fullscreen: false
     },
     view: {
         center: [5, 52],
-        zoom: 9
+        zoom: 5
     },
     base: {
         source: 'cartodb_light'
@@ -38,7 +41,21 @@ const map = new Map({
     hover: {
         tooltip: {
             body: function(d) {
-                return string + d.get('name');
+                return `
+                <table>
+                    <tr>
+                        <th colspan="2">Provincie</th>
+                    <tr>
+                    <tr>
+                        <th>Lower: </th>
+                        <td>${d.get('name')}</td>
+                    </tr>
+                    <tr>
+                        <th>Upper: </th>
+                        <td>${d.get('capital')}</td>
+                    </tr>
+                </table>
+                `;
             },
             style: tooltipStyle
         },
@@ -69,7 +86,8 @@ areas.features.forEach(function(area) {
         name = area.properties.name;
     map.addFeature('areas', geometry, {
         props: {
-            name: name
+            name: name,
+            capital: name.toUpperCase()
         }
     });
 })

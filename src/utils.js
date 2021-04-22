@@ -9,12 +9,17 @@ export function _default(options, def) {
 
     // iterate default properties
     Object.keys(def).forEach(function(key) {
+        // if property == Array, load it
+        if (Array.isArray(options[key])) {
+            res[key] = options[key];
+        }
         // if property == object, invoke function
-        if (typeof options[key] == 'object'){
+        else if (typeof options[key] == 'object') {
             res[key] = _default(options[key], def[key]);
-        } else {
-            // use options property if exists
-            // otherwise, use default option
+        }
+        else {
+            // load options property if exists
+            // otherwise, load default option
             res[key] = (options[key] == undefined) ? def[key] : options[key];
         }
     })

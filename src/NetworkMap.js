@@ -2,13 +2,18 @@ import Map from './Map';
 import * as d3 from "d3";
 import Control from 'ol/control/Control';
 import saveAs from 'file-saver';
+import { _default } from './utils.js'
 
 
 export default class NetworkMap extends Map {
     constructor(options) {
-        // map options
-        options.base = options.base || {source: 'cartodb_dark'};
-        options.hover = options.hover || {
+        // base layer
+        options.base = _default(options.base, {
+            source: 'cartodb_dark'
+        });
+
+        // hover
+        options.hover = _default(options.hover, {
             style: {
                 stroke: {
                     width: 10
@@ -26,19 +31,29 @@ export default class NetworkMap extends Map {
                     color: 'white'
                 }
             }
-        };
-        super(options);
+        });
 
-        // network map controls
-        var controls = options.controls || {},
-            toggleNetwork = controls.toggleNetwork != undefined ? controls.toggleNetwork : true,
-            toggleLegend = controls.toggleLegend != undefined ? controls.toggleLegend : true,
-            toggleLight = controls.toggleLight != undefined ? controls.toggleLight : true,
-            exportCSV = controls.exportCSV != undefined ? controls.exportCSV : true;
-        if (toggleNetwork) this.map.addControl(new ToggleNetwork({target: this}));
-        if (toggleLegend) this.map.addControl(new ToggleLegend({target: this}));
-        if (toggleLight) this.map.addControl(new ToggleLight({target: this}));
-        if (exportCSV) this.map.addControl(new ExportCSV({target: this}));
+        // initialize map
+        super(options);
+        var _this = this;
+
+        // NetworkMap controls
+        options.controls = _default(options.controls, {
+            toggleNetwork: true,
+            toggleLegend: true,
+            toggleLight: true,
+            exportCSV: true
+        });
+        var controlClass = {
+            toggleNetwork: ToggleNetwork,
+            toggleLegend: ToggleLegend,
+            toggleLight: ToggleLight,
+            exportCSV: ExportCSV
+        }
+        Object.entries(options.controls).forEach(function(pair) {
+            var [key, value] = pair;
+            if (value) _this.map.addControl(new controlClass[key]({target: _this}));
+        })
 
         // network map options
         this.data = options.data || [];

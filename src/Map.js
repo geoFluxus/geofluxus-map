@@ -94,8 +94,30 @@ export default class Map {
         if (controls.fullscreen) this.map.addControl(new FullScreen());
         if (controls.exportPNG) this.map.addControl(new ExportPNG());
 
-        // activate tooltips
+        // activate highlight & tooltips
         this._onHover(options.hover);
+
+        // stylize buttons
+        this._stylizeButtons();
+    }
+
+    // stylize buttons
+    _stylizeButtons() {
+        // div style
+        var elems = document.getElementsByClassName('ol-control');
+        for (var i = 0; i < elems.length; i++) {
+            var elem = elems[i];
+            elem.style.setProperty("background-color", "transparent");
+
+            // button style
+            var children = elem.children;
+            for (var j = 0; j < children.length; j++) {
+                var name = children[j].tagName.toLowerCase()
+                if (name == 'button') {
+                    children[j].style.setProperty("background-color", "rgba(0, 0, 0, 0.2)");
+                }
+            }
+        }
     }
 
     // activate tooltips
@@ -123,6 +145,15 @@ export default class Map {
             tooltipBody = tooltip.body,
             tooltipStyle = tooltip.style || {};
 
+        // default style options
+        div.style.fontFamily = "'Helvetica', 'Arial', sans-serif";
+
+        // change style options
+        Object.entries(tooltipStyle).forEach(function(pair) {
+            var [key, value] = pair;
+            div.style[key] = value;
+        })
+
         // initialize selection highlighting
         var selected, initialStyle;
         function displayTooltip(evt) {
@@ -141,21 +172,8 @@ export default class Map {
             if (feature) {
                 // set tooltip body
                 overlay.setPosition(evt.coordinate);
-                div.innerHTML = tooltip.body(feature);
-
-                // default options
-                div.style.display = 'block';
-                div.style.backgroundColor = 'rgba(139, 138, 138, 0.8)';
-                div.style.borderRadius = '1.5rem';
-                div.style.padding = '0.75rem';
-                div.style.fontFamily = 'Montserrat, sans-serif';
-                div.style.fontSize = '15px';
-
-                // change style options
-                Object.entries(tooltipStyle).forEach(function(pair) {
-                    var [key, value] = pair;
-                    div.style[key] = value;
-                })
+                div.style.display = 'block'; // show tooltip
+                if (tooltipBody != undefined) div.innerHTML = tooltipBody(feature);
 
                 // initialize feature highlight
                 selected = feature;
@@ -185,6 +203,7 @@ export default class Map {
                 });
                 feature.setStyle(highlightStyle);
             } else {
+                // hide tooltip
                 div.style.display = 'none';
             }
         };

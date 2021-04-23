@@ -22,14 +22,16 @@ export default class NetworkMap extends Map {
             },
             tooltip: {
                 body: function(d) {
-                    var format = d3.format(".3"),
-                        prefix = d3.format(".3s"),
-                        amount = d.get('amount');
-                    return amount < 1e3 ? format(amount) : prefix(amount);
+                    return `<span>${d.get('amount')}</span>`;
                 },
                 style: {
-                    color: 'white'
-                }
+                    color: 'white',
+                    textAlign: 'center',
+                    padding: '0.5em',
+                    fontSize: '15px',
+                    backgroundColor: 'rgba(139, 138, 138, 1)',
+                    borderRadius: '1.5rem'
+                },
             }
         });
 
@@ -78,6 +80,9 @@ export default class NetworkMap extends Map {
         this.legendOptions = options.legend || {};
         this.legendOptions.color = this.legendOptions.color || 'white';
         this._drawLegend();
+
+        // stylize buttons
+        this._stylizeButtons();
     }
 
     _drawNetwork() {
@@ -133,7 +138,7 @@ export default class NetworkMap extends Map {
                     zIndex: amount,
                 },
                 props: {
-                    amount: amount
+                    amount: getTooltip(amount)
                 }
             });
         });
@@ -181,8 +186,9 @@ export default class NetworkMap extends Map {
         this.legend.style.right = "0";
         this.legend.style.margin = "auto";
         this.legend.style.bottom = '0';
-        this.legend.style.backgroundColor = 'transparent';
         this.legend.style.color = 'white';
+        this.legend.style.fontFamily = "'Helvetica', 'Arial', sans-serif";
+        this.legend.style.position = 'absolute';
 
         // load custom style
         Object.entries(options).forEach(function(pair) {
@@ -196,7 +202,6 @@ export default class NetworkMap extends Map {
         var fontSize = options.fontSize || 10;
 
         // create OpenLayers control for legend
-        this.legend.className = 'ol-control-panel ol-unselectable ol-control';
         this.legend.id = 'legend';
         var controlPanel = new Control({
             element: this.legend

@@ -16,46 +16,40 @@ const map = new NetworkMap({
 ////        minZoom: 7,
 ////        maxZoom: 10
 ////    },
-////    base: {
-////        source: 'cartodb_light',
-////    },
-//    hover: {
-////        style: {
-////            stroke: {
-////                width: 10
-////            },
-////            zIndex: 9999
-////        },
-//        tooltip: {
-//            style: {
-////                color: 'white',
-//                textAlign: 'center',
-//                padding: '1rem'
-//            },
-//            body: function(d) {
-//                return `
-//                <span><b>CO<sub>2</sub></b></span>
-//                <br>
-//                <span>Amount: ${d.get('amount').toFixed(3)} kg</span>`;
-//            }
-//        }
+//    base: {
+//        source: 'cartodb_light',
 //    },
+    hover: {
+//        style: {
+//            stroke: {
+//                width: 10
+//            },
+//            zIndex: 9999
+//        },
+        tooltip: {
+            body: function(d) {
+                return `
+                <span>${d.get('amount')} kg Waste</span>
+                `;
+            }
+        }
+    },
     data: data,
 //    defaultColor: 'blue',
 //    scale: scale,
 //    hover: {
 //        style: hoverStyle
 //    },
-//    legend: {
-////        title: '<span>CO<sub>2</sub> (kg)</span>',
-////        width: 700,
-////        height: 30,
-////        marginLeft: '1vw',
-////        marginTop: '85vh',
-////        borderRadius: '1rem',
-////        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-////        paddingBottom: '10px',
-////        color: 'black',
-////        fontSize: 15,
-//    }
+    legend: {
+//        title: '<span>Waste (kg)</span>',
+//        width: 700,
+//        height: 30,
+//        marginLeft: '1vw',
+//        marginTop: '85vh',
+//        borderRadius: '1rem',
+//        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+//        paddingBottom: '10px',
+//        color: 'black',
+//        fontSize: 15,
+    }
 })

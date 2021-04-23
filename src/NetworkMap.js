@@ -118,15 +118,16 @@ export default class NetworkMap extends Map {
 
         // add ways to map and load with amounts
         this.data.forEach(function (flow) {
+            // primary properties
             var amount = flow.amount,
                 layer = amount ? 'flows' : 'network',
                 geometry = flow.geometry;
 
-            function getTooltip(d) {
-                var format = d3.format(".3"),
-                    prefix = d3.format(".3s");
-                return amount < 1e3 ? format(d) : prefix(d);
-            }
+            // secondary properties
+            var props = {amount: amount.toFixed(2)}
+            Object.keys(flow).forEach(function(key) {
+                if (!['amount', 'geometry'].includes(key)) props[key] = flow[key];
+            })
 
             _this.addFeature(layer, geometry, {
                 style: {
@@ -137,9 +138,7 @@ export default class NetworkMap extends Map {
                     },
                     zIndex: amount,
                 },
-                props: {
-                    amount: getTooltip(amount)
-                }
+                props: props
             });
         });
 

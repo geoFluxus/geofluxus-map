@@ -7,11 +7,11 @@ var scale = ['#9e0142','#d53e4f','#f46d43','#fdae61','#fee08b','#e6f598','#abdda
 // initialize map
 const map = new NetworkMap({
     target: "root",
-//    controls: {
+    controls: {
 //        zoom: false,
 //        drag: false,
-//        exportCSV: false
-//    },
+        exportCSV: false
+    },
 ////    view: {
 ////        minZoom: 7,
 ////        maxZoom: 10
@@ -29,7 +29,7 @@ const map = new NetworkMap({
         tooltip: {
             body: function(d) {
                 return `
-                <span>${d.get('amount')} kg Waste</span>
+                <span>${d.get('amount')} tn waste</span>
                 `;
             }
         }
@@ -41,7 +41,7 @@ const map = new NetworkMap({
 //        style: hoverStyle
 //    },
     legend: {
-//        title: '<span>Waste (kg)</span>',
+        title: '<span>Waste (tonnes)</span>',
 //        width: 700,
 //        height: 30,
 //        marginLeft: '1vw',

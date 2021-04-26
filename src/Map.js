@@ -8,6 +8,7 @@ import VectorSource from 'ol/source/Vector';
 import Style from 'ol/style/Style';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
+import Circle from 'ol/style/Circle';
 import Polygon from 'ol/geom/Polygon';
 import MultiPolygon from 'ol/geom/MultiPolygon';
 import LineString from 'ol/geom/LineString';
@@ -234,10 +235,27 @@ export default class Map {
         // define style
         var style = options.style || {},
             stroke = style.stroke || {},
-            fill = style.fill || {};
+            fill = style.fill || {},
+            image = style.image || {};
         stroke.color = stroke.color || 'rgba(100, 150, 250, 1)';
         stroke.width = stroke.width || 1;
         fill.color = fill.color || 'rgb(100, 150, 250, 0.1)';
+
+        // special marker for points
+        var imageRadius = imageRadius,
+            imageStroke = image.Stroke || {},
+            imageFill = image.Fill || {};
+        image = new Circle({
+            radius: options.radius || 5,
+            fill: new Fill({
+                color: imageFill.color || 'rgb(100, 150, 250, 0.1)'
+            }),
+            stroke: new Stroke({
+                color: imageStroke.stroke || 'rgba(100, 150, 250, 1)',
+                width: imageStroke.width || 1
+            })
+        });
+
         var layerStyle = new Style({
             stroke: new Stroke({
                 color: stroke.color,
@@ -246,6 +264,7 @@ export default class Map {
             fill: new Fill({
                 color: fill.color
             }),
+            image: image
         });
 
         // create & add layer

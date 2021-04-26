@@ -60,6 +60,9 @@ export default class NetworkMap extends Map {
         // network map options
         this.data = options.data || [];
         this.defaultColor = options.defaultColor || 'white';
+
+        // color scale (https://colorbrewer2.org)
+        // sequential scale
         this.scale = options.scale || [
             'rgb(26, 152, 80)',
             'rgb(102, 189, 99)',

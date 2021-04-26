@@ -2,8 +2,7 @@
 node_modules
 .cache
 package-lock.json
-data.js
-areas.js
+data/
 index.html
 dist/*
 !dist/index.js

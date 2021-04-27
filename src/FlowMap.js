@@ -5,6 +5,7 @@ import {Layer} from 'ol/layer';
 import SourceState from 'ol/source/State';
 import {fromLonLat, toLonLat} from 'ol/proj';
 import {getCenter, getWidth} from 'ol/extent';
+import {transform} from 'ol/proj';
 
 
 export default class FlowMap extends Map {
@@ -104,87 +105,79 @@ export default class FlowMap extends Map {
     }
 
     _drawFlows() {
-        var d3Layer = new D3Layer({features: this.data});
+        var d3Layer = new D3Layer({
+            features: this.data,
+            name: 'd3Layer',
+            map: this.map
+        });
         this.map.addLayer(d3Layer);
     }
+
 }
 
 
 class D3Layer extends Layer {
-    // https://openlayers.org/en/latest/examples/d3.html
     constructor(options) {
         options = options || {};
-        super(options);
+        super({name: options.name});
 
-        var _this = this;
+        this.map = options.map;
         this.features = options.features;
-        this.geojson = {
-            type: "FeatureCollection",
-            features: []
-        }
-        this.features.forEach(function(f) {
-            var obj = {
-                type: "Feature",
-                geometry: {
-                    type: "Point",
-                    coordinates: [f.origin.lon, f.origin.lat]
-                }
-            }
-            _this.geojson.features.push(obj);
-        })
 
         this.svg = d3
           .select(document.createElement('div'))
           .append('svg')
           .style('position', 'absolute');
-
-        this.svg.append('path').datum(this.geojson).attr('class', 'boundary');
     }
 
-    getSourceState() {
-        return SourceState.READY;
+    //getSourceState() {
+    //    return SourceState.READY;
+    //}
+
+    projection(coords) {
+        var coords = transform(coords, 'EPSG:4326', 'EPSG:3857');
+        return this.map.getPixelFromCoordinate(coords);
     }
 
     render(frameState) {
         // get map framestate
         var width = frameState.size[0],
-            height = frameState.size[1],
-            projection = frameState.viewState.projection;
-
-        // define d3 projection
-        var d3Projection = d3.geoMercator().scale(1).translate([0, 0]),
-            d3Path = d3.geoPath().projection(d3Projection);
-
-        // get pixel bounds
-        var pixelBounds = d3Path.bounds(this.geojson);
-        var pixelBoundsWidth = pixelBounds[1][0] - pixelBounds[0][0];
-        var pixelBoundsHeight = pixelBounds[1][1] - pixelBounds[0][1];
-
-        // get geographic bounds
-        var geoBounds = d3.geoBounds(this.geojson);
-        var geoBoundsLeftBottom = fromLonLat(geoBounds[0], projection);
-        var geoBoundsRightTop = fromLonLat(geoBounds[1], projection);
-        var geoBoundsWidth = geoBoundsRightTop[0] - geoBoundsLeftBottom[0];
-        if (geoBoundsWidth < 0) {
-          geoBoundsWidth += getWidth(projection.getExtent());
-        }
-        var geoBoundsHeight = geoBoundsRightTop[1] - geoBoundsLeftBottom[1];
-
-        var widthResolution = geoBoundsWidth / pixelBoundsWidth;
-        var heightResolution = geoBoundsHeight / pixelBoundsHeight;
-        var r = Math.max(widthResolution, heightResolution);
-        var scale = r / frameState.viewState.resolution;
-
-        var center = toLonLat(getCenter(frameState.extent), projection);
-        d3Projection
-          .scale(scale)
-          .center(center)
-          .translate([width / 2, height / 2]);
-        d3Path = d3Path.projection(d3Projection);
+            height = frameState.size[1];
 
         this.svg.attr('width', width);
         this.svg.attr('height', height);
-        this.svg.select('path').attr('d', d3Path).attr('fill', 'red');
+        this.svg.selectAll("*").remove();
+
+        var _this = this;
+        this.map.once('postrender', function() {
+            _this.features.forEach(function(d) {
+                var o = _this.projection([d.origin.lon, d.origin.lat]),
+                    d = _this.projection([d.destination.lon, d.destination.lat]);
+
+                function bezier(points) {
+                    // Set control point inputs
+                    var source = {x: points[0][0], y: points[0][1]},
+                        target = {x: points[1][0], y: points[1][1]},
+                        dx = source.x - target.x,
+                        dy = source.y - target.y,
+                        sx = 0.4,
+                        sy = 0.1;
+                    //bezier or arc
+                    var controls = [sx * dx, sy * dy, sx * dx, sy * dy];
+
+                    return "M" + source.x + "," + source.y +
+                        "C" + (source.x - controls[0]) + "," + (source.y - controls[1]) +
+                        " " + (target.x + controls[2]) + "," + (target.y + controls[3]) +
+                        " " + target.x + "," + target.y;
+                };
+
+                _this.svg.append('path')
+                .attr('d', bezier([o, d]))
+                .attr("stroke", 'red')
+                .attr("fill", 'none')
+            })
+        })
+
         return this.svg.node();
     }
 }

@@ -105,52 +105,12 @@ export default class FlowMap extends Map {
     }
 
     _drawFlows() {
-        var d3Layer = new D3Layer({
-            features: this.data,
-            name: 'd3Layer',
-            map: this.map
-        });
-        this.map.addLayer(d3Layer);
-    }
+        var draw = function(features) {
+            var _this = this;
+            var sx = 0.4,
+                sy = 0.1;
 
-}
-
-
-class D3Layer extends Layer {
-    constructor(options) {
-        options = options || {};
-        super({name: options.name});
-
-        this.map = options.map;
-        this.features = options.features;
-
-        this.svg = d3
-          .select(document.createElement('div'))
-          .append('svg')
-          .style('position', 'absolute');
-    }
-
-    //getSourceState() {
-    //    return SourceState.READY;
-    //}
-
-    projection(coords) {
-        var coords = transform(coords, 'EPSG:4326', 'EPSG:3857');
-        return this.map.getPixelFromCoordinate(coords);
-    }
-
-    render(frameState) {
-        // get map framestate
-        var width = frameState.size[0],
-            height = frameState.size[1];
-
-        this.svg.attr('width', width);
-        this.svg.attr('height', height);
-        this.svg.selectAll("*").remove();
-
-        var _this = this;
-        this.map.once('postrender', function() {
-            _this.features.forEach(function(d) {
+            features.forEach(function(d) {
                 var o = _this.projection([d.origin.lon, d.origin.lat]),
                     d = _this.projection([d.destination.lon, d.destination.lat]);
 
@@ -159,11 +119,11 @@ class D3Layer extends Layer {
                     var source = {x: points[0][0], y: points[0][1]},
                         target = {x: points[1][0], y: points[1][1]},
                         dx = source.x - target.x,
-                        dy = source.y - target.y,
-                        sx = 0.4,
-                        sy = 0.1;
+                        dy = source.y - target.y;
+                        sx -= 0.3 / features.length,
+                        sy += 0.3 / features.length;
                     //bezier or arc
-                    var controls = [sx * dx, sy * dy, sx * dx, sy * dy];
+                    var controls = [sx * dx, sy * dy, sy * dx, sx * dy];
 
                     return "M" + source.x + "," + source.y +
                         "C" + (source.x - controls[0]) + "," + (source.y - controls[1]) +
@@ -176,7 +136,62 @@ class D3Layer extends Layer {
                 .attr("stroke", 'red')
                 .attr("fill", 'none')
             })
-        })
+        }
+
+        var flowsLayer = new D3Layer({
+            features: this.data,
+            name: 'd3Layer',
+            map: this.map,
+            draw: draw
+        });
+        this.map.addLayer(flowsLayer);
+    }
+
+}
+
+
+class D3Layer extends Layer {
+    constructor(options) {
+        options = options || {};
+        super({name: options.name});
+
+        this.map = options.map;  // OpenLayers map
+        this.features = options.features;  // layer features
+        this.draw = options.draw;  // draw function to render features
+
+        // svg element
+        this.svg = d3
+          .select(document.createElement('div'))
+          .append('svg')
+          .style('position', 'absolute');
+    }
+
+    //getSourceState() {
+    //    return SourceState.READY;
+    //}
+
+    projection(coords) {
+        // convert coordinates to pixels
+        // requires input data coordinates in EPSG:4326
+        var coords = transform(coords, 'EPSG:4326', 'EPSG:3857');
+        return this.map.getPixelFromCoordinate(coords);
+    }
+
+    render(frameState) {
+        // get map framestate
+        var width = frameState.size[0],
+            height = frameState.size[1];
+
+        // resize svg & clean
+        this.svg.attr('width', width);
+        this.svg.attr('height', height);
+        this.svg.selectAll("*").remove();
+
+        // draw features
+        var _this = this;
+        this.map.once('postrender', function(){
+            _this.draw(_this.features)
+        });
 
         return this.svg.node();
     }

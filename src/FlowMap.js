@@ -18,6 +18,8 @@ export default class FlowMap extends Map {
         super(options);
 
         this.data = options.data || [];
+        this.groupBy = options.groupBy;
+        this.maxFlowWidth = options.maxFlowWidth || 50;
 
         // color scale (https://colorbrewer2.org)
         // ordinal scale
@@ -35,10 +37,9 @@ export default class FlowMap extends Map {
             'rgb(94,79,162)'
         ];
         this.scale = d3.interpolateRgbBasis(this.scale);
-        this.colorBy = options.colorBy;
         this.colors = this._getColors();
 
-        this._render();
+        this._render(); // process to render map anew
     }
 
     // define category colors
@@ -48,7 +49,7 @@ export default class FlowMap extends Map {
         // get unique categories
         var categories = [];
         this.data.forEach(function(d) {
-            var value = d[_this.colorBy];
+            var value = d[_this.groupBy];
             if (!categories.includes(value)) categories.push(value);
         })
 
@@ -61,103 +62,97 @@ export default class FlowMap extends Map {
         return colors;
     }
 
-    // draw
+    // render
     _render() {
         // if not nodes or links in data,
         // convert to links & nodes
         if (!this.data.nodes || !this.data.links) this._transformToLinksAndNodes();
 
-        //this._drawNodes();
-        this._drawFlows();
+        // get max link amount to scale flows
+        this._getMaxLinkAmount();
+
+        // draw links
+        this._drawLinks();
     }
 
     // convert data to links & nodes
+    // get link layers
     _transformToLinksAndNodes() {
-        var nodes = new Set(),
-            links = [];
+        var _this =  this;
 
-        // split data to nodes & links
-        this.data.forEach(function(flow) {
-            // load unique nodes
-            var source = JSON.stringify(flow.source),
-                target = JSON.stringify(flow.target);
-            nodes.add(source);
-            nodes.add(target);
+        var nodes = [],
+            links = this.data;
 
-            // load link
-            flow.source = source;
-            flow.target = target;
-            links.push(flow);
-        })
+//        var nodes = new Set(),
+//            linkLayers = new Set(),
+//            links = [];
+//
+//        // split data to nodes & links
+//        this.data.forEach(function(flow) {
+//            // load unique nodes
+//            var source = JSON.stringify(flow.source),
+//                target = JSON.stringify(flow.target);
+//            nodes.add(source);
+//            nodes.add(target);
+//
+//            // load link
+//            flow.source = source;
+//            flow.target = target;
 
-        // link -> source / target
-        nodes = Array.from(nodes);
-        var idx = {};  // keep track of indexes
-        nodes.forEach(function(n, i) {
-            idx[n] = i;
-        })
-        links.forEach(function(l) {
-            l.source = idx[l.source];
-            l.target = idx[l.target];
-        })
+//
+//            // add link layer
+//            linkLayers.add(flow[_this.groupBy]);
+//        })
+//
+//        // link -> source / target
+//        nodes = Array.from(nodes);
+//        var idx = {};  // keep track of indexes
+//        nodes.forEach(function(n, i) {
+//            idx[n] = i;
+//        })
+//        links.forEach(function(l) {
+//            l.source = idx[l.source];
+//            l.target = idx[l.target];
+//        })
+//
+//        // source / target -> link
+//        nodes.forEach(function(n, i) {
+//            nodes[i] = JSON.parse(n);
+//            nodes[i].sourceLinks = [];
+//            nodes[i].targetLinks = [];
+//        })
+//        links.forEach(function(l, i) {
+//            nodes[l.source].sourceLinks.push(i);
+//            nodes[l.target].targetLinks.push(i);
+//        })
 
-        // source / target -> link
-        nodes.forEach(function(n, i) {
-            nodes[i] = JSON.parse(n);
-            nodes[i].sourceLinks = [];
-            nodes[i].targetLinks = [];
-        })
-        links.forEach(function(l, i) {
-            nodes[l.source].sourceLinks.push(i);
-            nodes[l.target].targetLinks.push(i);
-        })
-
+        // load to data
         this.data = {
             nodes: nodes,
-            links: links
+            links: this.data
         }
     }
 
-    _drawNodes() {
-        var _this = this;
-
-        // load origin & destination nodes
-        this.data.forEach(function(d, idx) {
-            // origin
-            d.origin.flow = idx;
-            d.origin.geometry = {
-                type: "Point",
-                coordinates: [d.origin.lon, d.origin.lat]
-            }
-            _this.origins.push(d.origin);
-
-            // destination
-            d.destination.flow = idx;
-            d.destination.geometry = {
-                type: "Point",
-                coordinates: [d.destination.lon, d.destination.lat]
-            }
-            _this.destinations.push(d.destination);
-        })
-
-        // draw origin nodes
-        this.addVectorLayer('origins');
-        this.origins.forEach(function(o) {
-            _this.addFeature('origins', o.geometry);
-        })
-
-        // draw destination nodes
-        this.addVectorLayer('destinations');
-        this.destinations.forEach(function(d) {
-            _this.addFeature('destinations', d.geometry);
-        })
+    // get max link amount to scale flows
+    _getMaxLinkAmount() {
+        var links = this.data.links,
+            amounts = [];
+        links.forEach(function(l) {
+            amounts.push(l.amount)
+        });
+        this.maxLinkAmount = Math.max(...amounts);
     }
 
-    _drawFlows() {
+
+    _drawLinks() {
+        var _this = this,
+            links = this.data.links;
+
+        // function to draw path
         var draw = function(features) {
             var _this = this;
             var sx = 0.4,
-                sy = 0.1;
+            sy = 0.1;
 
             function bezier(points) {
                 // Set control point inputs
@@ -188,13 +183,13 @@ export default class FlowMap extends Map {
             })
         }
 
-        var flowsLayer = new D3Layer({
-            features: this.data,
-            name: 'd3Layer',
-            map: this.map,
+        var d3Layer = new D3Layer({
+            name: 'flows',
+            map: _this.map,
+            features: links,
             draw: draw
         });
-        this.map.addLayer(flowsLayer);
+        _this.map.addLayer(d3Layer);
     }
 }
 
@@ -205,8 +200,8 @@ class D3Layer extends Layer {
         super({name: options.name});
 
         this.map = options.map;  // OpenLayers map
-        this.features = options.features;  // layer features
-        this.draw = options.draw;  // draw function to render features
+        this.features = options.features;
+        this.draw = options.draw;
 
         // svg element
         this.svg = d3
@@ -226,6 +221,10 @@ class D3Layer extends Layer {
         return this.map.getPixelFromCoordinate(coords);
     }
 
+    clear() {
+        this.svg.selectAll("*").remove();
+    }
+
     render(frameState) {
         // get map framestate
         var width = frameState.size[0],
@@ -234,7 +233,7 @@ class D3Layer extends Layer {
         // resize svg & clean
         this.svg.attr('width', width);
         this.svg.attr('height', height);
-        this.svg.selectAll("*").remove();
+        this.clear();
 
         // draw features
         var _this = this;

@@ -14,12 +14,16 @@ export default class FlowMap extends Map {
         options.base = _default(options.base, {
             source: 'cartodb_dark'
         });
+//        options.controls = _default(options.controls, {
+//            zoom: false
+//        });
 
         super(options);
 
         this.data = options.data || [];
         this.groupBy = options.groupBy;
         this.maxFlowWidth = options.maxFlowWidth || 50;
+        this.minFlowWidth = options.minFlowWidth || 1;
 
         // color scale (https://colorbrewer2.org)
         // ordinal scale
@@ -69,7 +73,7 @@ export default class FlowMap extends Map {
         if (!this.data.nodes || !this.data.links) this._transformToLinksAndNodes();
 
         // get max link amount to scale flows
-        this._getMaxLinkAmount();
+        this._getMaxFlowValue();
 
         // draw links
         this._drawLinks();
@@ -80,79 +84,103 @@ export default class FlowMap extends Map {
     _transformToLinksAndNodes() {
         var _this =  this;
 
-        var nodes = [],
-            links = this.data;
+        var nodes = new Set(),
+            links = [];
 
-//        var nodes = new Set(),
-//            linkLayers = new Set(),
-//            links = [];
-//
-//        // split data to nodes & links
-//        this.data.forEach(function(flow) {
-//            // load unique nodes
-//            var source = JSON.stringify(flow.source),
-//                target = JSON.stringify(flow.target);
-//            nodes.add(source);
-//            nodes.add(target);
-//
-//            // load link
-//            flow.source = source;
-//            flow.target = target;
+        // split data to nodes & links
+        this.data.forEach(function(flow) {
+            // load unique nodes
+            var source = JSON.stringify(flow.source),
+                target = JSON.stringify(flow.target);
+            nodes.add(source);
+            nodes.add(target);
 
-//
-//            // add link layer
-//            linkLayers.add(flow[_this.groupBy]);
-//        })
-//
-//        // link -> source / target
-//        nodes = Array.from(nodes);
-//        var idx = {};  // keep track of indexes
-//        nodes.forEach(function(n, i) {
-//            idx[n] = i;
-//        })
-//        links.forEach(function(l) {
-//            l.source = idx[l.source];
-//            l.target = idx[l.target];
-//        })
-//
-//        // source / target -> link
-//        nodes.forEach(function(n, i) {
-//            nodes[i] = JSON.parse(n);
-//            nodes[i].sourceLinks = [];
-//            nodes[i].targetLinks = [];
-//        })
-//        links.forEach(function(l, i) {
-//            nodes[l.source].sourceLinks.push(i);
-//            nodes[l.target].targetLinks.push(i);
-//        })
+            // load link
+            links.push(flow);
+        })
+
+        // link -> source / target
+        nodes = Array.from(nodes);
+        var idx = {};  // keep track of indexes
+        nodes.forEach(function(n, i) {
+            idx[n] = i;
+        })
+        links.forEach(function(l) {
+            l._source = idx[JSON.stringify(l.source)];
+            l._target = idx[JSON.stringify(l.target)];
+        })
+
+        // source / target -> link
+        nodes.forEach(function(n, i) {
+            nodes[i] = JSON.parse(n);
+            nodes[i]._sourceLinks = [];
+            nodes[i]._targetLinks = [];
+        })
+        links.forEach(function(l, i) {
+            nodes[l._source]._sourceLinks.push(i);
+            nodes[l._target]._targetLinks.push(i);
+        })
 
         // load to data
         this.data = {
             nodes: nodes,
-            links: this.data
+            links: links
         }
     }
 
     // get max link amount to scale flows
-    _getMaxLinkAmount() {
-        var links = this.data.links,
-            amounts = [];
-        links.forEach(function(l) {
-            amounts.push(l.amount)
-        });
-        this.maxLinkAmount = Math.max(...amounts);
+    _getMaxFlowValue() {
+        var _this = this;
+
+        // collect flows with same source and target
+        this.flows = {};
+        this.data.links.forEach(function(link) {
+            var id = link._source + '-' + link._target;
+            if (!_this.flows[id]) _this.flows[id] = [];
+            _this.flows[id].push(link);
+        })
+
+        // compute maximum value
+        var totalValues = [];
+        Object.values(this.flows).forEach(function(links) {
+            var totalValue = 0;
+            links.forEach(function (c) {
+                totalValue += c.amount
+            });
+            totalValues.push(totalValue)
+        })
+        this.maxFlowValue = Math.max(...totalValues);
+
+        // normalize flow width
+        var maxFlowWidth = this.maxFlowWidth,
+            minFlowWidth = this.minFlowWidth,
+            normFactor = maxFlowWidth / _this.maxFlowValue;
+        this.data.links.forEach(function(link) {
+            var calcWidth = (link.amount) * normFactor,
+                strokeWidth = Math.max(minFlowWidth, calcWidth);
+            link.strokeWidth = strokeWidth;
+        })
     }
 
-
+    // draw links
     _drawLinks() {
         var _this = this,
-            links = this.data.links;
+            links = this.data.links,
+            nodes = this.data.nodes;
+
+        var topLeft = [3, 54],
+            bottomRight = [8, 50];
+        nodes.forEach(function(node) {
+            topLeft = [Math.min(topLeft[0], node.lon), Math.max(topLeft[1], node.lat)];
+            bottomRight = [Math.max(bottomRight[0], node.lon), Math.min(bottomRight[1], node.lat)];
+        })
+        var extent = [topLeft, bottomRight];
 
         // function to draw path
         var draw = function(features) {
             var _this = this;
             var sx = 0.4,
-            sy = 0.1;
+                sy = 0.1;
 
             function bezier(points) {
                 // Set control point inputs
@@ -173,21 +201,26 @@ export default class FlowMap extends Map {
             };
 
             features.forEach(function(d) {
-                var o = _this.projection([d.source.lon, d.source.lat]),
-                    d = _this.projection([d.target.lon, d.target.lat]);
+                var source = _this.projection([d.source.lon, d.source.lat]),
+                    target = _this.projection([d.target.lon, d.target.lat]);
 
-                _this.svg.append('path')
-                .attr('d', bezier([o, d]))
+                _this.g.append('path')
+                .attr('d', bezier([source, target]))
+                .attr("stroke-opacity", 0.5)
                 .attr("stroke", 'red')
+                .attr("stroke-width", d.strokeWidth)
+                .attr("stroke-linecap", "round")
                 .attr("fill", 'none')
             })
         }
 
+        // add flow layer to map
         var d3Layer = new D3Layer({
             name: 'flows',
             map: _this.map,
             features: links,
-            draw: draw
+            draw: draw,
+            extent: extent
         });
         _this.map.addLayer(d3Layer);
     }
@@ -198,48 +231,98 @@ class D3Layer extends Layer {
     constructor(options) {
         options = options || {};
         super({name: options.name});
+        var _this = this;
 
         this.map = options.map;  // OpenLayers map
         this.features = options.features;
         this.draw = options.draw;
+
+        this.extent = options.extent;
 
         // svg element
         this.svg = d3
           .select(document.createElement('div'))
           .append('svg')
           .style('position', 'absolute');
+        this.g = this.svg.append("g");
+
+        function onMoveEnd(evt) {
+          var map = evt.map;
+          map.getLayers().forEach(function(l) {
+            if (l instanceof D3Layer) {
+                l.renderOnMoveEnd()
+            }
+          })
+        }
+
+        function onMoveStart(evt) {
+          _this.clear();
+        }
+
+        this.map.on('movestart', onMoveStart);
+        this.map.on('moveend', onMoveEnd);
     }
 
     //getSourceState() {
     //    return SourceState.READY;
     //}
 
-    projection(coords) {
+    projection(coords, projection) {
+        var projection = projection || 'EPSG:4326';
         // convert coordinates to pixels
         // requires input data coordinates in EPSG:4326
-        var coords = transform(coords, 'EPSG:4326', 'EPSG:3857');
+        var coords = transform(coords, projection, 'EPSG:3857');
         return this.map.getPixelFromCoordinate(coords);
     }
 
     clear() {
-        this.svg.selectAll("*").remove();
+        this.g.selectAll("*").remove();
     }
 
-    render(frameState) {
-        // get map framestate
-        var width = frameState.size[0],
-            height = frameState.size[1];
-
-        // resize svg & clean
-        this.svg.attr('width', width);
-        this.svg.attr('height', height);
-        this.clear();
-
-        // draw features
+    addFeatures() {
         var _this = this;
         this.map.once('postrender', function(){
-            _this.draw(_this.features)
-        });
+            _this.draw(_this.features);
+        })
+    }
+
+    renderOnMoveEnd() {
+        this.draw(this.features);
+    }
+
+//    bounds() {
+//        this.
+//    }
+
+    render(frameState) {
+        var _this = this;
+
+        // get map framestate
+        var width = frameState.size[0],
+            height = frameState.size[1],
+            zoom = frameState.viewState.zoom;
+
+        this.svg.attr('width', width)
+        this.svg.attr('height', height)
+
+//        this.map.once('moveend', function(){
+//            var topLeft = _this.projection(_this.extent[0]);
+//            var bottomRight = _this.projection(_this.extent[1]);
+//            topLeft = [topLeft[0] - 250, topLeft[1] - 250];
+//            bottomRight = [bottomRight[0] + 250, bottomRight[1] + 250];
+//            var bbox = [topLeft, bottomRight]
+//
+//            // resize svg & clean
+//            _this.svg.attr('width', bottomRight[0] - topLeft[0]);
+//            _this.svg.attr('height', bottomRight[1] - topLeft[1]);
+////            _this.svg.attr('transform', `scale(${zoom})`)
+//            _this.svg.style("left", topLeft[0] + "px")
+//            _this.svg.style("top", topLeft[1] + "px");
+//             _this.g.attr("transform",
+//                "translate(" + -topLeft[0] + "," + -topLeft[1] + ") ");
+//
+//
+//        });
 
         return this.svg.node();
     }

@@ -11,6 +11,8 @@ import {transform, transformExtent} from 'ol/proj';
 // function to draw arc
 var drawArc = function(features) {
     var _this = this;
+
+    // arc offset
     var sx = 0.4,
         sy = 0.1;
 
@@ -33,13 +35,13 @@ var drawArc = function(features) {
     };
 
     features.forEach(function(d) {
-        var source = _this.projection([d.source.lon, d.source.lat]),
-            target = _this.projection([d.target.lon, d.target.lat]);
+        var source = _this.getPixelFromCoordinate([d.source.lon, d.source.lat]),
+            target = _this.getPixelFromCoordinate([d.target.lon, d.target.lat]);
 
         _this.g.append('path')
         .attr('d', bezier([source, target]))
         .attr("stroke-opacity", 0.5)
-        .attr("stroke", 'red')
+        .attr("stroke", d.color)
         .attr("stroke-width", d.strokeWidth)
         .attr("stroke-linecap", "round")
         .attr("fill", 'none')
@@ -76,20 +78,41 @@ export default class FlowMap extends Map {
             'rgb(50,136,189)',
             'rgb(94,79,162)'
         ];
-        this.scale = d3.interpolateRgbBasis(this.scale);
-        this.colors = this._getColors();
 
-        this._render(); // process to render map anew
+        // define colors based on groupby property
+        this.colors = (Array.isArray(this.scale)) ? this._getColors() : this.scale;
+
+        // if not nodes or links in data,
+        // convert to links & nodes
+        this._transformToLinksAndNodes();
+
+        // load colors to links
+        this._colorLinks();
+
+        // process to render map anew
+        this._render();
     }
 
-    // define category colors
+    // render
+    _render() {
+        // get max link amount to scale flows
+        this._getMaxFlowValue();
+
+        // draw links
+        this._drawLinks();
+    }
+
+    // define colors based on groupby property
     _getColors() {
-        var _this = this;
+        var _this = this,
+            links = this.data.links;
+
+        this.scale = d3.interpolateRgbBasis(this.scale);
 
         // get unique categories
         var categories = [];
-        this.data.forEach(function(d) {
-            var value = d[_this.groupBy];
+        links.forEach(function(link) {
+            var value = link[_this.groupBy];
             if (!categories.includes(value)) categories.push(value);
         })
 
@@ -100,19 +123,6 @@ export default class FlowMap extends Map {
         }
 
         return colors;
-    }
-
-    // render
-    _render() {
-        // if not nodes or links in data,
-        // convert to links & nodes
-        this._transformToLinksAndNodes();
-
-        // get max link amount to scale flows
-        this._getMaxFlowValue();
-
-        // draw links
-        this._drawLinks();
     }
 
     // convert data to links & nodes
@@ -164,6 +174,16 @@ export default class FlowMap extends Map {
         }
     }
 
+    // load colors to links
+    _colorLinks() {
+        var _this = this,
+            links = this.data.links;
+
+        links.forEach(function(link) {
+            link.color = _this.colors[link[_this.groupBy]];
+        })
+    }
+
     // get max link amount to scale flows
     _getMaxFlowValue() {
         var _this = this;
@@ -187,10 +207,16 @@ export default class FlowMap extends Map {
         })
         this.maxFlowValue = Math.max(...totalValues);
 
+        // get flow width based on amount
+        this._getFlowWidth();
+    }
+
+    // get flow width based on amount
+    _getFlowWidth() {
         // normalize flow width
         var maxFlowWidth = this.maxFlowWidth,
             minFlowWidth = this.minFlowWidth,
-            normFactor = maxFlowWidth / _this.maxFlowValue;
+            normFactor = maxFlowWidth / this.maxFlowValue;
         this.data.links.forEach(function(link) {
             var calcWidth = (link.amount) * normFactor,
                 strokeWidth = Math.max(minFlowWidth, calcWidth);
@@ -275,7 +301,7 @@ class D3Layer extends Layer {
 
     // convert coordinates to pixels
     // requires input data coordinates in EPSG:4326
-    projection(coords) {
+    getPixelFromCoordinate(coords) {
         var coords = transform(coords, 'EPSG:4326', 'EPSG:3857');
         return this.map.getPixelFromCoordinate(coords);
     }

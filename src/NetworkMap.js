@@ -56,6 +56,7 @@ export default class NetworkMap extends Map {
             var [key, value] = pair;
             if (value) _this.map.addControl(new controlClass[key]({target: _this}));
         })
+        this._stylizeButtons();
 
         // network map options
         this.data = options.data || [];
@@ -83,9 +84,6 @@ export default class NetworkMap extends Map {
         this.legendOptions = options.legend || {};
         this.legendOptions.color = this.legendOptions.color || 'white';
         this._drawLegend();
-
-        // stylize buttons
-        this._stylizeButtons();
     }
 
     _drawNetwork() {

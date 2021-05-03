@@ -6,47 +6,7 @@ import SourceState from 'ol/source/State';
 import {fromLonLat, toLonLat} from 'ol/proj';
 import {getCenter, getWidth} from 'ol/extent';
 import {transform, transformExtent} from 'ol/proj';
-
-
-// function to draw arc
-var drawArc = function(features) {
-    var _this = this;
-
-    // arc offset
-    var sx = 0.4,
-        sy = 0.1;
-
-    function bezier(points) {
-        // Set control point inputs
-        var source = {x: points[0][0], y: points[0][1]},
-            target = {x: points[1][0], y: points[1][1]},
-            dx = source.x - target.x,
-            dy = source.y - target.y;
-            sx -= 0.3 / features.length,
-            sy += 0.3 / features.length;
-
-        // bezier or arc
-        var controls = [sx * dx, sy * dy, sy * dx, sx * dy];
-
-        return "M" + source.x + "," + source.y +
-            "C" + (source.x - controls[0]) + "," + (source.y - controls[1]) +
-            " " + (target.x + controls[2]) + "," + (target.y + controls[3]) +
-            " " + target.x + "," + target.y;
-    };
-
-    features.forEach(function(d) {
-        var source = _this.getPixelFromCoordinate([d.source.lon, d.source.lat]),
-            target = _this.getPixelFromCoordinate([d.target.lon, d.target.lat]);
-
-        _this.g.append('path')
-        .attr('d', bezier([source, target]))
-        .attr("stroke-opacity", 0.5)
-        .attr("stroke", d.color)
-        .attr("stroke-width", d.strokeWidth)
-        .attr("stroke-linecap", "round")
-        .attr("fill", 'none')
-    })
-}
+import Control from 'ol/control/Control';
 
 
 export default class FlowMap extends Map {
@@ -55,13 +15,26 @@ export default class FlowMap extends Map {
         options.base = _default(options.base, {
             source: 'cartodb_dark'
         });
-
         super(options);
 
+        var _this = this;
         this.data = options.data || [];
         this.groupBy = options.groupBy;
         this.maxFlowWidth = options.maxFlowWidth || 50;
         this.minFlowWidth = options.minFlowWidth || 1;
+
+        // FlowMap controls
+        options.controls = _default(options.controls, {
+            toggleFlows: true
+        });
+        var controlClass = {
+            toggleFlows: ToggleFlows
+        }
+        Object.entries(options.controls).forEach(function(pair) {
+            var [key, value] = pair;
+            if (value) _this.map.addControl(new controlClass[key]({target: _this}));
+        })
+        this._stylizeButtons();
 
         // color scale (https://colorbrewer2.org)
         // ordinal scale
@@ -79,12 +52,12 @@ export default class FlowMap extends Map {
             'rgb(94,79,162)'
         ];
 
-        // define colors based on groupby property
-        this.colors = (Array.isArray(this.scale)) ? this._getColors() : this.scale;
-
         // if not nodes or links in data,
         // convert to links & nodes
         this._transformToLinksAndNodes();
+
+        // define colors based on groupby property
+        this.colors = (Array.isArray(this.scale)) ? this._getColors() : this.scale;
 
         // load colors to links
         this._colorLinks();
@@ -251,11 +224,10 @@ export default class FlowMap extends Map {
         var links = this.data.links;
 
         // add flows layer to map
-        var d3Layer = new D3Layer({
+        var d3Layer = new FlowLayer({
             name: 'flows',
             map: this.map,
-            features: links,
-            draw: drawArc
+            features: links
         });
         this.map.addLayer(d3Layer);
 
@@ -277,9 +249,6 @@ class D3Layer extends Layer {
 
         // layer source of features
         this.features = options.features;
-
-        // feature draw function
-        this.draw = options.draw;
 
         // svg element
         this.svg = d3
@@ -323,5 +292,87 @@ class D3Layer extends Layer {
         this.svg.attr('height', height);
 
         return this.svg.node();
+    }
+}
+
+
+class FlowLayer extends D3Layer {
+    constructor(options) {
+        options = options || {};
+        super(options)
+    }
+
+    // function to draw arc
+    draw(features) {
+        var _this = this;
+
+        // arc offset
+        var sx = 0.4,
+            sy = 0.1;
+
+        function bezier(points) {
+            // Set control point inputs
+            var source = {x: points[0][0], y: points[0][1]},
+                target = {x: points[1][0], y: points[1][1]},
+                dx = source.x - target.x,
+                dy = source.y - target.y;
+                sx -= 0.3 / features.length,
+                sy += 0.3 / features.length;
+
+            // bezier or arc
+            var controls = [sx * dx, sy * dy, sy * dx, sx * dy];
+
+            return "M" + source.x + "," + source.y +
+                "C" + (source.x - controls[0]) + "," + (source.y - controls[1]) +
+                " " + (target.x + controls[2]) + "," + (target.y + controls[3]) +
+                " " + target.x + "," + target.y;
+        };
+
+        features.forEach(function(d) {
+            var source = _this.getPixelFromCoordinate([d.source.lon, d.source.lat]),
+                target = _this.getPixelFromCoordinate([d.target.lon, d.target.lat]);
+
+            _this.g.append('path')
+            .attr('d', bezier([source, target]))
+            .attr("stroke-opacity", 0.5)
+            .attr("stroke", d.color)
+            .attr("stroke-width", d.strokeWidth)
+            .attr("stroke-linecap", "round")
+            .attr("fill", 'none')
+        })
+    }
+}
+
+
+// toggle network control
+class ToggleFlows extends Control {
+    constructor(options) {
+        options = options || {};
+
+        // default button style
+        const button = document.createElement('button');
+        button.innerHTML = '<i class="fas fa-random"></i>';
+        button.className = 'ol-toggle-network';
+        button.title = "Toggle flows"
+
+        const element = document.createElement('div');
+        element.className = 'ol-toggle-network ol-unselectable ol-control';
+        element.style.top = '9.5em';
+        element.style.left = '.5em';
+        element.appendChild(button);
+
+        super({
+            element: element
+        });
+
+        // target NetworkMap
+        this.target = options.target;
+
+        button.addEventListener('click', this.toggleNetwork.bind(this), false);
+    }
+
+    toggleNetwork() {
+        this.target.setVisible('flows', this.visible);
+        this.visible = !this.visible;
     }
 }

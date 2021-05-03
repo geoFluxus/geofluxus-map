@@ -25,6 +25,6 @@ var scale = {
 const map = new FlowMap({
     target: "root",
     data: flows,
-    scale: scale,
+//    scale: scale,
     groupBy: 'processgroup'
 })

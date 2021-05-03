@@ -67,8 +67,12 @@ export default class FlowLayer extends D3Layer {
     constructor(options) {
         options = options || {};
         super(options)
+
+        this.mode = {};
+        this.animateOptions = {};
     }
 
+    // build bezier curves
     bezier(options) {
         // get source / target
         var source = options.source,
@@ -91,11 +95,11 @@ export default class FlowLayer extends D3Layer {
             " " + target.x + "," + target.y;
     }
 
-    // function to draw arc
-    draw(features) {
+    // function to draw arcs
+    draw() {
         var _this = this;
 
-        for (var id in features) {
+        for (var id in this.features) {
             // get grouped flows
             var flows = _this.features[id];
 
@@ -114,6 +118,7 @@ export default class FlowLayer extends D3Layer {
                 source = _this.getPixelFromCoordinate(source);
                 target = _this.getPixelFromCoordinate(target);
 
+                // curve options
                 var bezierOptions = {
                     source: source,
                     target: target,
@@ -122,12 +127,15 @@ export default class FlowLayer extends D3Layer {
                     curve: curve
                 }
 
+                // animation options
+                var strokeLinecap = (_this.mode == 'dash') ? "unset" : "round";
+
                 _this.g.append('path')
                 .attr('d', _this.bezier(bezierOptions))
                 .attr("stroke-opacity", 0.5)
                 .attr("stroke", d.color)
                 .attr("stroke-width", d.strokeWidth)
-                .attr("stroke-linecap", "round")
+                .attr("stroke-linecap", strokeLinecap)
                 .attr("fill", 'none')
 
                 // shift curve
@@ -135,5 +143,30 @@ export default class FlowLayer extends D3Layer {
                 yShift += shiftStep;
             })
         }
+    }
+
+    // animate flows
+    animate(option) {
+        var options = ['none', 'dash'],
+            option = option % options.length;
+        this.mode = options[option];
+
+        // animation options
+        switch(this.mode) {
+            case 'none':
+                this.animateOptions = {};
+                break;
+            case 'dash':
+                this.animateOptions = {
+                    length: 10,
+                    gap: 4,
+                    offset: 0
+                }
+                break;
+        }
+
+        // clear & redraw
+        this.clear();
+        this.draw();
     }
 }

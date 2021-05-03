@@ -21,10 +21,12 @@ export default class FlowMap extends Map {
 
         // FlowMap controls
         options.controls = _default(options.controls, {
-            toggleFlows: true
+            toggleFlows: true,
+            animate: true,
         });
         var controlClass = {
-            toggleFlows: ToggleFlows
+            toggleFlows: ToggleFlows,
+            animate: Animate
         }
         Object.entries(options.controls).forEach(function(pair) {
             var [key, value] = pair;
@@ -59,6 +61,7 @@ export default class FlowMap extends Map {
         this._colorLinks();
 
         // process to render map anew
+        this.animate = 0; // no animation
         this._render();
     }
 
@@ -217,18 +220,23 @@ export default class FlowMap extends Map {
 
     // draw flows
     _drawFlows() {
-        // add flows layer to map
-        console.log(FlowLayer)
-        var flowLayer = new FlowLayer({
-            name: 'flows',
-            map: this.map,
-            features: this.flows
-        });
-        this.map.addLayer(flowLayer);
+        var flowLayer = this._getLayer('flows');
 
-        // focus on flows layer extent
-        var extent = this._getExtent();
-        this.focusOnLayer(extent);
+        if (!flowLayer) {
+            // add flows layer to map
+            var flowLayer = new FlowLayer({
+                name: 'flows',
+                map: this.map,
+                features: this.flows
+            });
+            this.map.addLayer(flowLayer);
+
+            // focus on flows layer extent
+            var extent = this._getExtent();
+            this.focusOnLayer(extent);
+        } else {
+            flowLayer.animate(this.animate);
+        }
     }
 }
 
@@ -257,11 +265,49 @@ class ToggleFlows extends Control {
         // target NetworkMap
         this.target = options.target;
 
-        button.addEventListener('click', this.toggleNetwork.bind(this), false);
+        button.addEventListener('click', this.toggleFlows.bind(this), false);
     }
 
-    toggleNetwork() {
+    toggleFlows() {
         this.target.setVisible('flows', this.visible);
         this.visible = !this.visible;
+    }
+}
+
+
+// animate
+class Animate extends Control {
+    constructor(options) {
+        options = options || {};
+
+        // default button style
+        const button = document.createElement('button');
+        button.innerHTML = '<i class="far fa-play-circle"></i>';
+        button.className = 'ol-animate';
+        button.title = "Animate"
+
+        const element = document.createElement('div');
+        element.className = 'ol-animate ol-unselectable ol-control';
+        element.style.top = '12em';
+        element.style.left = '.5em';
+        element.appendChild(button);
+
+        super({
+            element: element
+        });
+
+        // target NetworkMap
+        this.target = options.target;
+
+        // animation mode
+        this.mode = 0;
+
+        button.addEventListener('click', this.animate.bind(this), false);
+    }
+
+    animate() {
+        this.mode++;
+        this.target.animate = this.mode;
+        this.target._render();
     }
 }

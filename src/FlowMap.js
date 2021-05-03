@@ -68,11 +68,11 @@ export default class FlowMap extends Map {
 
     // render
     _render() {
-        // get max link amount to scale flows
-        this._getMaxFlowValue();
+        // convert links to flows
+        this._getFlows();
 
-        // draw links
-        this._drawLinks();
+        // draw flows
+        this._drawFlows();
     }
 
     // define colors based on groupby property
@@ -157,8 +157,8 @@ export default class FlowMap extends Map {
         })
     }
 
-    // get max link amount to scale flows
-    _getMaxFlowValue() {
+    // get flows
+    _getFlows() {
         var _this = this;
 
         // collect flows with same source and target
@@ -219,17 +219,15 @@ export default class FlowMap extends Map {
         ];
     }
 
-    // draw links
-    _drawLinks() {
-        var links = this.data.links;
-
+    // draw flows
+    _drawFlows() {
         // add flows layer to map
-        var d3Layer = new FlowLayer({
+        var flowLayer = new FlowLayer({
             name: 'flows',
             map: this.map,
-            features: links
+            features: this.flows
         });
-        this.map.addLayer(d3Layer);
+        this.map.addLayer(flowLayer);
 
         // focus on flows layer extent
         var extent = this._getExtent();
@@ -302,44 +300,72 @@ class FlowLayer extends D3Layer {
         super(options)
     }
 
+    bezier(options) {
+        // get source / target
+        var source = options.source,
+            target = options.target;
+        source = {x: source[0], y: source[1]};
+        target = {x: target[0], y: target[1]};
+
+        // set control points
+        var dx = source.x - target.x,
+            dy = source.y - target.y,
+            sx = options.xShift || 0.4,
+            sy = options.yShift || 0.1;
+        var arc = [sx * dx, sy * dy, sy * dx, sx * dy],
+            bezier = [sx * dx, sy * dy, sx * dx, sy * dy],
+            controls = (options.curve === 'arc') ? arc : bezier;
+
+        return "M" + source.x + "," + source.y +
+            "C" + (source.x - controls[0]) + "," + (source.y - controls[1]) +
+            " " + (target.x + controls[2]) + "," + (target.y + controls[3]) +
+            " " + target.x + "," + target.y;
+    }
+
     // function to draw arc
     draw(features) {
         var _this = this;
 
-        // arc offset
-        var sx = 0.4,
-            sy = 0.1;
+        for (var id in features) {
+            // get grouped flows
+            var flows = _this.features[id];
 
-        function bezier(points) {
-            // Set control point inputs
-            var source = {x: points[0][0], y: points[0][1]},
-                target = {x: points[1][0], y: points[1][1]},
-                dx = source.x - target.x,
-                dy = source.y - target.y;
-                sx -= 0.3 / features.length,
-                sy += 0.3 / features.length;
+            // curve properties
+            var shiftStep = 0.3 / flows.length,
+                xShift = 0.4,
+                yShift = 0.1,
+                curve = (flows.length > 1) ? 'arc' : 'bezier';
 
-            // bezier or arc
-            var controls = [sx * dx, sy * dy, sy * dx, sx * dy];
+            // draw flows
+            flows.forEach(function(d) {
+                // get flow source & target
+                // convert to pixels
+                var source = [d.source.lon, d.source.lat],
+                    target = [d.target.lon, d.target.lat];
+                source = _this.getPixelFromCoordinate(source);
+                target = _this.getPixelFromCoordinate(target);
 
-            return "M" + source.x + "," + source.y +
-                "C" + (source.x - controls[0]) + "," + (source.y - controls[1]) +
-                " " + (target.x + controls[2]) + "," + (target.y + controls[3]) +
-                " " + target.x + "," + target.y;
-        };
+                var bezierOptions = {
+                    source: source,
+                    target: target,
+                    xShift: xShift,
+                    yShift: yShift,
+                    curve: curve
+                }
 
-        features.forEach(function(d) {
-            var source = _this.getPixelFromCoordinate([d.source.lon, d.source.lat]),
-                target = _this.getPixelFromCoordinate([d.target.lon, d.target.lat]);
+                _this.g.append('path')
+                .attr('d', _this.bezier(bezierOptions))
+                .attr("stroke-opacity", 0.5)
+                .attr("stroke", d.color)
+                .attr("stroke-width", d.strokeWidth)
+                .attr("stroke-linecap", "round")
+                .attr("fill", 'none')
 
-            _this.g.append('path')
-            .attr('d', bezier([source, target]))
-            .attr("stroke-opacity", 0.5)
-            .attr("stroke", d.color)
-            .attr("stroke-width", d.strokeWidth)
-            .attr("stroke-linecap", "round")
-            .attr("fill", 'none')
-        })
+                // shift curve
+                xShift -= shiftStep;
+                yShift += shiftStep;
+            })
+        }
     }
 }
 
@@ -352,11 +378,11 @@ class ToggleFlows extends Control {
         // default button style
         const button = document.createElement('button');
         button.innerHTML = '<i class="fas fa-random"></i>';
-        button.className = 'ol-toggle-network';
+        button.className = 'ol-toggle-flows';
         button.title = "Toggle flows"
 
         const element = document.createElement('div');
-        element.className = 'ol-toggle-network ol-unselectable ol-control';
+        element.className = 'ol-toggle-flows ol-unselectable ol-control';
         element.style.top = '9.5em';
         element.style.left = '.5em';
         element.appendChild(button);

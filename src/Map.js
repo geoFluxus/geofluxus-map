@@ -360,6 +360,7 @@ export default class Map {
     // focus on layer
     focusOnLayer() {
         // fit to layer with given name
+        var extent;
         if (typeof arguments[0] == 'string') {
             var name = arguments[0];
 
@@ -371,24 +372,17 @@ export default class Map {
 
             // get layer extent from features
             var source = layer.getSource();
-            if (source.getFeatures().length) {
-                this.map.getView().fit(source.getExtent(), this.map.getSize());
-            }
+            extent = source.getExtent();
         }
         // fit to given extent
         else {
-            var extent = arguments[0];
+            extent = arguments[0];
             extent = transformExtent(extent, this.projection, 'EPSG:3857');
-            this.map.getView().fit(extent, this.map.getSize());
         }
 
-
         // update map view
-        var currView = this.map.getView();
-        this.view.center = currView.getCenter();
-        this.view.zoom = currView.getZoom();
-        this.view.minZoom = currView.getMinZoom();
-        this.view.maxZoom = currView.getMaxZoom();
+        this.map.getView().fit(extent, this.map.getSize());
+        this.extent = extent;
     }
 
     // set layer visibility
@@ -470,7 +464,9 @@ class Reset extends Control {
     }
 
     reset() {
-        this.map_.setView(new View(this.target.view));
+        var map = this.target.map,
+            extent = this.target.extent;
+        map.getView().fit(extent, map.getSize());
     }
 }
 

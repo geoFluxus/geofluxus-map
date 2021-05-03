@@ -1,6 +1,6 @@
 import 'ol/ol.css';
 import {Map as olMap, View} from 'ol';
-import {transform} from 'ol/proj';
+import {transform, transformExtent} from 'ol/proj';
 import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
 import VectorLayer from 'ol/layer/Vector';
@@ -358,18 +358,30 @@ export default class Map {
     }
 
     // focus on layer
-    focusOnLayer(name) {
-        // get layer
-        var layer = this._getLayer(name);
-        if (layer == undefined) {
-            throw Error(`Layer "${name}" does not exist!`)
+    focusOnLayer() {
+        // fit to layer with given name
+        if (typeof arguments[0] == 'string') {
+            var name = arguments[0];
+
+            // get layer
+            var layer = this._getLayer(name);
+            if (layer == undefined) {
+                throw Error(`Layer "${name}" does not exist!`)
+            }
+
+            // get layer extent from features
+            var source = layer.getSource();
+            if (source.getFeatures().length) {
+                this.map.getView().fit(source.getExtent(), this.map.getSize());
+            }
+        }
+        // fit to given extent
+        else {
+            var extent = arguments[0];
+            extent = transformExtent(extent, this.projection, 'EPSG:3857');
+            this.map.getView().fit(extent, this.map.getSize());
         }
 
-        // fit map to layer extent
-        var source = layer.getSource();
-        if (source.getFeatures().length) {
-            this.map.getView().fit(source.getExtent(), this.map.getSize());
-        }
 
         // update map view
         var currView = this.map.getView();

@@ -5,7 +5,46 @@ import {Layer} from 'ol/layer';
 import SourceState from 'ol/source/State';
 import {fromLonLat, toLonLat} from 'ol/proj';
 import {getCenter, getWidth} from 'ol/extent';
-import {transform} from 'ol/proj';
+import {transform, transformExtent} from 'ol/proj';
+
+
+// function to draw arc
+var drawArc = function(features) {
+    var _this = this;
+    var sx = 0.4,
+        sy = 0.1;
+
+    function bezier(points) {
+        // Set control point inputs
+        var source = {x: points[0][0], y: points[0][1]},
+            target = {x: points[1][0], y: points[1][1]},
+            dx = source.x - target.x,
+            dy = source.y - target.y;
+            sx -= 0.3 / features.length,
+            sy += 0.3 / features.length;
+
+        // bezier or arc
+        var controls = [sx * dx, sy * dy, sy * dx, sx * dy];
+
+        return "M" + source.x + "," + source.y +
+            "C" + (source.x - controls[0]) + "," + (source.y - controls[1]) +
+            " " + (target.x + controls[2]) + "," + (target.y + controls[3]) +
+            " " + target.x + "," + target.y;
+    };
+
+    features.forEach(function(d) {
+        var source = _this.projection([d.source.lon, d.source.lat]),
+            target = _this.projection([d.target.lon, d.target.lat]);
+
+        _this.g.append('path')
+        .attr('d', bezier([source, target]))
+        .attr("stroke-opacity", 0.5)
+        .attr("stroke", 'red')
+        .attr("stroke-width", d.strokeWidth)
+        .attr("stroke-linecap", "round")
+        .attr("fill", 'none')
+    })
+}
 
 
 export default class FlowMap extends Map {
@@ -14,9 +53,6 @@ export default class FlowMap extends Map {
         options.base = _default(options.base, {
             source: 'cartodb_dark'
         });
-//        options.controls = _default(options.controls, {
-//            zoom: false
-//        });
 
         super(options);
 
@@ -70,7 +106,7 @@ export default class FlowMap extends Map {
     _render() {
         // if not nodes or links in data,
         // convert to links & nodes
-        if (!this.data.nodes || !this.data.links) this._transformToLinksAndNodes();
+        this._transformToLinksAndNodes();
 
         // get max link amount to scale flows
         this._getMaxFlowValue();
@@ -140,7 +176,7 @@ export default class FlowMap extends Map {
             _this.flows[id].push(link);
         })
 
-        // compute maximum value
+        // compute maximum value of flows
         var totalValues = [];
         Object.values(this.flows).forEach(function(links) {
             var totalValue = 0;
@@ -162,67 +198,44 @@ export default class FlowMap extends Map {
         })
     }
 
+    // get map extent based on nodes
+    _getExtent() {
+        var nodes = this.data.nodes;
+
+        // focus on Netherlands by default
+        var topLeft = [
+                Math.min(...nodes.map(n => n.lon)),
+                Math.max(...nodes.map(n => n.lat))
+            ],
+            bottomRight = [
+                Math.max(...nodes.map(n => n.lon)),
+                Math.min(...nodes.map(n => n.lat))
+            ];
+
+        return [
+            topLeft[0],
+            topLeft[1],
+            bottomRight[0],
+            bottomRight[1]
+        ];
+    }
+
     // draw links
     _drawLinks() {
-        var _this = this,
-            links = this.data.links,
-            nodes = this.data.nodes;
+        var links = this.data.links;
 
-        var topLeft = [3, 54],
-            bottomRight = [8, 50];
-        nodes.forEach(function(node) {
-            topLeft = [Math.min(topLeft[0], node.lon), Math.max(topLeft[1], node.lat)];
-            bottomRight = [Math.max(bottomRight[0], node.lon), Math.min(bottomRight[1], node.lat)];
-        })
-        var extent = [topLeft, bottomRight];
-
-        // function to draw path
-        var draw = function(features) {
-            var _this = this;
-            var sx = 0.4,
-                sy = 0.1;
-
-            function bezier(points) {
-                // Set control point inputs
-                var source = {x: points[0][0], y: points[0][1]},
-                    target = {x: points[1][0], y: points[1][1]},
-                    dx = source.x - target.x,
-                    dy = source.y - target.y;
-                    sx -= 0.3 / features.length,
-                    sy += 0.3 / features.length;
-
-                // bezier or arc
-                var controls = [sx * dx, sy * dy, sy * dx, sx * dy];
-
-                return "M" + source.x + "," + source.y +
-                    "C" + (source.x - controls[0]) + "," + (source.y - controls[1]) +
-                    " " + (target.x + controls[2]) + "," + (target.y + controls[3]) +
-                    " " + target.x + "," + target.y;
-            };
-
-            features.forEach(function(d) {
-                var source = _this.projection([d.source.lon, d.source.lat]),
-                    target = _this.projection([d.target.lon, d.target.lat]);
-
-                _this.g.append('path')
-                .attr('d', bezier([source, target]))
-                .attr("stroke-opacity", 0.5)
-                .attr("stroke", 'red')
-                .attr("stroke-width", d.strokeWidth)
-                .attr("stroke-linecap", "round")
-                .attr("fill", 'none')
-            })
-        }
-
-        // add flow layer to map
+        // add flows layer to map
         var d3Layer = new D3Layer({
             name: 'flows',
-            map: _this.map,
+            map: this.map,
             features: links,
-            draw: draw,
-            extent: extent
+            draw: drawArc
         });
-        _this.map.addLayer(d3Layer);
+        this.map.addLayer(d3Layer);
+
+        // focus on flows layer extent
+        var extent = this._getExtent();
+        this.focusOnLayer(extent);
     }
 }
 
@@ -233,11 +246,14 @@ class D3Layer extends Layer {
         super({name: options.name});
         var _this = this;
 
-        this.map = options.map;  // OpenLayers map
-        this.features = options.features;
-        this.draw = options.draw;
+        // layer map
+        this.map = options.map;
 
-        this.extent = options.extent;
+        // layer source of features
+        this.features = options.features;
+
+        // feature draw function
+        this.draw = options.draw;
 
         // svg element
         this.svg = d3
@@ -246,83 +262,39 @@ class D3Layer extends Layer {
           .style('position', 'absolute');
         this.g = this.svg.append("g");
 
+        // draw layer only on moveend
         function onMoveEnd(evt) {
-          var map = evt.map;
-          map.getLayers().forEach(function(l) {
-            if (l instanceof D3Layer) {
-                l.renderOnMoveEnd()
-            }
-          })
+            _this.draw(_this.features);
         }
-
         function onMoveStart(evt) {
-          _this.clear();
+            _this.clear();
         }
-
         this.map.on('movestart', onMoveStart);
         this.map.on('moveend', onMoveEnd);
     }
 
-    //getSourceState() {
-    //    return SourceState.READY;
-    //}
-
-    projection(coords, projection) {
-        var projection = projection || 'EPSG:4326';
-        // convert coordinates to pixels
-        // requires input data coordinates in EPSG:4326
-        var coords = transform(coords, projection, 'EPSG:3857');
+    // convert coordinates to pixels
+    // requires input data coordinates in EPSG:4326
+    projection(coords) {
+        var coords = transform(coords, 'EPSG:4326', 'EPSG:3857');
         return this.map.getPixelFromCoordinate(coords);
     }
 
+    // clear svg of features
     clear() {
         this.g.selectAll("*").remove();
     }
 
-    addFeatures() {
-        var _this = this;
-        this.map.once('postrender', function(){
-            _this.draw(_this.features);
-        })
-    }
-
-    renderOnMoveEnd() {
-        this.draw(this.features);
-    }
-
-//    bounds() {
-//        this.
-//    }
-
+    // render layer (internal OpenLayers function)
     render(frameState) {
         var _this = this;
 
         // get map framestate
         var width = frameState.size[0],
-            height = frameState.size[1],
-            zoom = frameState.viewState.zoom;
+            height = frameState.size[1];
 
-        this.svg.attr('width', width)
-        this.svg.attr('height', height)
-
-//        this.map.once('moveend', function(){
-//            var topLeft = _this.projection(_this.extent[0]);
-//            var bottomRight = _this.projection(_this.extent[1]);
-//            topLeft = [topLeft[0] - 250, topLeft[1] - 250];
-//            bottomRight = [bottomRight[0] + 250, bottomRight[1] + 250];
-//            var bbox = [topLeft, bottomRight]
-//
-//            // resize svg & clean
-//            _this.svg.attr('width', bottomRight[0] - topLeft[0]);
-//            _this.svg.attr('height', bottomRight[1] - topLeft[1]);
-////            _this.svg.attr('transform', `scale(${zoom})`)
-//            _this.svg.style("left", topLeft[0] + "px")
-//            _this.svg.style("top", topLeft[1] + "px");
-//             _this.g.attr("transform",
-//                "translate(" + -topLeft[0] + "," + -topLeft[1] + ") ");
-//
-//
-//        });
+        this.svg.attr('width', width);
+        this.svg.attr('height', height);
 
         return this.svg.node();
     }

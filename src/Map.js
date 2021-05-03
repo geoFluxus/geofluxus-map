@@ -22,6 +22,7 @@ import html2canvas from 'html2canvas';
 import saveAs from 'file-saver';
 import '@fortawesome/fontawesome-free/js/all.js';
 import { _default } from './utils.js';
+import './base.css';
 
 
 // map bases
@@ -97,28 +98,6 @@ export default class Map {
 
         // activate highlight & tooltips
         this._onHover(options.hover);
-
-        // stylize buttons
-        this._stylizeButtons();
-    }
-
-    // stylize buttons
-    _stylizeButtons() {
-        // div style
-        var elems = document.getElementsByClassName('ol-control');
-        for (var i = 0; i < elems.length; i++) {
-            var elem = elems[i];
-            elem.style.setProperty("background-color", "transparent");
-
-            // button style
-            var children = elem.children;
-            for (var j = 0; j < children.length; j++) {
-                var name = children[j].tagName.toLowerCase()
-                if (name == 'button') {
-                    children[j].style.setProperty("background-color", "rgba(0, 0, 0, 0.2)");
-                }
-            }
-        }
     }
 
     // activate tooltips

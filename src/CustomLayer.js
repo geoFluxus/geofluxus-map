@@ -1,6 +1,7 @@
 import {Layer} from 'ol/layer';
 import * as d3 from 'd3';
 import {transform, transformExtent} from 'ol/proj';
+import './flowmap.css';
 
 
 // custom OpenLayers base layer for d3 visualizations
@@ -68,7 +69,7 @@ export default class FlowLayer extends D3Layer {
         options = options || {};
         super(options)
 
-        this.mode = {};
+        this.mode = 'none';
         this.animateOptions = {};
     }
 
@@ -127,16 +128,26 @@ export default class FlowLayer extends D3Layer {
                     curve: curve
                 }
 
-                // animation options
-                var strokeLinecap = (_this.mode == 'dash') ? "unset" : "round";
+                // draw path
+                var path = _this.g.append('path')
+                            .attr('d', _this.bezier(bezierOptions))
+                            .attr("stroke-opacity", 0.5)
+                            .attr("stroke", d.color)
+                            .attr("stroke-width", d.strokeWidth)
+                            .attr("stroke-linecap", "round")
+                            .attr("fill", 'none')
+                            .classed('flow', true)
+                .classed('animated', _this.mode);
 
-                _this.g.append('path')
-                .attr('d', _this.bezier(bezierOptions))
-                .attr("stroke-opacity", 0.5)
-                .attr("stroke", d.color)
-                .attr("stroke-width", d.strokeWidth)
-                .attr("stroke-linecap", strokeLinecap)
-                .attr("fill", 'none')
+                // animation options
+                if (_this.mode == 'dash') {
+                    var length = _this.animateOptions.length,
+                        gap = _this.animateOptions.gap,
+                        offset = _this.animateOptions.offset;
+                    path.attr("stroke-linecap", "unset");
+                    path.attr("stroke-dasharray", [length, gap].join(','));
+                    path.attr("stroke-dashoffset", offset);
+                }
 
                 // shift curve
                 xShift -= shiftStep;

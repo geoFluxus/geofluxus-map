@@ -32,7 +32,6 @@ export default class FlowMap extends Map {
             var [key, value] = pair;
             if (value) _this.map.addControl(new controlClass[key]({target: _this}));
         })
-        this._stylizeButtons();
 
         // color scale (https://colorbrewer2.org)
         // ordinal scale

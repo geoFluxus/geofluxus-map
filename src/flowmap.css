@@ -1,0 +1,21 @@
+.flow {
+    z-index: 999999 !important;
+    position: relative;
+}
+
+.animated.flow {
+    animation: flow 30s linear infinite;
+    -webkit-animation: flow 30s linear infinite;
+}
+
+@keyframes flow {
+    to {
+        stroke-dashoffset: -300;
+    }
+}
+
+@-webkit-keyframes flow {
+    to {
+        stroke-dashoffset: -300;
+    }
+}

@@ -1,0 +1,23 @@
+.ol-control {
+    background-color: transparent;
+}
+
+.ol-control button {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.ol-control:hover {
+    background-color: transparent;
+}
+
+.ol-control button:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.ol-control:focus {
+    background-color: transparent;
+}
+
+.ol-control button:focus {
+    background-color: rgba(0, 0, 0, 0.2);
+}

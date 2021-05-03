@@ -56,7 +56,6 @@ export default class NetworkMap extends Map {
             var [key, value] = pair;
             if (value) _this.map.addControl(new controlClass[key]({target: _this}));
         })
-        this._stylizeButtons();
 
         // network map options
         this.data = options.data || [];

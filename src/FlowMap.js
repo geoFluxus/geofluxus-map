@@ -22,6 +22,14 @@ export default class FlowMap extends Map {
         this.animate = 0; // no animation
         this.toHide= []; // to hide groupBy categories
 
+        // custom d3 tooltip
+        this.tooltip = d3.select("body")
+                         .append("div")
+                         .attr("class", "d3-tooltip")
+                         .style("display", 'none')
+                         .style("color", 'white')
+                         .style("position", "absolute");
+
         // FlowMap controls
         options.controls = _default(options.controls, {
             toggleFlows: true,
@@ -342,7 +350,8 @@ export default class FlowMap extends Map {
             var flowLayer = new FlowLayer({
                 name: 'flows',
                 map: this.map,
-                features: this.flows
+                features: this.flows,
+                tooltip: this.tooltip
             });
             this.map.addLayer(flowLayer);
 
@@ -350,10 +359,17 @@ export default class FlowMap extends Map {
             var extent = this._getExtent();
             this.focusOnLayer(extent);
         } else {
+            // check animation mode
             flowLayer.animate(this.animate);
+
+            // update features
             flowLayer.features = this.flows;
+
+            // clear layer
             flowLayer.clear();
-            flowLayer.draw(flowLayer.features);
+
+            // force redraw
+            flowLayer.draw();
         }
     }
 }

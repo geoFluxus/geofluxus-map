@@ -33,6 +33,9 @@ class D3Layer extends Layer {
         }
         this.map.on('movestart', onMoveStart);
         this.map.on('moveend', onMoveEnd);
+
+        // layer tooltip
+        this.tooltip = options.tooltip;
     }
 
     // convert coordinates to pixels
@@ -97,8 +100,10 @@ export default class FlowLayer extends D3Layer {
     }
 
     // draw path
-    drawPath(bezier, color, width) {
-        // draw path
+    drawPath(d, bezier, color, width) {
+        var _this = this;
+
+        // d3 path
         var path = this.g.append('path')
                     .attr('d', this.bezier(bezier))
                     .attr("stroke-opacity", 0.5)
@@ -106,13 +111,25 @@ export default class FlowLayer extends D3Layer {
                     .attr("stroke-width", width)
                     .attr("stroke-linecap", "round")
                     .style("pointer-events", 'stroke')
-                    .on("mouseover", function () {
+                    .on("mouseover", function() {
                         d3.select(this).node().parentNode.appendChild(this);
                         d3.select(this).style("cursor", "pointer");
                         path.attr("stroke-opacity", 1);
+
+                        // Show and fill tooltip:
+                        _this.tooltip
+                            .html(_this.getTooltip(d))
+                            .style('display', 'inline');
                     })
-                    .on("mouseout", function () {
+                    .on("mousemove", function(evt) {
+                        var tooltipSize = _this.tooltip.node().getBoundingClientRect();
+                        _this.tooltip
+                            .style("top", (evt.pageY - tooltipSize.height) + 'px')
+                            .style("left", (evt.pageX - (tooltipSize.width / 2)) + 'px');
+                    })
+                    .on("mouseout", function() {
                         path.attr("stroke-opacity", 0.5);
+                        _this.tooltip.style('display', 'none');
                     })
                     .attr("fill", 'none')
                     .classed('flow', true)
@@ -162,11 +179,11 @@ export default class FlowLayer extends D3Layer {
                 }
 
                 // draw path
-                _this.drawPath(bezier, d.color, d.strokeWidth);
+                _this.drawPath(d, bezier, d.color, d.strokeWidth);
 
                  // buffer path for very thin lines (easier mouseover)
                 if (d.strokeWidth < 7) {
-                    _this.drawPath(bezier, 'none', 7);
+                    _this.drawPath(d, bezier, 'none', 7);
                 }
 
                 // shift curve
@@ -195,9 +212,9 @@ export default class FlowLayer extends D3Layer {
                 }
                 break;
         }
+    }
 
-        // clear & redraw
-        this.clear();
-        this.draw();
+    getTooltip(d) {
+        return `<span>${d.source.name} -> ${d.target.name}</span>`
     }
 }

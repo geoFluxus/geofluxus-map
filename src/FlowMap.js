@@ -19,7 +19,7 @@ export default class FlowMap extends Map {
         this.groupBy = options.groupBy;  // group flows by property
         this.maxFlowWidth = options.maxFlowWidth || 50;
         this.minFlowWidth = options.minFlowWidth || 1;
-        this.animate = 0; // no animation
+        this.animate = options.animate || 0; // no animation
         this.toHide= []; // to hide groupBy categories
 
         // custom d3 tooltip
@@ -180,11 +180,11 @@ export default class FlowMap extends Map {
 
         // default & custom legend style
         this.legend.style.right = "0.5em";
-        this.legend.style.top = "0.5em";
+        this.legend.style.bottom = "0.5em";
         this.legend.style.color = 'white';
-        this.legend.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+        this.legend.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
         this.legend.style.position = 'absolute';
-        this.legend.style.borderRadius = '1rem';
+        //this.legend.style.borderRadius = '1rem';
         this.legend.style.padding = '10px';
         Object.entries(options).forEach(function(pair) {
             var [key, value] = pair;
@@ -355,6 +355,9 @@ export default class FlowMap extends Map {
             });
             this.map.addLayer(flowLayer);
 
+            // check animation mode
+            flowLayer.animate(this.animate);
+
             // focus on flows layer extent
             var extent = this._getExtent();
             this.focusOnLayer(extent);
@@ -433,15 +436,11 @@ class Animate extends Control {
         // target NetworkMap
         this.target = options.target;
 
-        // animation mode
-        this.mode = 0;
-
         button.addEventListener('click', this.animate.bind(this), false);
     }
 
     animate() {
-        this.mode++;
-        this.target.animate = this.mode;
+        this.target.animate++;
         this.target._render();
     }
 }

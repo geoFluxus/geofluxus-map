@@ -26,6 +26,10 @@ var scale = {
 const map = new FlowMap({
     target: "root",
     data: flows,
+    animate: 1,
+//    controls: {
+//        zoom: false
+//    },
 //    scale: scale,
     groupBy: 'processgroup',
     legend: {

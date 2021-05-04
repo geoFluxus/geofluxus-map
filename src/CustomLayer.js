@@ -215,6 +215,6 @@ export default class FlowLayer extends D3Layer {
     }
 
     getTooltip(d) {
-        return `<span>${d.source.name} -> ${d.target.name}</span>`
+        return `<span>${d.source.name} <i class="fas fa-arrow-right"></i> ${d.target.name}</span>`
     }
 }

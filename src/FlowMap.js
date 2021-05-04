@@ -59,6 +59,9 @@ export default class FlowMap extends Map {
         // load colors to links
         this._colorLinks();
 
+        // get legend
+        this._getLegend();
+
         // process to render map anew
         this.animate = 0; // no animation
         this._render();
@@ -152,6 +155,69 @@ export default class FlowMap extends Map {
 
         links.forEach(function(link) {
             link.color = _this.colors[link[_this.groupBy]];
+        })
+    }
+
+    // get legend
+    _getLegend() {
+        var _this = this;
+
+        // legend div
+        if (this.legend != undefined) this.legend.remove();
+        this.legend = document.createElement('div');
+
+        // default legend style
+        this.legend.style.right = "0.5em";
+        this.legend.style.top = "0.5em";
+        this.legend.style.color = 'white';
+        this.legend.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+        this.legend.style.position = 'absolute';
+        this.legend.style.borderRadius = '1rem';
+        this.legend.style.padding = '10px';
+
+        // create OpenLayers control for legend
+        this.legend.id = 'legend';
+        var controlPanel = new Control({
+            element: this.legend
+        });
+        this.map.addControl(controlPanel);
+
+        // legend title
+        var title = document.createElement('div');
+        title.id = "legend-title";
+        title.style.textAlign = "center";
+        title.style.padding = '10px';
+        title.innerHTML = '<span><b>Legend</b></span>';
+        this.legend.appendChild(title);
+
+        // checkboxes for groupby property
+        Object.entries(this.colors).forEach(function(entry) {
+            var [property, color] = entry
+
+            // div to host checkbox & label
+            var div = document.createElement('div')
+            div.style.margin = '10px'
+
+            // checkbox wrapper
+            var wrapper = document.createElement('div')
+            wrapper.style.width = '20px';
+            wrapper.style.lineHeight = '0';
+            wrapper.style.float = 'left';
+            wrapper.style.backgroundColor = `${color}`
+            wrapper.style.marginRight = '10px';
+            wrapper.style.borderRadius = '3px';
+
+            // checkbox
+            var checkbox = document.createElement('input');
+            var label = document.createElement('label');
+            label.innerHTML = property;
+            checkbox.type = 'checkbox';
+
+            // append elements
+            wrapper.appendChild(checkbox);
+            div.appendChild(wrapper);
+            div.appendChild(label);
+            _this.legend.appendChild(div);
         })
     }
 

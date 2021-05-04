@@ -96,6 +96,39 @@ export default class FlowLayer extends D3Layer {
             " " + target.x + "," + target.y;
     }
 
+    // draw path
+    drawPath(bezier, color, width) {
+        // draw path
+        var path = this.g.append('path')
+                    .attr('d', this.bezier(bezier))
+                    .attr("stroke-opacity", 0.5)
+                    .attr("stroke", color)
+                    .attr("stroke-width", width)
+                    .attr("stroke-linecap", "round")
+                    .style("pointer-events", 'stroke')
+                    .on("mouseover", function () {
+                        d3.select(this).node().parentNode.appendChild(this);
+                        d3.select(this).style("cursor", "pointer");
+                        path.attr("stroke-opacity", 1);
+                    })
+                    .on("mouseout", function () {
+                        path.attr("stroke-opacity", 0.5);
+                    })
+                    .attr("fill", 'none')
+                    .classed('flow', true)
+                    .classed('animated', this.mode);
+
+        // animation options
+        if (this.mode == 'dash') {
+            var length = this.animateOptions.length,
+                gap = this.animateOptions.gap,
+                offset = this.animateOptions.offset;
+            path.attr("stroke-linecap", "unset");
+            path.attr("stroke-dasharray", [length, gap].join(','));
+            path.attr("stroke-dashoffset", offset);
+        }
+    }
+
     // function to draw arcs
     draw() {
         var _this = this;
@@ -120,7 +153,7 @@ export default class FlowLayer extends D3Layer {
                 target = _this.getPixelFromCoordinate(target);
 
                 // curve options
-                var bezierOptions = {
+                var bezier = {
                     source: source,
                     target: target,
                     xShift: xShift,
@@ -129,24 +162,11 @@ export default class FlowLayer extends D3Layer {
                 }
 
                 // draw path
-                var path = _this.g.append('path')
-                            .attr('d', _this.bezier(bezierOptions))
-                            .attr("stroke-opacity", 0.5)
-                            .attr("stroke", d.color)
-                            .attr("stroke-width", d.strokeWidth)
-                            .attr("stroke-linecap", "round")
-                            .attr("fill", 'none')
-                            .classed('flow', true)
-                .classed('animated', _this.mode);
+                _this.drawPath(bezier, d.color, d.strokeWidth);
 
-                // animation options
-                if (_this.mode == 'dash') {
-                    var length = _this.animateOptions.length,
-                        gap = _this.animateOptions.gap,
-                        offset = _this.animateOptions.offset;
-                    path.attr("stroke-linecap", "unset");
-                    path.attr("stroke-dasharray", [length, gap].join(','));
-                    path.attr("stroke-dashoffset", offset);
+                 // buffer path for very thin lines (easier mouseover)
+                if (d.strokeWidth < 7) {
+                    _this.drawPath(bezier, 'none', 7);
                 }
 
                 // shift curve

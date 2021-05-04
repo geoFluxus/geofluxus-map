@@ -2,15 +2,14 @@ import {FlowMap} from '../index.js'
 import flows from '../data/flows'
 
 //var data = []
-//for (var i=0; i < 10; i++) {
+//for (var i=0; i < 100; i++) {
 //    var offLon = Math.floor((Math.random()*100) + 1) * 0.1,
-//        offLat = Math.floor((Math.random()*100) + 1) * 0.1,
-//        more = Math.floor((Math.random()*100) + 1) * 0.1;
+//        offLat = Math.floor((Math.random()*100) + 1) * 0.1;
 //    flows.forEach(function(f) {
 //        var add = JSON.parse(JSON.stringify(f));
 //        add.source.lon += offLon;
 //        add.source.lat -= offLat;
-//        add.processgroup += more;
+////        add.processgroup += more;
 //        data.push(add)
 //    })
 //}
@@ -28,5 +27,11 @@ const map = new FlowMap({
     target: "root",
     data: flows,
 //    scale: scale,
-    groupBy: 'processgroup'
+    groupBy: 'processgroup',
+    legend: {
+        title: "<span><b>Process groups</b></span>",
+//        overflow: 'hidden',
+//        height: '200px',
+//        overflowY: 'scroll'
+    }
 })

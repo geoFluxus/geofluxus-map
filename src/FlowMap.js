@@ -13,11 +13,14 @@ export default class FlowMap extends Map {
         });
         super(options);
 
+        // default properties
         var _this = this;
         this.data = options.data || [];
-        this.groupBy = options.groupBy;
+        this.groupBy = options.groupBy;  // group flows by property
         this.maxFlowWidth = options.maxFlowWidth || 50;
         this.minFlowWidth = options.minFlowWidth || 1;
+        this.animate = 0; // no animation
+        this.toHide= []; // to hide groupBy categories
 
         // FlowMap controls
         options.controls = _default(options.controls, {
@@ -60,10 +63,10 @@ export default class FlowMap extends Map {
         this._colorLinks();
 
         // get legend
-        this._getLegend();
+        this.legendOptions = options.legend || {};
+        this._drawLegend();
 
         // process to render map anew
-        this.animate = 0; // no animation
         this._render();
     }
 
@@ -158,15 +161,16 @@ export default class FlowMap extends Map {
         })
     }
 
-    // get legend
-    _getLegend() {
+    // draw legend
+    _drawLegend() {
         var _this = this;
+        var options = this.legendOptions;
 
         // legend div
         if (this.legend != undefined) this.legend.remove();
         this.legend = document.createElement('div');
 
-        // default legend style
+        // default & custom legend style
         this.legend.style.right = "0.5em";
         this.legend.style.top = "0.5em";
         this.legend.style.color = 'white';
@@ -174,6 +178,10 @@ export default class FlowMap extends Map {
         this.legend.style.position = 'absolute';
         this.legend.style.borderRadius = '1rem';
         this.legend.style.padding = '10px';
+        Object.entries(options).forEach(function(pair) {
+            var [key, value] = pair;
+            _this.legend.style[key] = value;
+        })
 
         // create OpenLayers control for legend
         this.legend.id = 'legend';
@@ -187,47 +195,89 @@ export default class FlowMap extends Map {
         title.id = "legend-title";
         title.style.textAlign = "center";
         title.style.padding = '10px';
-        title.innerHTML = '<span><b>Legend</b></span>';
+        title.innerHTML = options.title || '<span><b>Legend</b></span>';
         this.legend.appendChild(title);
+
+        // add selectAll
+        var selectAll = this._getCheckbox(['Select All', 'none']),
+            checkboxes = [];
 
         // checkboxes for groupby property
         Object.entries(this.colors).forEach(function(entry) {
-            var [property, color] = entry
+            var checkbox = _this._getCheckbox(entry);
+            checkboxes.push(checkbox);
 
-            // div to host checkbox & label
-            var div = document.createElement('div')
-            div.style.margin = '10px'
-
-            // checkbox wrapper
-            var wrapper = document.createElement('div')
-            wrapper.style.width = '20px';
-            wrapper.style.lineHeight = '0';
-            wrapper.style.float = 'left';
-            wrapper.style.backgroundColor = `${color}`
-            wrapper.style.marginRight = '10px';
-            wrapper.style.borderRadius = '3px';
-
-            // checkbox
-            var checkbox = document.createElement('input');
-            var label = document.createElement('label');
-            label.innerHTML = property;
-            checkbox.type = 'checkbox';
-
-            // append elements
-            wrapper.appendChild(checkbox);
-            div.appendChild(wrapper);
-            div.appendChild(label);
-            _this.legend.appendChild(div);
+            // add event
+            checkbox.addEventListener('change', function() {
+                var id = this.id;
+                if (this.checked) {
+                    _this.toHide = _this.toHide.filter(function(item) {
+                        return item !== id
+                    })
+                } else {
+                    selectAll.checked = false;
+                    _this.toHide.push(id);
+                }
+                _this._render();
+                if (!_this.toHide.length) selectAll.checked = true;
+            });
+            checkbox.checked = true;  // checked by default
         })
+
+        // selectAll event
+        selectAll.addEventListener('change', function() {
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = this.checked;
+                var event = new Event('change');
+                checkboxes[i].dispatchEvent(event);
+            }
+        })
+        selectAll.checked = true;  // checked by default
+    }
+
+    // create groupBy checkbox
+    _getCheckbox(entry) {
+        var _this = this,
+            [property, color] = entry;
+
+        // div to host checkbox & label
+        var div = document.createElement('div')
+        div.style.margin = '10px'
+
+        // checkbox wrapper
+        var wrapper = document.createElement('div')
+        wrapper.style.float = 'left';
+        wrapper.style.backgroundColor = `${color}`
+        wrapper.style.marginRight = '10px';
+        wrapper.style.borderRadius = '3px';
+
+        // checkbox
+        var checkbox = document.createElement('input');
+        var label = document.createElement('label');
+        label.innerHTML = property;
+        checkbox.type = 'checkbox';
+        checkbox.id = property;
+
+        // append elements
+        wrapper.appendChild(checkbox);
+        div.appendChild(wrapper);
+        div.appendChild(label);
+        this.legend.appendChild(div);
+
+        return checkbox;
     }
 
     // get flows
     _getFlows() {
         var _this = this;
 
-        // collect flows with same source and target
         this.flows = {};
         this.data.links.forEach(function(link) {
+            // if toHide, continue
+            var property = link[_this.groupBy];
+            if (_this.toHide.includes(property)) return;
+
+            // collect links with same source and target
             var id = link._source + '-' + link._target;
             if (!_this.flows[id]) _this.flows[id] = [];
             _this.flows[id].push(link);
@@ -301,6 +351,9 @@ export default class FlowMap extends Map {
             this.focusOnLayer(extent);
         } else {
             flowLayer.animate(this.animate);
+            flowLayer.features = this.flows;
+            flowLayer.clear();
+            flowLayer.draw(flowLayer.features);
         }
     }
 }

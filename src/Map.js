@@ -126,7 +126,7 @@ export default class Map {
             tooltipStyle = tooltip.style || {};
 
         // default style options
-        div.style.fontFamily = "'Helvetica', 'Arial', sans-serif";
+        //div.style.fontFamily = "'Helvetica', 'Arial', sans-serif";
 
         // change style options
         Object.entries(tooltipStyle).forEach(function(pair) {
@@ -428,7 +428,7 @@ class Reset extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-reset ol-unselectable ol-control';
-        element.style.top = '4.5em';
+        element.style.top = '7em';
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -463,7 +463,7 @@ class ExportPNG extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-export-png ol-unselectable ol-control';
-        element.style.top = '7em';
+        element.style.top = '9.5em';
         element.style.left = '.5em';
         element.appendChild(button);
 

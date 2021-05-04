@@ -253,7 +253,7 @@ class ToggleFlows extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-toggle-flows ol-unselectable ol-control';
-        element.style.top = '9.5em';
+        element.style.top = '12em';
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -287,7 +287,7 @@ class Animate extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-animate ol-unselectable ol-control';
-        element.style.top = '12em';
+        element.style.top = '14.5em';
         element.style.left = '.5em';
         element.appendChild(button);
 

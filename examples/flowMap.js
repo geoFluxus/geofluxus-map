@@ -2,7 +2,7 @@ import {FlowMap} from '../index.js'
 import flows from '../data/flows'
 
 //var data = []
-//for (var i=0; i < 1000; i++) {
+//for (var i=0; i < 10; i++) {
 //    var offLon = Math.floor((Math.random()*100) + 1) * 0.1,
 //        offLat = Math.floor((Math.random()*100) + 1) * 0.1;
 //    flows.forEach(function(f) {

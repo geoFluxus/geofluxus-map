@@ -1,3 +1,7 @@
+.ol-viewport {
+    font-family: Helvetica, Arial, sans-serif;
+}
+
 .ol-control {
     background-color: transparent;
 }
@@ -20,4 +24,9 @@
 
 .ol-control button:focus {
     background-color: rgba(0, 0, 0, 0.2);
+}
+
+.ol-full-screen {
+    left: .5em;
+    top: 4.5em;
 }

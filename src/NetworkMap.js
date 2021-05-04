@@ -186,7 +186,7 @@ export default class NetworkMap extends Map {
         this.legend.style.margin = "auto";
         this.legend.style.bottom = '0';
         this.legend.style.color = 'white';
-        this.legend.style.fontFamily = "'Helvetica', 'Arial', sans-serif";
+        //this.legend.style.fontFamily = "'Helvetica', 'Arial', sans-serif";
         this.legend.style.position = 'absolute';
 
         // load custom style
@@ -277,7 +277,7 @@ class ToggleNetwork extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-toggle-network ol-unselectable ol-control';
-        element.style.top = '9.5em';
+        element.style.top = '12em';
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -311,7 +311,7 @@ class ToggleLegend extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-toggle-legend ol-unselectable ol-control';
-        element.style.top = '12em';
+        element.style.top = '14.5em';
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -345,7 +345,7 @@ class ToggleLight extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-toggle-light ol-unselectable ol-control';
-        element.style.top = '14.5em';
+        element.style.top = '17em';
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -396,7 +396,7 @@ class ExportCSV extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-toggle-network ol-unselectable ol-control';
-        element.style.top = '17em';
+        element.style.top = '19.5em';
         element.style.left = '.5em';
         element.appendChild(button);
 

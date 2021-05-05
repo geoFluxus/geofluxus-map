@@ -23,9 +23,10 @@ var scale = {
     'Recycling': 'rgb(102,166,30)'
 };
 
-const map = new FlowMap({
-    target: "root",
+const map1 = new FlowMap({
+    target: "root1",
     data: flows,
+    base: {source: 'cartodb_light'},
     animate: 0,
 //    controls: {
 //        zoom: false
@@ -39,3 +40,23 @@ const map = new FlowMap({
 //        overflowY: 'scroll'
     }
 })
+
+
+const map2 = new FlowMap({
+    target: "root2",
+    data: flows,
+    animate: 1,
+//    controls: {
+//        zoom: false
+//    },
+//    scale: scale,
+    groupBy: 'processgroup',
+    legend: {
+        title: "<span><b>PROCESS GROUPS</b></span>",
+//        overflow: 'hidden',
+//        height: '200px',
+//        overflowY: 'scroll'
+    }
+})
+
+console.log(flows)

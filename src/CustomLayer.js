@@ -23,6 +23,7 @@ class D3Layer extends Layer {
           .append('svg')
           .style('position', 'absolute');
         this.g = this.svg.append("g");
+        this.defs = this.svg.append("defs");
 
         // draw layer only on moveend
         function onMoveEnd(evt) {
@@ -30,6 +31,7 @@ class D3Layer extends Layer {
         }
         function onMoveStart(evt) {
             _this.clear();
+            _this.tooltip.style('visibility', 'hidden');
         }
         this.map.on('movestart', onMoveStart);
         this.map.on('moveend', onMoveEnd);
@@ -48,6 +50,7 @@ class D3Layer extends Layer {
     // clear svg of features
     clear() {
         this.g.selectAll("*").remove();
+        this.defs.selectAll("*").remove();
     }
 
     // render layer (internal OpenLayers function)
@@ -103,11 +106,35 @@ export default class FlowLayer extends D3Layer {
     drawPath(d, bezier, color, width) {
         var _this = this;
 
+        var target = this.map.getTarget();
+        if (color != 'none') {
+            // color gradient along path
+            var gradient = this.defs.append('linearGradient')
+                                    .attr("id", `${target}_grad${d._id}`)
+                                    .attr("x1", bezier.source[0])
+                                    .attr("y1", bezier.source[1])
+                                    .attr("x2", bezier.target[0])
+                                    .attr("y2", bezier.target[1])
+                                    .attr('gradientUnits', "userSpaceOnUse")
+            // gradient start
+            gradient.append('stop')
+                    .attr('stop-color', color)
+                    .attr('stop-opacity', 0.2)
+                    .attr('offset', 0)
+
+            // gradient stop
+            gradient.append('stop')
+                    .attr('stop-color', color)
+                    .attr('stop-opacity', 1.0)
+                    .attr('offset', 1)
+        }
+
         // d3 path
+        var gradRef = color == 'none' ? 'none' : `url(#${target}_grad${d._id})`;
         var path = this.g.append('path')
                     .attr('d', this.bezier(bezier))
                     .attr("stroke-opacity", 0.5)
-                    .attr("stroke", color)
+                    .attr("stroke", gradRef)
                     .attr("stroke-width", width)
                     .attr("stroke-linecap", "round")
                     .style("pointer-events", 'stroke')
@@ -115,6 +142,7 @@ export default class FlowLayer extends D3Layer {
                         d3.select(this).node().parentNode.appendChild(this);
                         d3.select(this).style("cursor", "pointer");
                         path.attr("stroke-opacity", 1);
+                        path.attr("stroke", color);
 
                         // Show and fill tooltip:
                         _this.tooltip
@@ -129,6 +157,7 @@ export default class FlowLayer extends D3Layer {
                     })
                     .on("mouseout", function() {
                         path.attr("stroke-opacity", 0.5);
+                        path.attr("stroke", gradRef);
                         _this.tooltip.style("visibility", "hidden")
                     })
                     .attr("fill", 'none')

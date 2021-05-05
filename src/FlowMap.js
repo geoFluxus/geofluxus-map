@@ -15,7 +15,7 @@ export default class FlowMap extends Map {
 
         // default properties
         var _this = this;
-        this.data = options.data || [];
+        this.data = JSON.parse(JSON.stringify(options.data || []));  // shallow copy
         this.groupBy = options.groupBy;  // group flows by property
         this.maxFlowWidth = options.maxFlowWidth || 50;
         this.minFlowWidth = options.minFlowWidth || 1;
@@ -23,25 +23,35 @@ export default class FlowMap extends Map {
         this.toHide= []; // to hide groupBy categories
 
         // custom d3 tooltip
-        this.tooltip = d3.select("body")
+        this.tooltip = d3.select(`#${options.target}`)
                          .append("div")
                          .attr("class", "d3-tooltip")
                          .style("visibility", "hidden")
                          .style("color", 'white')
-                         .style("position", "absolute");
+                         .style("position", "absolute")
+                         .style("font-family", "Helvetica, Arial, sans-serif");
 
         // FlowMap controls
         options.controls = _default(options.controls, {
             toggleFlows: true,
             animate: true,
+            toggleLegend: true,
         });
         var controlClass = {
             toggleFlows: ToggleFlows,
-            animate: Animate
+            animate: Animate,
+            toggleLegend: ToggleLegend
         }
+        var topPos = 12;
         Object.entries(options.controls).forEach(function(pair) {
             var [key, value] = pair;
-            if (value) _this.map.addControl(new controlClass[key]({target: _this}));
+            if (value) {
+                _this.map.addControl(new controlClass[key]({
+                    target: _this,
+                    top: `${topPos}em`
+                }));
+                topPos += 2.5;
+            }
         })
 
         // color scale (https://colorbrewer2.org)
@@ -136,7 +146,8 @@ export default class FlowMap extends Map {
         nodes.forEach(function(n, i) {
             idx[n] = i;
         })
-        links.forEach(function(l) {
+        links.forEach(function(l, i) {
+            l._id = i;
             l._source = idx[JSON.stringify(l.source)];
             l._target = idx[JSON.stringify(l.target)];
         })
@@ -144,6 +155,7 @@ export default class FlowMap extends Map {
         // source / target -> link
         nodes.forEach(function(n, i) {
             nodes[i] = JSON.parse(n);
+            nodes[i]._id = i;
             nodes[i]._sourceLinks = [];
             nodes[i]._targetLinks = [];
         })
@@ -391,7 +403,7 @@ class ToggleFlows extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-toggle-flows ol-unselectable ol-control';
-        element.style.top = '12em';
+        element.style.top = options.top;
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -425,7 +437,7 @@ class Animate extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-animate ol-unselectable ol-control';
-        element.style.top = '14.5em';
+        element.style.top = options.top;
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -442,5 +454,39 @@ class Animate extends Control {
     animate() {
         this.target.animate++;
         this.target._render();
+    }
+}
+
+
+// toggle legend control
+class ToggleLegend extends Control {
+    constructor(options) {
+        options = options || {};
+
+        // default button style
+        const button = document.createElement('button');
+        button.innerHTML = '<i class="fas fa-palette"></i>';
+        button.className = 'ol-toggle-legend';
+        button.title = "Toggle legend"
+
+        const element = document.createElement('div');
+        element.className = 'ol-toggle-legend ol-unselectable ol-control';
+        element.style.top = options.top;
+        element.style.left = '.5em';
+        element.appendChild(button);
+
+        super({
+            element: element
+        });
+
+        // target NetworkMap
+        this.target = options.target;
+
+        button.addEventListener('click', this.toggleLegend.bind(this), false);
+    }
+
+    toggleLegend() {
+        var legend = this.target.legend;
+        legend.style.display = legend.style.display == 'none' ? 'block' : 'none';
     }
 }

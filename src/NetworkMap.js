@@ -52,13 +52,20 @@ export default class NetworkMap extends Map {
             toggleLight: ToggleLight,
             exportCSV: ExportCSV
         }
+        var topPos = 12;
         Object.entries(options.controls).forEach(function(pair) {
             var [key, value] = pair;
-            if (value) _this.map.addControl(new controlClass[key]({target: _this}));
+            if (value) {
+                _this.map.addControl(new controlClass[key]({
+                    target: _this,
+                    top: `${topPos}em`
+                }));
+                topPos += 2.5;
+            }
         })
 
         // network map options
-        this.data = options.data || [];
+        this.data = JSON.parse(JSON.stringify(options.data || []));
         this.defaultColor = options.defaultColor || 'white';
 
         // color scale (https://colorbrewer2.org)
@@ -220,7 +227,7 @@ export default class NetworkMap extends Map {
         palette.id = "legend-palette";
         this.legend.appendChild(palette);
 
-        var rectSVG = d3.select("#legend-palette")
+        var rectSVG = d3.select(palette)
                         .append("svg")
                         .attr("width", width + rectWidth)
                         .attr("height", height),
@@ -242,7 +249,7 @@ export default class NetworkMap extends Map {
         axis.id = "legend-axis";
         this.legend.appendChild(axis);
 
-        var textSVG = d3.select("#legend-axis")
+        var textSVG = d3.select(palette)
                         .append("svg")
                         .attr("width", width + rectWidth * 1.1)
                         .attr("height", height),
@@ -277,7 +284,7 @@ class ToggleNetwork extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-toggle-network ol-unselectable ol-control';
-        element.style.top = '12em';
+        element.style.top = options.top;
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -311,7 +318,7 @@ class ToggleLegend extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-toggle-legend ol-unselectable ol-control';
-        element.style.top = '14.5em';
+        element.style.top = options.top;
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -345,7 +352,7 @@ class ToggleLight extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-toggle-light ol-unselectable ol-control';
-        element.style.top = '17em';
+        element.style.top = options.top;
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -396,7 +403,7 @@ class ExportCSV extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-toggle-network ol-unselectable ol-control';
-        element.style.top = '19.5em';
+        element.style.top = options.top;
         element.style.left = '.5em';
         element.appendChild(button);
 

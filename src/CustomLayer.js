@@ -91,12 +91,12 @@ export default class FlowLayer extends D3Layer {
             sy = options.yShift || 0.1;
         var arc = [sx * dx, sy * dy, sy * dx, sx * dy],
             bezier = [sx * dx, sy * dy, sx * dx, sy * dy],
-            controls = (options.curve === 'arc') ? arc : bezier;
+            controls = arc;
 
         return "M" + source.x + "," + source.y +
             "C" + (source.x - controls[0]) + "," + (source.y - controls[1]) +
             " " + (target.x + controls[2]) + "," + (target.y + controls[3]) +
-            " " + target.x + "," + target.y;
+            " " + target.x + "," + target.y
     }
 
     // draw path
@@ -119,7 +119,7 @@ export default class FlowLayer extends D3Layer {
                         // Show and fill tooltip:
                         _this.tooltip
                             .html(_this.getTooltip(d))
-                            .style('display', 'inline');
+                            .style("visibility", "visible")
                     })
                     .on("mousemove", function(evt) {
                         var tooltipSize = _this.tooltip.node().getBoundingClientRect();
@@ -129,7 +129,7 @@ export default class FlowLayer extends D3Layer {
                     })
                     .on("mouseout", function() {
                         path.attr("stroke-opacity", 0.5);
-                        _this.tooltip.style('display', 'none');
+                        _this.tooltip.style("visibility", "hidden")
                     })
                     .attr("fill", 'none')
                     .classed('flow', true)
@@ -162,6 +162,9 @@ export default class FlowLayer extends D3Layer {
 
             // draw flows
             flows.forEach(function(d) {
+                // if no display, proceed to next flow
+                if (d.display == 'none') return;
+
                 // get flow source & target
                 // convert to pixels
                 var source = [d.source.lon, d.source.lat],

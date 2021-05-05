@@ -26,7 +26,7 @@ export default class FlowMap extends Map {
         this.tooltip = d3.select("body")
                          .append("div")
                          .attr("class", "d3-tooltip")
-                         .style("display", 'none')
+                         .style("visibility", "hidden")
                          .style("color", 'white')
                          .style("position", "absolute");
 
@@ -281,9 +281,9 @@ export default class FlowMap extends Map {
 
         this.flows = {};
         this.data.links.forEach(function(link) {
-            // if toHide, continue
+            // if toHide, change visibility
             var property = link[_this.groupBy];
-            if (_this.toHide.includes(property)) return;
+            link.display = _this.toHide.includes(property) ? "none" : "block";
 
             // collect links with same source and target
             var id = link._source + '-' + link._target;

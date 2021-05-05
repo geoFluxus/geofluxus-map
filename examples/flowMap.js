@@ -2,7 +2,7 @@ import {FlowMap} from '../index.js'
 import flows from '../data/flows'
 
 //var data = []
-//for (var i=0; i < 100; i++) {
+//for (var i=0; i < 50; i++) {
 //    var offLon = Math.floor((Math.random()*100) + 1) * 0.1,
 //        offLat = Math.floor((Math.random()*100) + 1) * 0.1;
 //    flows.forEach(function(f) {
@@ -13,7 +13,7 @@ import flows from '../data/flows'
 //        data.push(add)
 //    })
 //}
-//console.log(data)
+//console.log(data.length)
 
 var scale = {
     'Storage': 'rgb(27,158,119)',
@@ -26,7 +26,7 @@ var scale = {
 const map = new FlowMap({
     target: "root",
     data: flows,
-    animate: 1,
+    animate: 0,
 //    controls: {
 //        zoom: false
 //    },

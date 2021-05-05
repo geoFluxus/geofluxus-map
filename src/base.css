@@ -30,3 +30,11 @@
     left: .5em;
     top: 4.5em;
 }
+
+.ol-attribution {
+    top: .5em;
+}
+
+.ol-attribution:not(.ol-collapsed) {
+    background: transparent;
+}

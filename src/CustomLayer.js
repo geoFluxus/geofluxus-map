@@ -37,7 +37,8 @@ class D3Layer extends Layer {
         this.map.on('moveend', onMoveEnd);
 
         // layer tooltip
-        this.tooltip = options.tooltip;
+        this.tooltip = options.tooltip.element;
+        this.tooltipBody = options.tooltip.body;
     }
 
     // convert coordinates to pixels
@@ -133,7 +134,7 @@ export default class FlowLayer extends D3Layer {
         var gradRef = color == 'none' ? 'none' : `url(#${target}_grad${d._id})`;
         var path = this.g.append('path')
                     .attr('d', this.bezier(bezier))
-                    .attr("stroke-opacity", 0.5)
+                    //.attr("stroke-opacity", 0.5)
                     .attr("stroke", gradRef)
                     .attr("stroke-width", width)
                     .attr("stroke-linecap", "round")
@@ -146,7 +147,7 @@ export default class FlowLayer extends D3Layer {
 
                         // Show and fill tooltip:
                         _this.tooltip
-                            .html(_this.getTooltip(d))
+                            .html(_this.tooltipBody(d))
                             .style("visibility", "visible")
                     })
                     .on("mousemove", function(evt) {
@@ -156,7 +157,7 @@ export default class FlowLayer extends D3Layer {
                             .style("left", (evt.pageX - (tooltipSize.width / 2)) + 'px');
                     })
                     .on("mouseout", function() {
-                        path.attr("stroke-opacity", 0.5);
+                        //path.attr("stroke-opacity", 0.5);
                         path.attr("stroke", gradRef);
                         _this.tooltip.style("visibility", "hidden")
                     })
@@ -244,9 +245,5 @@ export default class FlowLayer extends D3Layer {
                 }
                 break;
         }
-    }
-
-    getTooltip(d) {
-        return `<span>${d.source.name} <i class="fas fa-arrow-right"></i> ${d.target.name}</span>`
     }
 }

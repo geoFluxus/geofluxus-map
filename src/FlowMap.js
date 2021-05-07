@@ -30,6 +30,21 @@ export default class FlowMap extends Map {
                          .style("color", 'white')
                          .style("position", "absolute")
                          .style("font-family", "Helvetica, Arial, sans-serif");
+        var tooltipOptions = options.tooltip || {};
+        this.tooltipBody = tooltipOptions.body || function(d) {
+            return `<span>${d[options.groupBy]}: ${d.amount.toFixed(2)}</span>`;
+        };
+        this.tooltipStyle = _default(tooltipOptions.style, {
+            color: 'white',
+            padding: '0.5em',
+            fontSize: '15px',
+            backgroundColor: 'rgba(139, 138, 138, 1)',
+            borderRadius: '1.5rem'
+        });
+        Object.entries(this.tooltipStyle).forEach(function(pair) {
+            var [key, value] = pair;
+            _this.tooltip.node().style[key] = value;
+        })
 
         // FlowMap controls
         options.controls = _default(options.controls, {
@@ -363,7 +378,10 @@ export default class FlowMap extends Map {
                 name: 'flows',
                 map: this.map,
                 features: this.flows,
-                tooltip: this.tooltip
+                tooltip: {
+                    element: this.tooltip,
+                    body: this.tooltipBody
+                }
             });
             this.map.addLayer(flowLayer);
 

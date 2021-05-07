@@ -27,11 +27,11 @@ const map1 = new NetworkMap({
 //            zIndex: 9999
 //        },
         tooltip: {
-            body: function(d) {
-                return `
-                <span>${d.get('amount')} tn waste</span>
-                `;
-            }
+//            body: function(d) {
+//                return `
+//                <span>${d.get('amount')} tn waste</span>
+//                `;
+//            }
         }
     },
     data: data,

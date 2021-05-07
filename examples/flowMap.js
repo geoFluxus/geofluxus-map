@@ -56,7 +56,34 @@ const map2 = new FlowMap({
 //        overflow: 'hidden',
 //        height: '200px',
 //        overflowY: 'scroll'
+    },
+    tooltip: {
+        body: function(d) {
+            return `
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>Process group: </td>
+                            <td>${d.processgroup}</td>
+                        </tr>
+                        <tr>
+                            <td>From: </td>
+                            <td>${d.source.name}</td>
+                        </tr>
+                        <tr>
+                            <td>To: </td>
+                            <td>${d.target.name }</td>
+                        </tr>
+                        <tr>
+                            <td>Amount: </td>
+                            <td>${d.amount.toFixed(2)} tonnes</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        },
+        style: {
+            padding: '15px'
+        }
     }
 })
-
-console.log(flows)

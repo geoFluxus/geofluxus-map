@@ -44,7 +44,7 @@ export default class NetworkMap extends Map {
             toggleNetwork: true,
             toggleLegend: true,
             toggleLight: true,
-            exportCSV: true
+            exportCSV: false
         });
         var controlClass = {
             toggleNetwork: ToggleNetwork,

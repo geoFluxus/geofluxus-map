@@ -25,17 +25,16 @@ export default class FlowMap extends Map {
         // custom d3 tooltip
         this.tooltip = d3.select(`#${options.target}`)
                          .append("div")
-                         .attr("class", "d3-tooltip")
-                         .style("visibility", "hidden")
-                         .style("color", 'white')
-                         .style("position", "absolute")
-                         .style("font-family", "Helvetica, Arial, sans-serif");
+                         .attr("class", "d3-tooltip");
         var tooltipOptions = options.tooltip || {};
         this.tooltipBody = tooltipOptions.body || function(d) {
             return `<span>${d[options.groupBy]}: ${d.amount.toFixed(2)}</span>`;
         };
         this.tooltipStyle = _default(tooltipOptions.style, {
+            visibility: "hidden",
+            position: "absolute",
             color: 'white',
+            fontFamily: "Helvetica, Arial, sans-serif",
             padding: '0.5em',
             fontSize: '15px',
             backgroundColor: 'rgba(139, 138, 138, 1)',
@@ -292,6 +291,7 @@ export default class FlowMap extends Map {
         label.innerHTML = property;
         checkbox.type = 'checkbox';
         checkbox.id = property;
+        checkbox.style.cursor = 'pointer';
 
         // append elements
         wrapper.appendChild(checkbox);
@@ -310,7 +310,8 @@ export default class FlowMap extends Map {
         this.data.links.forEach(function(link) {
             // if toHide, change visibility
             var property = link[_this.groupBy];
-            link.display = _this.toHide.includes(property) ? "none" : "block";
+            var display = _this.toHide.includes(property) ? "none" : "block";
+            link.display = display;
 
             // collect links with same source and target
             var id = link._source + '-' + link._target;

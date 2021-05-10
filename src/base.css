@@ -1,31 +1,10 @@
+/* change map font */
 .ol-viewport {
     font-family: Helvetica, Arial, sans-serif;
 }
 
-.ol-control {
-    background-color: transparent;
-}
 
-.ol-control button {
-    background-color: rgba(0, 0, 0, 0.2);
-}
-
-.ol-control:hover {
-    background-color: transparent;
-}
-
-.ol-control button:hover {
-    background-color: rgba(0, 0, 0, 0.2);
-}
-
-.ol-control:focus {
-    background-color: transparent;
-}
-
-.ol-control button:focus {
-    background-color: rgba(0, 0, 0, 0.2);
-}
-
+/* re-position default buttons */
 .ol-full-screen {
     left: .5em;
     top: 4.5em;
@@ -37,4 +16,32 @@
 
 .ol-attribution:not(.ol-collapsed) {
     background: transparent;
+}
+
+
+/* control style */
+.ol-control {
+    background-color: transparent;
+}
+
+.ol-control:hover {
+    background-color: transparent;
+}
+
+.ol-control:focus {
+    background-color: transparent;
+}
+
+.ol-control button {
+    background-color: transparent;
+    color: black;
+}
+
+.ol-control button:hover {
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.ol-control button:focus {
+    background-color: transparent;
 }

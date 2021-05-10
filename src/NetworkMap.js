@@ -63,6 +63,7 @@ export default class NetworkMap extends Map {
                 topPos += 2.5;
             }
         })
+        this._stylizeButtons({color: 'white'});
 
         // network map options
         this.data = JSON.parse(JSON.stringify(options.data || []));
@@ -377,6 +378,9 @@ class ToggleLight extends Control {
         var color = this.target.legendOptions.color == 'white' ? 'black' : 'white';
         this.target.legendOptions.color = color;
         this.target._drawLegend();
+
+        // change button style
+        this.target._stylizeButtons({color: color});
 
         // change network color
         var networkLayer = this.target._getLayer('network'),

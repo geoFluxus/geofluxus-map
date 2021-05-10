@@ -92,8 +92,8 @@ export default class Map {
         });
 
         // add custom controls
-        if (controls.reset) this.map.addControl(new Reset({target: this}));
         if (controls.fullscreen) this.map.addControl(new FullScreen());
+        if (controls.reset) this.map.addControl(new Reset({target: this}));
         if (controls.exportPNG) this.map.addControl(new ExportPNG({target: this}));
 
         // activate highlight & tooltips
@@ -411,6 +411,19 @@ export default class Map {
         });
 
         return baseLayer;
+    }
+
+    // change button style
+    _stylizeButtons(options) {
+        var controls = this.map.getControls();
+        controls.forEach(function(control) {
+            control.element.childNodes.forEach(function(button) {
+                Object.entries(options).forEach(function(pair) {
+                    var [key, value] = pair;
+                    button.style[key] = value;
+                })
+            })
+        })
     }
 }
 

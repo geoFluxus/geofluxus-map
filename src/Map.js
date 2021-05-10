@@ -94,7 +94,7 @@ export default class Map {
         // add custom controls
         if (controls.reset) this.map.addControl(new Reset({target: this}));
         if (controls.fullscreen) this.map.addControl(new FullScreen());
-        if (controls.exportPNG) this.map.addControl(new ExportPNG());
+        if (controls.exportPNG) this.map.addControl(new ExportPNG({target: this}));
 
         // activate highlight & tooltips
         this._onHover(options.hover);
@@ -471,25 +471,79 @@ class ExportPNG extends Control {
             element: element,
         });
 
+        // map target
+        this.target = options.target;
+        this.button = button;
+
         button.addEventListener('click', this.exportPNG.bind(this), false);
     }
 
     exportPNG() {
-        var map = this.map_,
-            target = map.getViewport();
-        // options for html2canvas to filter out all the 'ol-control' elements
-        var configOptions = {
-            ignoreElements: function(target) {
-                var klasses = target.classList;
-                return klasses.contains('ol-control') && (target.id != 'legend');
-            },
-            logging: false
-        };
-        html2canvas(target, configOptions)
-            .then(function(canvas) {
-                canvas.toBlob(function(blob) {
-                saveAs(blob, 'map.png');
-                });
-        });
+        // disable button / cursor
+        this.button.disabled = true;
+        document.body.style.cursor = 'wait';
+
+        var _this = this,
+            map = this.map_,
+            target = map.getViewport(),
+            legend = this.target.legend;
+
+        // print settings
+        // A4 landscape - 297 x 210 cm
+        // resolution: 300 dpi
+        var dim = [297, 210],
+            resolution = 300,
+            width = Math.round((dim[0] * resolution) / 25.4),
+            height = Math.round((dim[1] * resolution) / 25.4),
+            size = map.getSize(),
+            viewResolution = map.getView().getResolution();
+
+        // print once map is resized
+        map.once('rendercomplete', function() {
+            console.log('hello')
+            // resize map viewport
+            var target = map.getViewport();
+            target.style.width = width + 'px';
+            target.style.height = height + 'px';
+
+            // options for html2canvas to filter out all the 'ol-control' elements
+            var configOptions = {
+                ignoreElements: function(target) {
+                    var klasses = target.classList;
+                    return klasses.contains('ol-control');
+                },
+                logging: false,
+            };
+            html2canvas(target, configOptions)
+                .then(function(canvas) {
+                    canvas.toBlob(function(blob) {
+                        saveAs(blob, 'map.png');
+                    });
+            });
+
+            // reset map / legend / viewport
+            target.style.width = '100%';
+            target.style.height = '100%';
+            if (legend) legend.style.transform = 'none';
+            map.setSize(size);
+            map.getView().setResolution(viewResolution);
+
+            // enable button / cursor
+            _this.button.disabled = false;
+            document.body.style.cursor = 'auto';
+        })
+
+        // if map legend, scale & translate for printing
+        if (legend) {
+            var transY = -50,
+                transX = (legend.style.right != '0px') ? -50 : 0;
+            legend.style.transform = `scale(2.5) translate(${transX}%, ${transY}%)`;
+        }
+
+        // resize map for printing
+        var printSize = [width, height];
+        map.setSize(printSize);
+        var scaling = Math.min(width / size[0], height / size[1]);
+        map.getView().setResolution(viewResolution / scaling);
     }
 }

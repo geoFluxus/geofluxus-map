@@ -181,7 +181,27 @@ export default class Map {
                 var highlightStyle = options.style || {},
                     stroke = highlightStyle.stroke || {},
                     fill = highlightStyle.fill || {},
-                    zIndex = highlightStyle.zIndex;
+                    zIndex = highlightStyle.zIndex,
+                    image = highlightStyle.image || {};
+
+                // special marker for points
+                var imageRadius = image.radius,
+                    imageStroke = image.stroke || {},
+                    imageFill = image.fill || {};
+                // get initial marker style
+                var initialImageStyle = initialStyle.getImage();
+                var initialImageStroke = initialImageStyle.getStroke(),
+                    initialImageFill = initialImageStyle.getFill();
+                image = new Circle({
+                    radius: imageRadius || initialImageStyle.getRadius(),
+                    fill: new Fill({
+                        color: imageFill.color || initialImageFill.getColor()
+                    }),
+                    stroke: new Stroke({
+                        color: imageStroke.color || initialImageStroke.getColor(),
+                        width: imageStroke.width || initialImageStroke.getWidth()
+                    })
+                });
 
                 // get initial style of feature
                 var initialStroke = initialStyle.getStroke(),
@@ -197,7 +217,8 @@ export default class Map {
                     fill: new Fill({
                         color: fill.color || initialFill.getColor()
                     }),
-                    zIndex: zIndex || initialZIndex
+                    zIndex: zIndex || initialZIndex,
+                    image: image
                 });
                 feature.setStyle(highlightStyle);
             } else {
@@ -242,16 +263,17 @@ export default class Map {
         fill.color = fill.color || 'rgb(100, 150, 250, 0.1)';
 
         // special marker for points
-        var imageRadius = imageRadius,
-            imageStroke = image.Stroke || {},
-            imageFill = image.Fill || {};
+        var imageRadius = image.radius,
+            imageStroke = image.stroke || {},
+            imageFill = image.fill || {};
+        console.log(imageStroke)
         image = new Circle({
-            radius: options.radius || 5,
+            radius: imageRadius || 5,
             fill: new Fill({
                 color: imageFill.color || 'rgb(100, 150, 250, 0.1)'
             }),
             stroke: new Stroke({
-                color: imageStroke.stroke || 'rgba(100, 150, 250, 1)',
+                color: imageStroke.color || 'rgba(100, 150, 250, 1)',
                 width: imageStroke.width || 1
             })
         });

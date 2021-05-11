@@ -3,7 +3,7 @@ import { _default } from './utils';
 import * as d3 from 'd3';
 import Control from 'ol/control/Control';
 import Point from 'ol/geom/Point';
-import FlowLayer from './CustomLayer.js';
+import {FlowLayer, NodeLayer} from './CustomLayer.js';
 
 
 export default class FlowMap extends Map {
@@ -16,26 +16,18 @@ export default class FlowMap extends Map {
         // FlowMap controls
         options.controls = _default(options.controls, {
             toggleFlows: true,
+            toggleNodes: true,
             animate: true,
             toggleLegend: true,
             toggleLight: true
         });
         options.controlClasses = {
             toggleFlows: ToggleFlows,
+            toggleNodes: ToggleNodes,
             animate: Animate,
             toggleLegend: ToggleLegend,
             toggleLight: ToggleLight
         }
-        options.hover = _default(options.hover, {
-            style: {
-                image: {
-                    radius: 10,
-                    fill: {
-                        color: 'red'
-                    }
-                }
-            }
-        });
         super(options);
 
         // change button style
@@ -51,13 +43,20 @@ export default class FlowMap extends Map {
         this.animate = options.animate || 0; // no animation
         this.toHide= []; // to hide groupBy categories
 
+        // custom d3 svg
+        this.svg = d3
+          .select(document.createElement('div'))
+          .append('svg')
+          .style('position', 'absolute');
+
         // custom d3 tooltip
         this.tooltip = d3.select(`#${options.target}`)
                          .append("div")
                          .attr("class", "d3-tooltip");
         var tooltipOptions = options.tooltip || {};
         this.tooltipBody = tooltipOptions.body || function(d) {
-            return `<span>${d[options.groupBy]}: ${d.amount.toFixed(2)}</span>`;
+            if (d.source) return `<span>${d[options.groupBy]}: ${d.amount.toFixed(2)}</span>`;
+            return `<span>(${d.lon.toFixed(2)}, ${d.lat.toFixed(2)})`;
         };
         this.tooltipStyle = _default(tooltipOptions.style, {
             visibility: "hidden",
@@ -109,6 +108,8 @@ export default class FlowMap extends Map {
         this.focusOnLayer(extent);
 
         // process to render map anew
+        this.renderFlows = true;
+        this.renderNodes = true;
         this._render();
     }
 
@@ -120,11 +121,14 @@ export default class FlowMap extends Map {
         // update nodes
         this._getNodes();
 
+        // clear svg before draw
+        this.svg.selectAll("*").remove();
+
         // draw flows
-        this._drawFlows();
+        if (this.renderFlows) this._drawFlows();
 
         // draw nodes
-        this._drawNodes();
+        if (this.renderNodes) this._drawNodes();
     }
 
     // define colors based on groupby property
@@ -422,6 +426,7 @@ export default class FlowMap extends Map {
             name: 'flows',
             map: this.map,
             features: this.flows,
+            svg: this.svg,
             tooltip: {
                 element: this.tooltip,
                 body: this.tooltipBody
@@ -445,34 +450,27 @@ export default class FlowMap extends Map {
         var nodeLayer = this._getLayer('nodes');
         if (nodeLayer) this.map.removeLayer(nodeLayer);
 
-        // add node layer to map (Vector Layer)
-        this.addVectorLayer('nodes', {
-            style: {
-                image: {
-                    stroke: {
-                        width: 5
-                    },
-                    fill: {
-                        color: 'red'
-                    }
-                }
+        // add flows layer to map (D3 Layer)
+        var nodeLayer = new NodeLayer({
+            name: 'node',
+            map: this.map,
+            features: this.data.nodes,
+            svg: this.svg,
+            tooltip: {
+                element: this.tooltip,
+                body: this.tooltipBody
             }
         });
+        this.map.addLayer(nodeLayer);
 
-        this.data.nodes.forEach(function(node) {
-            if (node.visible) {
-                var geometry = {
-                    type: 'Point',
-                    coordinates: [node.lon, node.lat]
-                }
-                _this.addFeature('nodes', geometry)
-            }
-        })
+        // force draw
+        this.map.renderSync();
+        nodeLayer.draw();
     }
 }
 
 
-// toggle network control
+// toggle flows control
 class ToggleFlows extends Control {
     constructor(options) {
         options = options || {};
@@ -500,8 +498,42 @@ class ToggleFlows extends Control {
     }
 
     toggleFlows() {
-        this.target.setVisible('flows', this.visible);
-        this.visible = !this.visible;
+        this.target.renderFlows = !this.target.renderFlows;
+        this.target._render();
+    }
+}
+
+
+// toggle nodes control
+class ToggleNodes extends Control {
+    constructor(options) {
+        options = options || {};
+
+        // default button style
+        const button = document.createElement('button');
+        button.innerHTML = '<i class="fas fa-crosshairs"></i>';
+        button.className = 'ol-toggle-nodes';
+        button.title = "Toggle nodes"
+
+        const element = document.createElement('div');
+        element.className = 'ol-toggle-nodes ol-unselectable ol-control';
+        element.style.top = options.top;
+        element.style.left = '.5em';
+        element.appendChild(button);
+
+        super({
+            element: element
+        });
+
+        // target NetworkMap
+        this.target = options.target;
+
+        button.addEventListener('click', this.toggleNodes.bind(this), false);
+    }
+
+    toggleNodes() {
+        this.target.renderNodes = !this.target.renderNodes;
+        this.target._render();
     }
 }
 

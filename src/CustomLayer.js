@@ -18,10 +18,7 @@ class D3Layer extends Layer {
         this.features = options.features;
 
         // svg element
-        this.svg = d3
-          .select(document.createElement('div'))
-          .append('svg')
-          .style('position', 'absolute');
+        this.svg = options.svg;
         this.g = this.svg.append("g");
         this.defs = this.svg.append("defs");
 
@@ -70,8 +67,8 @@ class D3Layer extends Layer {
 }
 
 
-// flows layer for FlowMap
-export default class FlowLayer extends D3Layer {
+// flows layer - FlowMap
+export class FlowLayer extends D3Layer {
     constructor(options) {
         options = options || {};
         super(options)
@@ -247,3 +244,47 @@ export default class FlowLayer extends D3Layer {
         }
     }
 }
+
+
+// nodes layer - FlowMap
+export class NodeLayer extends D3Layer {
+    constructor(options) {
+        options = options || {};
+        super(options);
+    }
+
+    draw() {
+        var _this = this;
+
+        this.features.forEach(function(d) {
+            if (!d.visible) return;
+
+            var point = _this.getPixelFromCoordinate([d.lon, d.lat]);
+            var path = _this.g.append('circle')
+                        .attr("cx", point[0])
+                        .attr("cy", point[1])
+                        .attr("r", "8px")
+                        .attr("fill", "red")
+                        .on("mouseover", function() {
+                            d3.select(this).node().parentNode.appendChild(this);
+                            d3.select(this).style("cursor", "pointer");
+
+                            // Show and fill tooltip:
+                            _this.tooltip
+                                .html(_this.tooltipBody(d))
+                                .style("visibility", "visible")
+                        })
+                        .on("mousemove", function(evt) {
+                            var tooltipSize = _this.tooltip.node().getBoundingClientRect();
+                            _this.tooltip
+                                .style("top", (evt.pageY - tooltipSize.height) + 'px')
+                                .style("left", (evt.pageX - (tooltipSize.width / 2)) + 'px');
+                        })
+                        .on("mouseout", function() {
+                            _this.tooltip.style("visibility", "hidden")
+                        })
+        })
+    }
+}
+
+export default {FlowLayer, NodeLayer};

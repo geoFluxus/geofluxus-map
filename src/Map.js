@@ -348,7 +348,8 @@ export default class Map {
             var defaultStyle = layer.getStyle(),
                 defaultStroke = defaultStyle.getStroke(),
                 defaultFill = defaultStyle.getFill(),
-                defaultZIndex = defaultStyle.getZIndex();
+                defaultZIndex = defaultStyle.getZIndex(),
+                defaultImage = defaultStyle.getImage();
 
             var stroke = style.stroke || {},
                 fill = style.fill || {},
@@ -362,7 +363,8 @@ export default class Map {
                 fill: new Fill({
                     color: fill.color || defaultFill.getColor()
                 }),
-                zIndex: style.zIndex || defaultZIndex
+                zIndex: style.zIndex || defaultZIndex,
+                image: defaultImage
             });
             feature.setStyle(style);
         }

@@ -2,6 +2,7 @@ import Map from './Map';
 import { _default } from './utils';
 import * as d3 from 'd3';
 import Control from 'ol/control/Control';
+import Point from 'ol/geom/Point';
 import FlowLayer from './CustomLayer.js';
 
 
@@ -25,6 +26,16 @@ export default class FlowMap extends Map {
             toggleLegend: ToggleLegend,
             toggleLight: ToggleLight
         }
+        options.hover = _default(options.hover, {
+            style: {
+                image: {
+                    radius: 10,
+                    fill: {
+                        color: 'red'
+                    }
+                }
+            }
+        });
         super(options);
 
         // change button style
@@ -93,6 +104,10 @@ export default class FlowMap extends Map {
         this.legendOptions = options.legend || {};
         this._drawLegend();
 
+        // focus on extent
+        var extent = this._getExtent();
+        this.focusOnLayer(extent);
+
         // process to render map anew
         this._render();
     }
@@ -102,8 +117,14 @@ export default class FlowMap extends Map {
         // convert links to flows
         this._getFlows();
 
+        // update nodes
+        this._getNodes();
+
         // draw flows
         this._drawFlows();
+
+        // draw nodes
+        this._drawNodes();
     }
 
     // define colors based on groupby property
@@ -303,10 +324,10 @@ export default class FlowMap extends Map {
 
         this.flows = {};
         this.data.links.forEach(function(link) {
-            // if toHide, change visibility
+            // change link visibility
             var property = link[_this.groupBy];
-            var display = _this.toHide.includes(property) ? "none" : "block";
-            link.display = display;
+            var visible = _this.toHide.includes(property) ? false : true;
+            link.visible = visible;
 
             // collect links with same source and target
             var id = link._source + '-' + link._target;
@@ -327,6 +348,32 @@ export default class FlowMap extends Map {
 
         // get flow width based on amount
         this._getFlowWidth();
+    }
+
+    // draw nodes
+    _getNodes() {
+        var nodes = this.data.nodes,
+            links = this.data.links;
+
+        // change node visibility
+        nodes.forEach(function(node) {
+            // set default to false
+            node.visible = false;
+
+            // check source / target links
+            // if visible link, turn node to visible &
+            // stop search
+            function search(items) {
+                for (var id of items) {
+                    if (links[id].visible) {
+                        node.visible = true;
+                        break;
+                    }
+                }
+            }
+            search(node._sourceLinks);
+            if (!node.visible) search(node._targetLinks);
+        })
     }
 
     // get flow width based on amount
@@ -366,40 +413,61 @@ export default class FlowMap extends Map {
 
     // draw flows
     _drawFlows() {
+        // remove flow layer
         var flowLayer = this._getLayer('flows');
+        if (flowLayer) this.map.removeLayer(flowLayer);
 
-        if (!flowLayer) {
-            // add flows layer to map
-            var flowLayer = new FlowLayer({
-                name: 'flows',
-                map: this.map,
-                features: this.flows,
-                tooltip: {
-                    element: this.tooltip,
-                    body: this.tooltipBody
+        // add flows layer to map (D3 Layer)
+        var flowLayer = new FlowLayer({
+            name: 'flows',
+            map: this.map,
+            features: this.flows,
+            tooltip: {
+                element: this.tooltip,
+                body: this.tooltipBody
+            }
+        });
+        this.map.addLayer(flowLayer);
+
+        // check animation mode
+        flowLayer.animate(this.animate);
+
+        // force draw
+        this.map.renderSync();
+        flowLayer.draw();
+    }
+
+    // draw nodes
+    _drawNodes() {
+        var _this = this;
+
+        // remove node layer
+        var nodeLayer = this._getLayer('nodes');
+        if (nodeLayer) this.map.removeLayer(nodeLayer);
+
+        // add node layer to map (Vector Layer)
+        this.addVectorLayer('nodes', {
+            style: {
+                image: {
+                    stroke: {
+                        width: 5
+                    },
+                    fill: {
+                        color: 'red'
+                    }
                 }
-            });
-            this.map.addLayer(flowLayer);
+            }
+        });
 
-            // check animation mode
-            flowLayer.animate(this.animate);
-
-            // focus on flows layer extent
-            var extent = this._getExtent();
-            this.focusOnLayer(extent);
-        } else {
-            // check animation mode
-            flowLayer.animate(this.animate);
-
-            // update features
-            flowLayer.features = this.flows;
-
-            // clear layer
-            flowLayer.clear();
-
-            // force redraw
-            flowLayer.draw();
-        }
+        this.data.nodes.forEach(function(node) {
+            if (node.visible) {
+                var geometry = {
+                    type: 'Point',
+                    coordinates: [node.lon, node.lat]
+                }
+                _this.addFeature('nodes', geometry)
+            }
+        })
     }
 }
 

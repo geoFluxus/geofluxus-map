@@ -27,7 +27,7 @@ class D3Layer extends Layer {
 
         // draw layer only on moveend
         function onMoveEnd(evt) {
-            _this.draw(_this.features);
+            _this.draw();
         }
         function onMoveStart(evt) {
             _this.clear();
@@ -193,7 +193,7 @@ export default class FlowLayer extends D3Layer {
             // draw flows
             flows.forEach(function(d) {
                 // if no display, proceed to next flow
-                if (d.display == 'none') return;
+                if (!d.visible) return;
 
                 // get flow source & target
                 // convert to pixels

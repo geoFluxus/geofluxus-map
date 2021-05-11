@@ -266,7 +266,6 @@ export default class Map {
         var imageRadius = image.radius,
             imageStroke = image.stroke || {},
             imageFill = image.fill || {};
-        console.log(imageStroke)
         image = new Circle({
             radius: imageRadius || 5,
             fill: new Fill({

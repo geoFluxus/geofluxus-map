@@ -11,7 +11,22 @@ export default class FlowMap extends Map {
         options.base = _default(options.base, {
             source: 'cartodb_dark'
         });
+
+        // FlowMap controls
+        options.controls = _default(options.controls, {
+            toggleFlows: true,
+            animate: true,
+            toggleLegend: true,
+        });
+        options.controlClasses = {
+            toggleFlows: ToggleFlows,
+            animate: Animate,
+            toggleLegend: ToggleLegend
+        }
         super(options);
+
+        // change button style
+        this.stylizeButtons({color: 'white'});
 
         // default properties
         var _this = this;
@@ -43,29 +58,6 @@ export default class FlowMap extends Map {
         Object.entries(this.tooltipStyle).forEach(function(pair) {
             var [key, value] = pair;
             _this.tooltip.node().style[key] = value;
-        })
-
-        // FlowMap controls
-        options.controls = _default(options.controls, {
-            toggleFlows: true,
-            animate: true,
-            toggleLegend: true,
-        });
-        var controlClass = {
-            toggleFlows: ToggleFlows,
-            animate: Animate,
-            toggleLegend: ToggleLegend
-        }
-        var topPos = 12;
-        Object.entries(options.controls).forEach(function(pair) {
-            var [key, value] = pair;
-            if (value) {
-                _this.map.addControl(new controlClass[key]({
-                    target: _this,
-                    top: `${topPos}em`
-                }));
-                topPos += 2.5;
-            }
         })
 
         // color scale (https://colorbrewer2.org)

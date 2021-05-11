@@ -35,10 +35,6 @@ export default class NetworkMap extends Map {
             }
         });
 
-        // initialize map
-        super(options);
-        var _this = this;
-
         // NetworkMap controls
         options.controls = _default(options.controls, {
             toggleNetwork: true,
@@ -46,24 +42,19 @@ export default class NetworkMap extends Map {
             toggleLight: true,
             exportCSV: false
         });
-        var controlClass = {
+        options.controlClasses = {
             toggleNetwork: ToggleNetwork,
             toggleLegend: ToggleLegend,
             toggleLight: ToggleLight,
             exportCSV: ExportCSV
         }
-        var topPos = 12;
-        Object.entries(options.controls).forEach(function(pair) {
-            var [key, value] = pair;
-            if (value) {
-                _this.map.addControl(new controlClass[key]({
-                    target: _this,
-                    top: `${topPos}em`
-                }));
-                topPos += 2.5;
-            }
-        })
-        this._stylizeButtons({color: 'white'});
+
+        // initialize map
+        super(options);
+        var _this = this;
+
+        // change button style
+        this.stylizeButtons({color: 'white'});
 
         // network map options
         this.data = JSON.parse(JSON.stringify(options.data || []));

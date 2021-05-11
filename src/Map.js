@@ -40,6 +40,8 @@ var sources = {
 
 export default class Map {
     constructor(options) {
+        var _this = this;
+
         // map options //
         var options = options || {};
 
@@ -93,8 +95,21 @@ export default class Map {
 
         // add custom controls
         if (controls.fullscreen) this.map.addControl(new FullScreen());
-        if (controls.reset) this.map.addControl(new Reset({target: this}));
-        if (controls.exportPNG) this.map.addControl(new ExportPNG({target: this}));
+        var controlClasses = _default(options.controlClasses, {
+            reset: Reset,
+            exportPNG: ExportPNG
+        })
+        var topPos = 7; // position from screen top
+        Object.entries(controls).forEach(function(pair) {
+            var [key, value] = pair;
+            if (controls[key] && controlClasses[key]) {
+                _this.map.addControl(new controlClasses[key]({
+                    target: this,
+                    top: `${topPos}em`
+                }));
+                topPos += 2.5;
+            }
+        })
 
         // activate highlight & tooltips
         this._onHover(options.hover);
@@ -150,6 +165,9 @@ export default class Map {
 
             // update tooltip style & highlight
             if (feature) {
+                // change cursor style
+                this.getTargetElement().style.cursor = 'pointer';
+
                 // set tooltip body
                 overlay.setPosition(evt.coordinate);
                 div.style.display = 'block'; // show tooltip
@@ -183,6 +201,9 @@ export default class Map {
                 });
                 feature.setStyle(highlightStyle);
             } else {
+                // reset pointer style
+                this.getTargetElement().style.cursor = 'auto';
+
                 // hide tooltip
                 div.style.display = 'none';
             }
@@ -414,7 +435,7 @@ export default class Map {
     }
 
     // change button style
-    _stylizeButtons(options) {
+    stylizeButtons(options) {
         var controls = this.map.getControls();
         controls.forEach(function(control) {
             control.element.childNodes.forEach(function(button) {
@@ -441,7 +462,7 @@ class Reset extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-reset ol-unselectable ol-control';
-        element.style.top = '7em';
+        element.style.top = options.top;
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -476,7 +497,7 @@ class ExportPNG extends Control {
 
         const element = document.createElement('div');
         element.className = 'ol-export-png ol-unselectable ol-control';
-        element.style.top = '9.5em';
+        element.style.top = options.top;
         element.style.left = '.5em';
         element.appendChild(button);
 
@@ -492,14 +513,14 @@ class ExportPNG extends Control {
     }
 
     exportPNG() {
-        // disable button / cursor
-        this.button.disabled = true;
-        document.body.style.cursor = 'wait';
-
         var _this = this,
             map = this.map_,
             target = map.getViewport(),
             legend = this.target.legend;
+
+        // disable button / cursor
+        this.button.disabled = true;
+        target.style.cursor = 'wait';
 
         // print settings
         // A4 landscape - 297 x 210 cm
@@ -511,9 +532,22 @@ class ExportPNG extends Control {
             size = map.getSize(),
             viewResolution = map.getView().getResolution();
 
+        // if map legend, scale & translate for printing
+        if (legend) {
+            var transY = -50,
+                transX = (legend.style.right != '0px') ? -50 : 0;
+            legend.style.transform = `scale(2.5) translate(${transX}%, ${transY}%)`;
+        }
+
+        // resize map for printing
+        var printSize = [width, height];
+        map.setSize(printSize);
+        var scaling = Math.min(width / size[0], height / size[1]);
+        map.getView().setResolution(viewResolution / scaling);
+
         // print once map is resized
+        // alternative: listen to 'postcompose' to not await for tiles
         map.once('rendercomplete', function() {
-            console.log('hello')
             // resize map viewport
             var target = map.getViewport();
             target.style.width = width + 'px';
@@ -543,20 +577,7 @@ class ExportPNG extends Control {
 
             // enable button / cursor
             _this.button.disabled = false;
-            document.body.style.cursor = 'auto';
+            target.style.cursor = 'auto';
         })
-
-        // if map legend, scale & translate for printing
-        if (legend) {
-            var transY = -50,
-                transX = (legend.style.right != '0px') ? -50 : 0;
-            legend.style.transform = `scale(2.5) translate(${transX}%, ${transY}%)`;
-        }
-
-        // resize map for printing
-        var printSize = [width, height];
-        map.setSize(printSize);
-        var scaling = Math.min(width / size[0], height / size[1]);
-        map.getView().setResolution(viewResolution / scaling);
     }
 }

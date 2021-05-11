@@ -104,7 +104,7 @@ export default class Map {
             var [key, value] = pair;
             if (controls[key] && controlClasses[key]) {
                 _this.map.addControl(new controlClasses[key]({
-                    target: this,
+                    target: _this,
                     top: `${topPos}em`
                 }));
                 topPos += 2.5;
@@ -439,10 +439,12 @@ export default class Map {
         var controls = this.map.getControls();
         controls.forEach(function(control) {
             control.element.childNodes.forEach(function(button) {
-                Object.entries(options).forEach(function(pair) {
-                    var [key, value] = pair;
-                    button.style[key] = value;
-                })
+                if (button.tagName.toLowerCase() == 'button') {
+                    Object.entries(options).forEach(function(pair) {
+                        var [key, value] = pair;
+                        button.style[key] = value;
+                    })
+                }
             })
         })
     }

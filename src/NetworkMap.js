@@ -371,7 +371,7 @@ class ToggleLight extends Control {
         this.target._drawLegend();
 
         // change button style
-        this.target._stylizeButtons({color: color});
+        this.target.stylizeButtons({color: color});
 
         // change network color
         var networkLayer = this.target._getLayer('network'),

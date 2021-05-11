@@ -17,16 +17,19 @@ export default class FlowMap extends Map {
             toggleFlows: true,
             animate: true,
             toggleLegend: true,
+            toggleLight: true
         });
         options.controlClasses = {
             toggleFlows: ToggleFlows,
             animate: Animate,
-            toggleLegend: ToggleLegend
+            toggleLegend: ToggleLegend,
+            toggleLight: ToggleLight
         }
         super(options);
 
         // change button style
-        this.stylizeButtons({color: 'white'});
+        this.buttonColor = 'white';
+        this.stylizeButtons({color: this.buttonColor});
 
         // default properties
         var _this = this;
@@ -499,5 +502,46 @@ class ToggleLegend extends Control {
     toggleLegend() {
         var legend = this.target.legend;
         legend.style.display = legend.style.display == 'none' ? 'block' : 'none';
+    }
+}
+
+
+// toggle light control
+class ToggleLight extends Control {
+    constructor(options) {
+        options = options || {};
+
+        // default button style
+        const button = document.createElement('button');
+        button.innerHTML = '<i class="fas fa-lightbulb"></i>';
+        button.className = 'ol-toggle-light';
+        button.title = "Toggle light"
+
+        const element = document.createElement('div');
+        element.className = 'ol-toggle-light ol-unselectable ol-control';
+        element.style.top = options.top;
+        element.style.left = '.5em';
+        element.appendChild(button);
+
+        super({
+            element: element
+        });
+
+        // target NetworkMap
+        this.target = options.target;
+
+        button.addEventListener('click', this.toggleLight.bind(this), false);
+    }
+
+    toggleLight() {
+        var base = this.target.base;
+
+        // change map base layer
+        base.source = base.source == 'cartodb_dark' ? 'cartodb_light' : 'cartodb_dark';
+        this.target.changeBase(base);
+
+        // change button style
+        this.target.buttonColor = this.target.buttonColor == 'white' ? 'black' : 'white';
+        this.target.stylizeButtons({color: this.target.buttonColor});
     }
 }

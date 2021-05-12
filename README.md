@@ -21,7 +21,7 @@ Then, initialize a simple map for example like so:
 new Map(options)
 
 ### Options
-* **<p style="color:grey">target</p>** (_string_): The id of the HTML element to host the map.
+* **<span style="color:grey">target</span>** (_string_): The id of the HTML element to host the map.
   
 
 * **<span style="color:grey">projection** (_string_): The map projection ([EPSG code](https://epsg.io/)) for rendering feature geometries. The default projection for input geometries is **EPSG:4326** (WGS84) which corresponds to longitude / latitude coordinates. All input geometries are transformed to EPSG:3857 (Web Mercator).

@@ -1,6 +1,17 @@
 # geofluxus-map
 Powered by [OpenLayers](https://openlayers.org/) & [d3](https://d3js.org/). Check examples on JS (examples) and ReactJS (react-examples).
 
+To use, either install through NPM:
+```
+npm install geofluxus-map
+```
+or add the following in vanilla:
+```
+<script src="https://cdn.jsdelivr.net/npm/geofluxus-map@version/dist/index.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/geofluxus-map@version/dist/index.css" rel="stylesheet" type="text/css">
+```
+
+
 The following visualizations are available:
 * [**Map**](#map): A basic visualization for creating and styling simple maps with tooltips
 * [**NetworkMap**](#networkmap): A map visualization for distributions along road networks
@@ -21,124 +32,123 @@ Then, initialize a simple map for example like so:
 new Map(options)
 
 ### Options
-* **target** (_string_): The id of the HTML element to host the map.
+* **<a id="map-target">target</a>** (_string_): The id of the HTML element to host the map.
   
 
-* **projection** (_string_): The map projection ([EPSG code](https://epsg.io/)) for rendering feature geometries. The default projection for input geometries is **EPSG:4326** (WGS84) which corresponds to longitude / latitude coordinates. All input geometries are transformed to EPSG:3857 (Web Mercator).
+* **<a id="map-projection">projection</a>** (_string_): The map projection ([EPSG code](https://epsg.io/)) for rendering feature geometries. The default projection for input geometries is **EPSG:4326** (WGS84) which corresponds to longitude / latitude coordinates. All input geometries are transformed to EPSG:3857 (Web Mercator).
 
 
-* **base** (_object_): The map background
+* **<a id="map-base">base</a>** (_object_): The map background
     * **<a id="map-base-source">source</a>** (_string_): Background provider (default='osm').\
       **Available options**: 'osm', 'cartodb_dark', 'cartodb_light'
-    * **opacity** (_float_): The background opacity. Ranges in [0, 1] (default=1).
+    * **<a id="map-base-opacity">opacity</a>** (_float_): The background opacity. Ranges in [0, 1] (default=1).
     
 
-* **view** (_object_): The map view
-    * **zoom** (_object_): The zoom level (default=1)
-    * **minZoom** (_float_): Minimum zoom level (default=undefined)
-    * **maxZoom**  (_float_): Maximum zoom level (default=undefined)
-    * **center** (_Array_): The map center. Coordinates provided in map projection (default=[0, 0])
+* **<a id="map-view">view</a>** (_object_): The map view
+    * **<a id="map-view-zoom">zoom</a>** (_object_): The zoom level (default=1)
+    * **<a id="map-view-minzoom">minZoom</a>** (_float_): Minimum zoom level (default=undefined)
+    * **<a id="map-view-maxzoom">maxZoom</a>**  (_float_): Maximum zoom level (default=undefined)
+    * **<a id="map-view-center">center</a>** (_Array_): The map center. Coordinates provided in map projection (default=[0, 0])
     
 
-* **controls** (_object_): Enables / disables map control buttons on the top left corner of the map. All buttons are active by default.
-  * **zoom** (_boolean_): Allows zooming via mouse & keyboard. If disabled, zoom is available only via the map zoom controls on the top left corner of the map.
-  * **drag** (_boolean_): Allows dragging along the map
-  * **fullscreen** (_boolean_): Activates the fullscreen button
-  * **reset** (_boolean_): Activates the reset button. Allows to reset to the initial view extent (either the initial map view or one specified by focusing on certain layer)
-  * **exportPNG** (_boolean_): Activates the screenshot button. Allow to export a png version of the map on the current view. 
+* **<a id="map-controls">controls</a>** (_object_): Enables / disables map control buttons on the top left corner of the map. All buttons are active by default.
+  * **<a id="map-controls-zoom">zoom</a>** (_boolean_): Allows zooming via mouse & keyboard. If disabled, zoom is available only via the map zoom controls on the top left corner of the map.
+  * **<a id="map-controls-drag">drag</a>** (_boolean_): Allows dragging along the map
+  * **<a id="map-controls-fullscreen">fullscreen</a>** (_boolean_): Activates the fullscreen button
+  * **<a id="map-controls-reset">reset</a>** (_boolean_): Activates the reset button. Allows to reset to the initial view extent (either the initial map view or one specified by focusing on certain layer)
+  * **<a id="map-controls-exportpng">exportPNG</a>** (_boolean_): Activates the screenshot button. Allow to export a png version of the map on the current view. 
 
 
-* **hover** (_object_): Enables hover interactions
-    * **tooltip** (_object_): Enables HTML div tooltip on hover over feature.
-      * **body** (_function_): A function which iterates through the map features and load the tooltip content in HTML
-      * **style** (_object_): Define tooltip style as an object with CSS properties such as borderRadius, fontFamily etc.
-    * **style** (_object_): Enables feature highlighting on hover, defined as an OpenLayers style object.
-      * **stroke** (_object_): Style of feature boundary.
-        * **color** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
-        * **width** (_float_): Stroke width.
-      * **fill** (_object_): Style of feature surface.
-        * **color** (_string_): Fill color. Available formats: RGB, RGBA, HEX.
-      * **zIndex** (_float_): Define z-index for a highlighted feature
+* **<a id="map-hover">hover</a>** (_object_): Enables hover interactions
+    * **<a id="map-hover-tooltip">tooltip</a>** (_object_): Enables HTML div tooltip on hover over feature.
+      * **<a id="map-hover-tooltip-body">body</a>** (_function_): A function which iterates through the map features and load the tooltip content in HTML
+      * **<a id="map-hover-tooltip-style">style</a>** (_object_): Define tooltip style as an object with CSS properties such as borderRadius, fontFamily etc.
+    * **<a id="map-hover-style">style</a>** (_object_): Enables feature highlighting on hover, defined as an OpenLayers style object.
+      * **<a id="map-hover-style-stroke">stroke</a>** (_object_): Style of feature boundary.
+        * **<a id="map-hover-style-stroke-color">color</a>** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
+        * **<a id="map-hover-style-stroke-width">width</a>** (_float_): Stroke width.
+      * **<a id="map-hover-style-fill">fill</a>** (_object_): Style of feature surface.
+        * **<a id="map-hover-style-fill-color">color</a>** (_string_): Fill color. Available formats: RGB, RGBA, HEX.
+      * **<a id="map-hover-style-zindex">zIndex</a>** (_float_): Define z-index for a highlighted feature
     
 
 ### Methods
-* **addVectorLayer(name, options)**
+* **<a id="map-addvectorlayer">addVectorLayer(name, options)</a>**
   #### Description
   Define a vector layer to load geometric features on it\
   **ATTENTION!** For multiple layers, make sure each of them has a unique name. Keep in mind that each layer can host ONLY one type of geometry (see the available options for a vector layer below).
   #### Arguments
-  * **name** (_string_): A string to define the layer name
-  * **options** (_object_):
-    * **style** (_object_): Define an OpenLayers style for the layer
-      * **stroke** (_object_): Style of feature boundary
-        * **color** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
-        * **width** (_float_): Stroke width
-      * **fill** (_object_): Style of feature surface
-        * **color** (_string_): Fill color. Available formats: RGB, RGBA, HEX
-      * **zIndex** (_float_): Define z-index for layer features    
-      * **image** (_object_): (For point layers) Define circle style
-        * **radius** (_float_): Circle radius
-          * **stroke** (_object_): Style of feature boundary
-            * **color** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
-            * **width** (_float_): Stroke width
-          * **fill** (_object_): Style of feature surface
-            * **color** (_string_): Fill color. Available formats: RGB, RGBA, HEX
+  * **<a id="map-addvectorlayer-name">name</a>** (_string_): A string to define the layer name
+  * **<a id="map-addvectorlayer-options">options</a>** (_object_):
+    * **<a id="map-addvectorlayer-options-style">style</a>** (_object_): Define an OpenLayers style for the layer
+      * **<a id="map-addvectorlayer-options-style-stroke">stroke</a>** (_object_): Style of feature boundary
+        * **<a id="map-addvectorlayer-options-style-stroke-color">color</a>** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
+        * **<a id="map-addvectorlayer-options-style-stroke-width">width</a>** (_float_): Stroke width
+      * **<a id="map-addvectorlayer-options-style-fill">fill</a>** (_object_): Style of feature surface
+        * **<a id="map-addvectorlayer-options-style-fill-color">color</a>** (_string_): Fill color. Available formats: RGB, RGBA, HEX
+      * **<a id="map-addvectorlayer-options-style-zindex">zIndex</a>** (_float_): Define z-index for layer features    
+      * **<a id="map-addvectorlayer-options-style-image">image</a>** (_object_): (For point layers) Define circle style
+        * **<a id="map-addvectorlayer-options-style-image-radius">radius</a>** (_float_): Circle radius
+          * **<a id="map-addvectorlayer-options-style-image-stroke">stroke</a>** (_object_): Style of feature boundary
+            * **<a id="map-addvectorlayer-options-style-image-stroke-color">color</a>** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
+            * **<a id="map-addvectorlayer-options-style-image-stroke-width">width</a>** (_float_): Stroke width
+          * **<a id="map-addvectorlayer-options-style-image-fill">fill</a>** (_object_): Style of feature surface
+            * **<a id="map-addvectorlayer-options-style-image-fill-color">color</a>** (_string_): Fill color. Available formats: RGB, RGBA, HEX
     
 
-* **addFeature(layer, geometry, options)**
+* **<a id="map-addfeature">addFeature(layer, geometry, options)</a>**
   #### Description
   Add feature to an existing layer
   #### Arguments
-  * **name** (_string_): The layer name to which the feature belongs
-  * **geometry** (_object_): The feature geometry. Should be provided from [GeoJSON](https://geojson.org/) format
+  * **<a id="map-addfeature-name">name</a>** (_string_): The layer name to which the feature belongs
+  * **<a id="map-addfeature-geometry">geometry</a>** (_object_): The feature geometry. Should be provided from [GeoJSON](https://geojson.org/) format
     containing (a) the geometry type & (b) the geometry coordinates.\
     **Supported geometry types**: Point, LineString, MultiLineString, Polygon, MultiPolygon
-  * **options** (_object_):
-    * **style** (_object_): OpenLayers style for feature
-      * **stroke** (_object_): Style of feature boundary.
-        * **color** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
-        * **width** (_float_): Stroke width.
-      * **fill** (_object_): Style of feature surface.
-        * **color** (_string_): Fill color. Available formats: RGB, RGBA, HEX.
-      * **zIndex** (_float_): Layer z-index. By default, OpenLayers renders features in Last In, FirstOut order (the last layer declared is rendered on canvas top).
-    * **props** (_object_): Add to feature properties other than geometry with key-value pairs (ie. if you want to later call
+  * **<a id="map-addfeature-options">options</a>** (_object_):
+    * **<a id="map-addfeature-options-style">style</a>** (_object_): OpenLayers style for feature
+      * **<a id="map-addfeature-options-style-stroke">stroke</a>** (_object_): Style of feature boundary.
+        * **<a id="map-addfeature-options-style-stroke-color">color</a>** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
+        * **<a id="map-addfeature-options-style-stroke-width">width</a>** (_float_): Stroke width.
+      * **<a id="map-addfeature-options-style-fill">fill</a>** (_object_): Style of feature surface.
+        * **<a id="map-addfeature-options-style-fill-color">color</a>** (_string_): Fill color. Available formats: RGB, RGBA, HEX.
+      * **<a id="map-addfeature-options-style-zindex">zIndex</a>** (_float_): Layer z-index. By default, OpenLayers renders features in Last In, FirstOut order (the last layer declared is rendered on canvas top).
+    * **<a id="map-addfeature-options-props">props</a>** (_object_): Add to feature properties other than geometry with key-value pairs (ie. if you want to later call
       them in the map tooltip)
 
 
-* **focusOnLayer(name)**
+* **<a id="map-focusonlayer">focusOnLayer(name)</a>**
   #### Description
   Set map view to the extent of an existing layer
 
   #### Arguments
-  * **name** (_string_): The name of the layer to focus on
+  * **<a id="map-focusonlayer-name">name</a>** (_string_): The name of the layer to focus on
   
   
 
-* **setVisible(name, visible)**
+* **<a id="map-setvisible">setVisible(name, visible)</a>**
   #### Description
   Change visibility of an existing layer
 
   #### Arguments
-  * **name** (_string_): The layer name
-  * **visible** (_boolean_): Turn to visible (true) or not (false)  
+  * **<a id="map-setvisible-name">name</a>** (_string_): The layer name
+  * **<a id="map-setvisible-visible">visible</a>** (_boolean_): Turn to visible (true) or not (false)  
   
 
-* **changeBase(base)**
+* **<a id="map-changebase">changeBase(base)</a>**
   #### Description
   Change base layer of map
 
   #### Arguments
-  * **base** (_string_): The source name of the new base layer (check [here](#map-base-source) for options)
+  * **<a id="map-changebase-base">base</a>** (_string_): The source name of the new base layer (check [here](#map-base-source) for options)
   
 
-* **stylizeButtons(options)**
+* **<a id="map-stylizebuttons">stylizeButtons(options)</a>**
   #### Description
   Change the style of the map buttons
 
   #### Arguments
-  * **options** (_object_): Define button style as an object with CSS properties such as borderRadius, fontFamily etc.
-
-
+  * **<a id="map-stylizebuttons-options">options</a>** (_object_): Define button style as an object with CSS properties such as borderRadius, fontFamily etc.
+    
 
 ## <a id="networkmap"></a>NetworkMap
 

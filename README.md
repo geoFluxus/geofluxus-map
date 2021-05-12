@@ -17,10 +17,10 @@ Then, initialize a simple map for example like so:
 ```const map = new Map({target: "map"});```
 
 
-##<a id="map"></a>Map
+## Map
 new Map(options)
 
-###Options
+### Options
 * **<span style="color:grey">target** (_string_): The id of the HTML element to host the map.
   
 
@@ -63,10 +63,10 @@ new Map(options)
 
 ### Methods
 * **<span style="color:grey">addVectorLayer(name, options)**
-  ####Description
+  #### Description
   Define a vector layer to load geometric features on it\
   **ATTENTION!** For multiple layers, make sure each of them has a unique name. Keep in mind that each layer can host ONLY one type of geometry (see the available options for a vector layer below).
-  ####Arguments
+  #### Arguments
   * **<span style="color:grey">name** (_string_): A string to define the layer name
   * **<span style="color:grey">options** (_object_):
     * **<span style="color:grey">style** (_object_): Define an OpenLayers style for the layer
@@ -86,9 +86,9 @@ new Map(options)
     
 
 * **<span style="color:grey">addFeature(layer, geometry, options)**
-  ####Description
+  #### Description
   Add feature to an existing layer
-  ####Arguments
+  #### Arguments
   * **<span style="color:grey">name** (_string_): The layer name to which the feature belongs
   * **<span style="color:grey">geometry** (_object_): The feature geometry. Should be provided from [GeoJSON](https://geojson.org/) format
     containing (a) the geometry type & (b) the geometry coordinates.\

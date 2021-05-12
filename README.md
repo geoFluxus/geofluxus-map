@@ -1,150 +1,122 @@
 # geofluxus-map
-Powered by [OpenLayers](https://openlayers.org/). Check examples on JS (examples) and ReactJS (react-examples).
+Powered by [OpenLayers](https://openlayers.org/) & [d3](https://d3js.org/). Check examples on JS (examples) and ReactJS (react-examples).
 
-## Map
-First, create a target HTML element with a defined id to host the map like:
+The following visualizations are available:
+* [**Map**](#map): A basic visualization for creating and styling simple maps with tooltips
+* [**NetworkMap**](#networkmap): A map visualization for distributions along road networks
+* [**FlowMap**](#flowmap): A map visualization for data flows
+
+To initialize any visualization, first create a target HTML element with id to host the map:
 
 ```<div id="map"></div>```
 
-Then, initialize the map like so:
+**ATTENTION!** Make sure that you have specified both the width and height of the target element.
 
-```const map = new GeofluxusMap({target: "map"});```
+Then, initialize a simple map for example like so:
 
-The following image should appear on your screen:
-
-![](img/map.png)
-
-Here is an overview of all available options for a map object:
-
-new GeofluxusMap({\
-&emsp;&emsp; [target](#ref1): "map",\
-&emsp;&emsp; [projection](#ref2): "EPSG:4326",\
-&emsp;&emsp; [base](#ref3): {\
-&emsp;&emsp; &emsp;&emsp; [source](#ref4): "osm",\
-&emsp;&emsp; &emsp;&emsp; [opacity](#ref5): 1.0,\
-&emsp;&emsp; },\
-&emsp;&emsp; [view](#ref6): {\
-&emsp;&emsp; &emsp;&emsp; [zoom](#ref7): 0,\
-&emsp;&emsp; &emsp;&emsp; [minZoom](#ref8): undefined,\
-&emsp;&emsp; &emsp;&emsp; [maxZoom](#ref9): undefined,\
-&emsp;&emsp; &emsp;&emsp; [center](#ref10): [0, 0],\
-&emsp;&emsp; }\
-&emsp;&emsp; [enableZoom](#ref11): false,\
-&emsp;&emsp; [enableDrag](#ref12): false,\
-&emsp;&emsp; [hover](#ref13): {\
-&emsp;&emsp; &emsp;&emsp; [tooltip](#ref14): {\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [style](#ref15): {\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; borderRadius: ...\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; fontFamily: ...\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; ...\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; }\
-&emsp;&emsp; &emsp;&emsp; },\
-&emsp;&emsp; &emsp;&emsp; [style](#ref16): {\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [stroke](#ref17): {\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [color](#ref18): ...,\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [width](#ref19): ...,\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; },\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [fill](#ref20): {\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; &emsp;&emsp; [color](#ref21): ...,\
-&emsp;&emsp; &emsp;&emsp; &emsp;&emsp; }\
-&emsp;&emsp; &emsp;&emsp; }\
-&emsp;&emsp; }\
-})
+```const map = new Map({target: "map"});```
 
 
-* _<a id="ref1">target</a> (**Mandatory**)_: The id of the HTML element to host the map.
-* _<a id="ref2">projection</a>_: The map projection (EPSG code) for rendering feature geometries. The default projection for input geometries is **EPSG:4326** (WGS84) which corresponds to longitude / latitude coordinates. All input geometries are transformed to EPSG:3857 (Web Mercator).
-* _<a id="ref3">base</a>_: The map background
-    * _<a id="ref4">source</a>_: Background provider (default='osm').\
-      **Available providers**: 'osm', 'cartodb_dark', 'cartodb_light'
-    * _<a id="ref5">opacity</a>_: The background opacity. Ranges in [0, 1] (default=1).
-* _<a id="ref6">view</a>_: The map view
-    * _<a id="ref7">zoom</a>_: The zoom level (default=1)
-    * _<a id="ref8">minZoom</a>_: Minimum zoom level (default=undefined)
-    * _<a id="ref9">maxZoom</a>_: Maximum zoom level (default=undefined)
-    * _<a id="ref10">center</a>_: The map center. Coordinates provided in map projection (default=[0, 0])
-* _<a id="ref11">enableZoom</a>_: Enables zoom via mouse / keyboard on top of zoom controls (default=false)
-* _<a id="ref12">enableDrag</a>_: Enables dragging via mouse / keyboard (default=false)
-* _<a id="ref13">hover</a>_: Enables hover interactions
-    * _<a id="ref14">tooltip</a>_: Enables HTML div tooltip on hover over feature.
-      * _<a id="ref15">style</a>_: Tooltip style. Edit HTML div properties such as borderRadius, fontFamily etc.
-    * _<a id="ref16">style</a>_: Enables feature highlighting on hover, defined as an OpenLayers style object.
-      * _<a id="ref17">stroke</a>_: Style of feature boundary.
-        * _<a id="ref18">color</a>_: Stroke color. Available formats: RGB, RGBA, HEX.
-        * _<a id="ref19">width</a>_: Stroke width.
-      * _<a id="ref20">fill</a>_: Style of feature surface.
-        * _<a id="ref21">color</a>_: Fill color. Available formats: RGB, RGBA, HEX.
+##<a id="map"></a>Map
+new Map(options)
+
+###Options
+* **<span style="color:grey">target** (_string_): The id of the HTML element to host the map.
+  
+
+* **<span style="color:grey">projection** (_string_): The map projection ([EPSG code](https://epsg.io/)) for rendering feature geometries. The default projection for input geometries is **EPSG:4326** (WGS84) which corresponds to longitude / latitude coordinates. All input geometries are transformed to EPSG:3857 (Web Mercator).
+
+
+* **<span style="color:grey">base** (_object_): The map background
+    * **<span style="color:grey">source** (_string_): Background provider (default='osm').\
+      **Available options**: 'osm', 'cartodb_dark', 'cartodb_light'
+    * **<span style="color:grey">opacity** (_float_): The background opacity. Ranges in [0, 1] (default=1).
     
-**ATTENTION!** We recommend to provide values for ALL available options when defining an OpenLayers style object.
 
-## Vector layers
-To add features to the map, you need first to define a vector layer. You can simply do this by just providing a name for the given layer:
-```
-map.addVectorLayer('areas');
-```
-**ATTENTION!** For multiple layers, make sure each of them has a unique name. Keep in mind that each layer can host ONLY one type of geometry (see the available options for a vector layer below).
-
-Here is an overview of all available options for a vector layer:
-
-map.addVectorLayer([name](#ref22), {\
-&emsp;&emsp; [style](#ref23): {\
-&emsp;&emsp;&emsp;&emsp; [stroke](#ref24): {\
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [color](#ref25): ...,\
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [width](#ref26): ...\
-&emsp;&emsp;&emsp;&emsp; },\
-&emsp;&emsp;&emsp;&emsp; [fill](#ref27): {\
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [color](#ref28): ...\
-&emsp;&emsp;&emsp;&emsp; },\
-&emsp;&emsp;&emsp;&emsp; [zIndex](#ref29): ...\
-&emsp;&emsp; }\
-})
-
-* _<a id="ref22">name</a> (**Mandatory**)_: Layer name. Unique for each layer
-* _options_:
-  * _<a id="ref23">style</a>_: OpenLayers style for all layer features
-    * _<a id="ref24">stroke</a>_: Style of feature boundary.
-        * _<a id="ref25">color</a>_: Stroke color. Available formats: RGB, RGBA, HEX.
-        * _<a id="ref26">width</a>_: Stroke width.
-    * _<a id="ref27">fill</a>_: Style of feature surface.
-        * _<a id="ref28">color</a>_: Fill color. Available formats: RGB, RGBA, HEX.
-    * _<a id="ref29">zIndex</a>_: Layer z-index. By default, OpenLayers renders layers in Last In, FirstOut order (the last layer declared is rendered on canvas top).
+* **<span style="color:grey">view** (_object_): The map view
+    * **<span style="color:grey">zoom** (_object_): The zoom level (default=1)
+    * **<span style="color:grey">minZoom** (_float_): Minimum zoom level (default=undefined)
+    * **<span style="color:grey">maxZoom**  (_float_): Maximum zoom level (default=undefined)
+    * **<span style="color:grey">center** (_Array_): The map center. Coordinates provided in map projection (default=[0, 0])
     
-Once defined, you can populate the layer with features:
-```
-map.addFeature(name, geometry);
-```
-If provided, features inherit the given layer style. Nevertheless, you can always define different styles for each individual feature if necessary.
 
-Here is an overview for all available options for vector layer features:
+* **<span style="color:grey">controls** (_object_): Enables / disables map control buttons on the top left corner of the map. All buttons are active by default.
+  * **<span style="color:grey">zoom** (_boolean_): Allows zooming via mouse & keyboard. If disabled, zoom is available only via the map zoom controls on the top left corner of the map.
+  * **<span style="color:grey">drag** (_boolean_): Allows dragging along the map
+  * **<span style="color:grey">fullscreen** (_boolean_): Activates the fullscreen button
+  * **<span style="color:grey">reset** (_boolean_): Activates the reset button. Allows to reset to the initial view extent (either the initial map view or one specified by focusing on certain layer)
+  * **<span style="color:grey">exportPNG** (_boolean_): Activates the screenshot button. Allow to export a png version of the map on the current view. 
 
-map.addFeature([layer](#ref30), [geometry](#ref31), {\
-&emsp;&emsp; [style](#ref32): {\
-&emsp;&emsp;&emsp;&emsp; [stroke](#ref33): {\
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [color](#ref34): ...,\
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [width](#ref35): ...\
-&emsp;&emsp;&emsp;&emsp; },\
-&emsp;&emsp;&emsp;&emsp; [fill](#ref36): {\
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; [color](#ref37): ...\
-&emsp;&emsp;&emsp;&emsp; },\
-&emsp;&emsp;&emsp;&emsp; [zIndex](#ref38): ...\
-&emsp;&emsp; },\
-&emsp;&emsp; [tooltip](#ref39): ...\
-})
 
-* _<a id="ref30">layer</a> (**Mandatory**)_: The layer name to which the feature belongs
-* _<a id="ref31">geometry</a> (**Mandatory**)_: The feature geometry. Should be provided from [GeoJSON](https://geojson.org/) format.\
-  **Supported geometry types**: Point, LineString, MultiLineString, Polygon, MultiPolygon
-* _options_:
-    * _<a id="ref32">style</a>_: OpenLayers style for feature
-    * _<a id="ref33">stroke</a>_: Style of feature boundary.
+* **<span style="color:grey">hover** (_object_): Enables hover interactions
+    * **<span style="color:grey">tooltip** (_object_): Enables HTML div tooltip on hover over feature.
+      * **<span style="color:grey">body** (_function_): A function which iterates through the map features and load the tooltip content in HTML
+      * **<span style="color:grey">style** (_object_): Define tooltip style as an object with CSS properties such as borderRadius, fontFamily etc.
+    * **<span style="color:grey">style** (_object_): Enables feature highlighting on hover, defined as an OpenLayers style object.
+      * **<span style="color:grey">stroke** (_object_): Style of feature boundary.
+        * **<span style="color:grey">color** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
+        * **<span style="color:grey">width** (_float_): Stroke width.
+      * **<span style="color:grey">fill** (_object_): Style of feature surface.
+        * **<span style="color:grey">color** (_string_): Fill color. Available formats: RGB, RGBA, HEX.
+      * **<span style="color:grey">zIndex** (_float_): Define z-index for a highlighted feature
+    
+
+### Methods
+* **<span style="color:grey">addVectorLayer(name, options)**
+  ####Description
+  Define a vector layer to load geometric features on it\
+  **ATTENTION!** For multiple layers, make sure each of them has a unique name. Keep in mind that each layer can host ONLY one type of geometry (see the available options for a vector layer below).
+  ####Arguments
+  * **<span style="color:grey">name** (_string_): A string to define the layer name
+  * **<span style="color:grey">options** (_object_):
+    * **<span style="color:grey">style** (_object_): Define an OpenLayers style for the layer
+      * **<span style="color:grey">stroke** (_object_): Style of feature boundary
+        * **<span style="color:grey">color** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
+        * **<span style="color:grey">width** (_float_): Stroke width
+      * **<span style="color:grey">fill** (_object_): Style of feature surface
+        * **<span style="color:grey">color** (_string_): Fill color. Available formats: RGB, RGBA, HEX
+      * **<span style="color:grey">zIndex** (_float_): Define z-index for layer features    
+      * **<span style="color:grey">image** (_object_): (For point layers) Define circle style
+        * **<span style="color:grey">radius** (_float_): Circle radius
+          * **<span style="color:grey">stroke** (_object_): Style of feature boundary
+            * **<span style="color:grey">color** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
+            * **<span style="color:grey">width** (_float_): Stroke width
+          * **<span style="color:grey">fill** (_object_): Style of feature surface
+            * **<span style="color:grey">color** (_string_): Fill color. Available formats: RGB, RGBA, HEX
+    
+
+* **<span style="color:grey">addFeature(layer, geometry, options)**
+  ####Description
+  Add feature to an existing layer
+  ####Arguments
+  * **<span style="color:grey">name** (_string_): The layer name to which the feature belongs
+  * **<span style="color:grey">geometry** (_object_): The feature geometry. Should be provided from [GeoJSON](https://geojson.org/) format
+    containing (a) the geometry type & (b) the geometry coordinates.\
+    **Supported geometry types**: Point, LineString, MultiLineString, Polygon, MultiPolygon
+  * **<span style="color:grey">options** (_object_):
+    * **<span style="color:grey">style** (_object_): OpenLayers style for feature
+      * **<span style="color:grey">stroke** (_object_): Style of feature boundary.
         * _<a id="ref34">color</a>_: Stroke color. Available formats: RGB, RGBA, HEX.
         * _<a id="ref35">width</a>_: Stroke width.
     * _<a id="ref36">fill</a>_: Style of feature surface.
         * _<a id="ref37">color</a>_: Fill color. Available formats: RGB, RGBA, HEX.
     * _<a id="ref38">zIndex</a>_: Layer z-index. By default, OpenLayers renders features in Last In, FirstOut order (the last layer declared is rendered on canvas top).
-    * _<a id="ref39">tooltip</a>_: The tooltip info for the feature
-    
-Once a layer has features, you can zoom to its extent by providing its name:
-```
-map.focusOnLayer('areas');
-```
+    * _<a id="ref39">tooltip</a>_: The tooltip info for the feature  
+
+
+* focusOnLayer()
+  
+
+* setVisible(name, visible)
+  
+
+* changeBase(base)
+  
+
+* stylizeButtons(options)
+
+
+
+## <a id="networkmap"></a>NetworkMap
+
+## <a id="flowmap"></a>FlowMap

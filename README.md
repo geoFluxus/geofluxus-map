@@ -34,7 +34,7 @@ or in vanilla JS:
 const map = new gFMap.Map({target: "map"});
 ```
 
-<br></br>
+
 ## Map
 new Map(options)
 
@@ -155,8 +155,7 @@ new Map(options)
   #### Arguments
   * **<a id="map-stylizebuttons-options">options</a>** (_object_): Define button style as an object with CSS properties such as borderRadius, fontFamily etc.
   
-
-<br></br>
+  
 ## <a id="networkmap"></a>NetworkMap (extends Map)
 new NetworkMap(options)
 
@@ -174,8 +173,7 @@ new NetworkMap(options)
   * **<a id="networkmap-legend-width">width</a>** (_float_): The legend width provided in pixels
   * **<a id="networkmap-legend-height">height</a>** (_float_): The legend height provided in pixels
 
-
-<br></br>
+  
 ## <a id="flowmap"></a>FlowMap (extends Map)
 new FlowMap(options)
 

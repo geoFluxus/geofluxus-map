@@ -40,7 +40,7 @@ new Map(options)
 
 ### Options
 * **<a id="map-target">target</a>** (_string_): The id of the HTML element to host the map.
-  
+
 
 * **<a id="map-projection">projection</a>** (_string_): The map projection ([EPSG code](https://epsg.io/)) for rendering feature geometries. The default projection for input geometries is **EPSG:4326** (WGS84) which corresponds to longitude / latitude coordinates. All input geometries are transformed to EPSG:3857 (Web Mercator).
 
@@ -154,8 +154,9 @@ new Map(options)
 
   #### Arguments
   * **<a id="map-stylizebuttons-options">options</a>** (_object_): Define button style as an object with CSS properties such as borderRadius, fontFamily etc.
+<br></br> 
   
-  
+ 
 ## <a id="networkmap"></a>NetworkMap (extends Map)
 new NetworkMap(options)
 
@@ -172,6 +173,7 @@ new NetworkMap(options)
   * **<a id="networkmap-legend-title">title</a>** (_string_): The legend title
   * **<a id="networkmap-legend-width">width</a>** (_float_): The legend width provided in pixels
   * **<a id="networkmap-legend-height">height</a>** (_float_): The legend height provided in pixels
+<br></br> 
 
   
 ## <a id="flowmap"></a>FlowMap (extends Map)

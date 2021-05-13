@@ -18,15 +18,21 @@ The following visualizations are available:
 * [**FlowMap**](#flowmap): A map visualization for data flows
 
 To initialize any visualization, first create a target HTML element with id to host the map:
-
-```<div id="map"></div>```
+```
+<div id="map"></div>
+```
 
 **ATTENTION!** Make sure that you have specified both the width and height of the target element.
 
-Then, initialize a simple map for example like so:
-
-```const map = new Map({target: "map"});```
-
+Then, initialize a simple map in NodeJS:
+```
+import Map from 'geofluxus-map';
+const map = new Map({target: "map"});
+```
+or in vanilla JS:
+```
+const map = new gFMap.Map({target: "map"});
+```
 
 ## Map
 new Map(options)
@@ -150,6 +156,45 @@ new Map(options)
   * **<a id="map-stylizebuttons-options">options</a>** (_object_): Define button style as an object with CSS properties such as borderRadius, fontFamily etc.
     
 
-## <a id="networkmap"></a>NetworkMap
+## <a id="networkmap"></a>NetworkMap (extends Map)
+new NetworkMap(options)
 
-## <a id="flowmap"></a>FlowMap
+### Options
+* **<a id="networkmap-controls">controls</a>** (_object_): Enables / disables control on top of basic map controls
+  (check [here](#map-controls))
+  * **<a id="networkmap-controls-togglenetwork">toggleNetwork</a>** (_boolean_): Allows to show/hide parts of network with zero amount
+  * **<a id="networkmap-controls-togglelegend">toggleLegend</a>** (_boolean_): Allows to show/hide the map legend
+  * **<a id="networkmap-controls-togglelight">toggleLight</a>** (_boolean_): Allows to interchange between dark & light mode map
+* **<a id="networkmap-data">data</a>** (_Array_): Loads the network map data
+* **<a id="networkmap-scale">scale</a>** (_Array_): A array of strings which defines the map color scale. Default color scale provided by
+  [ColorBrewer](https://colorbrewer2.org)
+* **<a id="networkmap-legend">legend</a>** (_object_): Defines the legend title, width, height and other CSS properties
+  * **<a id="networkmap-legend-title">title</a>** (_string_): The legend title
+  * **<a id="networkmap-legend-width">width</a>** (_float_): The legend width provided in pixels
+  * **<a id="networkmap-legend-height">height</a>** (_float_): The legend height provided in pixels
+
+
+## <a id="flowmap"></a>FlowMap (extends Map)
+new FlowMap(options)
+
+### Options
+* **<a id="flowmap-controls">controls</a>** (_object_): Enables / disables control on top of basic map controls
+  (check [here](#map-controls))
+  * **<a id="flowmap-controls-toggleflows">toggleFlows</a>** (_boolean_): Allows to show/hide map flows
+  * **<a id="flowmap-controls-togglenodes">toggleNodes</a>** (_boolean_): Allows to show/hide map nodes
+  * **<a id="flowmap-controls-animate">animate</a>** (_boolean_): Allows to animate flows
+  * **<a id="flowmap-controls-togglelegend">toggleLegend</a>** (_boolean_): Allows to show/hide the map legend
+  * **<a id="flowmap-controls-togglelight">toggleLight</a>** (_boolean_): Allows to interchange between dark & light mode map
+* **<a id="flowmap-data">data</a>** (_Array_): Loads the flowmap data
+* **<a id="flowmap-scale">scale</a>** (_Array_): A array of strings which defines the map color scale. Default color scale provided by
+  [ColorBrewer](https://colorbrewer2.org)
+* **<a id="flowmap-groupby">groupBy</a>** (_Array_): The property for splitting and coloring flows into groups
+* **<a id="flowmap-minflowwidth">minFlowWidth</a>** (_float_): The minimum flow width
+* **<a id="flowmap-maxflowwidth">maxFlowWidth</a>** (_float_): The maximum flow width
+* **<a id="flowmap-animate">animate</a>** (_float_): Defines the default animation mode\
+  **Available options**: 0 (No animation), 1 (Dash animation)
+* **<a id="flowmap-legend">legend</a>** (_object_): Defines the legend title and other CSS properties
+  * **<a id="flowmap-legend-title">title</a>** (_string_): The legend title
+* **<a id="flowmap-tooltip">tooltip</a>** (_object_): The map tooltip. Overrides the map hover option.
+  * **<a id="flowmap-tooltip-body">body</a>** (_function_): A function which iterates through the map features and load the tooltip content in HTML
+  * **<a id="flowmap-tooltip-style">style</a>** (_object_): Define tooltip style as an object with CSS properties such as borderRadius, fontFamily etc.

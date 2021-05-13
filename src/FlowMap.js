@@ -93,6 +93,10 @@ export default class FlowMap extends Map {
         // convert to links & nodes
         this._transformToLinksAndNodes();
 
+        // focus on extent
+        var extent = this._getExtent();
+        this.focusOnLayer(extent);
+
         // define colors based on groupby property
         this.colors = (Array.isArray(this.scale)) ? this._getColors() : this.scale;
 
@@ -102,10 +106,6 @@ export default class FlowMap extends Map {
         // get legend
         this.legendOptions = options.legend || {};
         this._drawLegend();
-
-        // focus on extent
-        var extent = this._getExtent();
-        this.focusOnLayer(extent);
 
         // process to render map anew
         this.renderFlows = true;
@@ -329,7 +329,7 @@ export default class FlowMap extends Map {
         this.flows = {};
         this.data.links.forEach(function(link) {
             // change link visibility
-            var property = link[_this.groupBy];
+            var property = link[_this.groupBy].toString();
             var visible = _this.toHide.includes(property) ? false : true;
             link.visible = visible;
 

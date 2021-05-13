@@ -100,7 +100,7 @@ new Map(options)
             * **<a id="map-addvectorlayer-options-style-image-stroke-width">width</a>** (_float_): Stroke width
           * **<a id="map-addvectorlayer-options-style-image-fill">fill</a>** (_object_): Style of feature surface
             * **<a id="map-addvectorlayer-options-style-image-fill-color">color</a>** (_string_): Fill color. Available formats: RGB, RGBA, HEX
-    
+***    
 
 * **<a id="map-addfeature">addFeature(layer, geometry, options)</a>**
   #### Description
@@ -120,7 +120,7 @@ new Map(options)
       * **<a id="map-addfeature-options-style-zindex">zIndex</a>** (_float_): Layer z-index. By default, OpenLayers renders features in Last In, FirstOut order (the last layer declared is rendered on canvas top).
     * **<a id="map-addfeature-options-props">props</a>** (_object_): Add to feature properties other than geometry with key-value pairs (ie. if you want to later call
       them in the map tooltip)
-
+***
 
 * **<a id="map-focusonlayer">focusOnLayer(name)</a>**
   #### Description
@@ -128,8 +128,7 @@ new Map(options)
 
   #### Arguments
   * **<a id="map-focusonlayer-name">name</a>** (_string_): The name of the layer to focus on
-  
-  
+***  
 
 * **<a id="map-setvisible">setVisible(name, visible)</a>**
   #### Description
@@ -138,7 +137,7 @@ new Map(options)
   #### Arguments
   * **<a id="map-setvisible-name">name</a>** (_string_): The layer name
   * **<a id="map-setvisible-visible">visible</a>** (_boolean_): Turn to visible (true) or not (false)  
-  
+***  
 
 * **<a id="map-changebase">changeBase(base)</a>**
   #### Description
@@ -146,7 +145,7 @@ new Map(options)
 
   #### Arguments
   * **<a id="map-changebase-base">base</a>** (_string_): The source name of the new base layer (check [here](#map-base-source) for options)
-  
+***  
 
 * **<a id="map-stylizebuttons">stylizeButtons(options)</a>**
   #### Description
@@ -154,7 +153,7 @@ new Map(options)
 
   #### Arguments
   * **<a id="map-stylizebuttons-options">options</a>** (_object_): Define button style as an object with CSS properties such as borderRadius, fontFamily etc.
-    
+
 
 ## <a id="networkmap"></a>NetworkMap (extends Map)
 new NetworkMap(options)

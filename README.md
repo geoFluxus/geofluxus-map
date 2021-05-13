@@ -46,16 +46,16 @@ new Map(options)
 
 
 * **<a id="map-base">base</a>** (_object_): The map background
-    * **<a id="map-base-source">source</a>** (_string_): Background provider (default='osm').\
+    * **<a id="map-base-source">source</a>** (_string_): Background provider.\
       **Available options**: 'osm', 'cartodb_dark', 'cartodb_light'
-    * **<a id="map-base-opacity">opacity</a>** (_float_): The background opacity. Ranges in [0, 1] (default=1).
+    * **<a id="map-base-opacity">opacity</a>** (_float_): The background opacity. Ranges in [0, 1].
     
 
 * **<a id="map-view">view</a>** (_object_): The map view
-    * **<a id="map-view-zoom">zoom</a>** (_object_): The zoom level (default=1)
-    * **<a id="map-view-minzoom">minZoom</a>** (_float_): Minimum zoom level (default=undefined)
-    * **<a id="map-view-maxzoom">maxZoom</a>**  (_float_): Maximum zoom level (default=undefined)
-    * **<a id="map-view-center">center</a>** (_Array_): The map center. Coordinates provided in map projection (default=[0, 0])
+    * **<a id="map-view-zoom">zoom</a>** (_object_): The zoom level
+    * **<a id="map-view-minzoom">minZoom</a>** (_float_): Minimum zoom level
+    * **<a id="map-view-maxzoom">maxZoom</a>**  (_float_): Maximum zoom level
+    * **<a id="map-view-center">center</a>** (_Array_): The map center. Coordinates provided in map projection (ie. [0, 0])
     
 
 * **<a id="map-controls">controls</a>** (_object_): Enables / disables map control buttons on the top left corner of the map. All buttons are active by default.

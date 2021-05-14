@@ -38,6 +38,23 @@ class ReactMap extends Component {
         },
         hover: {
             tooltip: {
+                body: function(d) {
+                    return `
+                    <table>
+                        <tr>
+                            <th colspan="2">Provincie</th>
+                        <tr>
+                        <tr>
+                            <th>Lower: </th>
+                            <td>${d.get('name')}</td>
+                        </tr>
+                        <tr>
+                            <th>Upper: </th>
+                            <td>${d.get('capital')}</td>
+                        </tr>
+                    </table>
+                    `;
+                },
                 style: tooltipStyle
             },
             style: hoverStyle
@@ -65,7 +82,10 @@ class ReactMap extends Component {
         var geometry = area.geometry,
             name = area.properties.name;
         map.addFeature('areas', geometry, {
-            tooltip: name
+            props: {
+                name: name,
+                capital: name.toUpperCase()
+            }
         });
     })
 
@@ -75,7 +95,7 @@ class ReactMap extends Component {
 
   render() {
     return (
-      <div id="map" style={{ width: "100%", height: "98vh" }}>
+      <div id="map" style={{ width: "50vw", height: "50vh" }}>
       </div>
     );
   }

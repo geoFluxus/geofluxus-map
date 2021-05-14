@@ -263,8 +263,8 @@ export class NodeLayer extends D3Layer {
             var path = _this.g.append('circle')
                         .attr("cx", point[0])
                         .attr("cy", point[1])
-                        .attr("r", "8px")
-                        .attr("fill", "red")
+                        .attr("r", "5px")
+                        .attr("fill", "rgba(139, 138, 138, 0.5)")
                         .on("mouseover", function() {
                             d3.select(this).node().parentNode.appendChild(this);
                             d3.select(this).style("cursor", "pointer");

@@ -188,8 +188,7 @@ new FlowMap(options)
   * **<a id="flowmap-controls-togglelegend">toggleLegend</a>** (_boolean_): Allows to show/hide the map legend
   * **<a id="flowmap-controls-togglelight">toggleLight</a>** (_boolean_): Allows to interchange between dark & light mode map
 * **<a id="flowmap-data">data</a>** (_Array_): Loads the flowmap data
-* **<a id="flowmap-scale">scale</a>** (_Array_): A array of strings which defines the map color scale. Default color scale provided by
-  [ColorBrewer](https://colorbrewer2.org)
+* **<a id="flowmap-scale">scale</a>** (_Object_): An object which assigns a color to each value of the groupBy property
 * **<a id="flowmap-groupby">groupBy</a>** (_Array_): The property for splitting and coloring flows into groups
 * **<a id="flowmap-minflowwidth">minFlowWidth</a>** (_float_): The minimum flow width
 * **<a id="flowmap-maxflowwidth">maxFlowWidth</a>** (_float_): The maximum flow width

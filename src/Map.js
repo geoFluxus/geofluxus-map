@@ -166,7 +166,7 @@ export default class Map {
             // update tooltip style & highlight
             if (feature) {
                 // change cursor style
-                this.getTargetElement().style.cursor = 'pointer';
+                this.getViewport().style.cursor = 'pointer';
 
                 // set tooltip body
                 overlay.setPosition(evt.coordinate);
@@ -223,7 +223,7 @@ export default class Map {
                 feature.setStyle(highlightStyle);
             } else {
                 // reset pointer style
-                this.getTargetElement().style.cursor = 'auto';
+                this.getViewport().style.cursor = 'auto';
 
                 // hide tooltip
                 div.style.display = 'none';

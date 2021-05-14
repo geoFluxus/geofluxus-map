@@ -20,16 +20,11 @@ var tooltipStyle = {
         zIndex: 9999
     }
 
-var string = "Medieval";
-
 // initialize map
 const map = new Map({
-    target: 'root',
+    target: 'root1',
     controls: {
-//        zoom: false,
-//        drag: false,
-//        exportPNG: false,
-        fullscreen: false
+        exportPNG: false,
     },
     view: {
         center: [5, 52],
@@ -94,3 +89,11 @@ areas.features.forEach(function(area) {
 
 // focus on 'areas'
 map.focusOnLayer('areas');
+
+// stylize buttons
+var buttonStyle = {
+    color: 'white',
+    backgroundColor: 'rgb(0, 125, 125)',
+    borderRadius: '100%'
+};
+map.stylizeButtons(buttonStyle)

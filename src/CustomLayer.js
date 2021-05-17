@@ -24,7 +24,7 @@ class D3Layer extends Layer {
 
         // draw layer only on moveend
         function onMoveEnd(evt) {
-            _this.draw();
+            _this.map.once('rendercomplete', function() {_this.draw()});
         }
         function onMoveStart(evt) {
             _this.clear();
@@ -105,7 +105,7 @@ export class FlowLayer extends D3Layer {
         var _this = this;
 
         var target = this.map.getTarget();
-        if (color != 'none') {
+        if (width > 7) {
             // color gradient along path
             var gradient = this.defs.append('linearGradient')
                                     .attr("id", `${target}_grad${d._id}`)
@@ -125,14 +125,16 @@ export class FlowLayer extends D3Layer {
                     .attr('stop-color', color)
                     .attr('stop-opacity', 1.0)
                     .attr('offset', 1)
+
+            color = `url(#${target}_grad${d._id})`;
         }
 
         // d3 path
-        var gradRef = color == 'none' ? 'none' : `url(#${target}_grad${d._id})`;
+        //var gradRef = color == 'none' ? 'none' : `url(#${target}_grad${d._id})`;
         var path = this.g.append('path')
                     .attr('d', this.bezier(bezier))
-                    //.attr("stroke-opacity", 0.5)
-                    .attr("stroke", gradRef)
+                    .attr("stroke-opacity", 0.5)
+                    .attr("stroke", color)
                     .attr("stroke-width", width)
                     .attr("stroke-linecap", "round")
                     .style("pointer-events", 'stroke')
@@ -154,8 +156,8 @@ export class FlowLayer extends D3Layer {
                             .style("left", (evt.pageX - (tooltipSize.width / 2)) + 'px');
                     })
                     .on("mouseout", function() {
-                        //path.attr("stroke-opacity", 0.5);
-                        path.attr("stroke", gradRef);
+                        path.attr("stroke-opacity", 0.5);
+                        path.attr("stroke", color);
                         _this.tooltip.style("visibility", "hidden")
                     })
                     .attr("fill", 'none')
@@ -177,6 +179,7 @@ export class FlowLayer extends D3Layer {
     draw() {
         var _this = this;
 
+        var num = 0;
         for (var id in this.features) {
             // get grouped flows
             var flows = _this.features[id];
@@ -189,8 +192,10 @@ export class FlowLayer extends D3Layer {
 
             // draw flows
             flows.forEach(function(d) {
+
                 // if no display, proceed to next flow
                 if (!d.visible) return;
+                num++;
 
                 // get flow source & target
                 // convert to pixels
@@ -212,15 +217,16 @@ export class FlowLayer extends D3Layer {
                 _this.drawPath(d, bezier, d.color, d.strokeWidth);
 
                  // buffer path for very thin lines (easier mouseover)
-                if (d.strokeWidth < 7) {
-                    _this.drawPath(d, bezier, 'none', 7);
-                }
+                //if (d.strokeWidth < 7) {
+                    //_this.drawPath(d, bezier, 'none', 7);
+                //}
 
                 // shift curve
                 xShift -= shiftStep;
                 yShift += shiftStep;
             })
         }
+        console.log(num)
     }
 
     // animate flows

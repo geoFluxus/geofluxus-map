@@ -557,18 +557,17 @@ class ExportPNG extends Control {
             size = map.getSize(),
             viewResolution = map.getView().getResolution();
 
-        // if map legend, scale & translate for printing
-        if (legend) {
-            var transY = -50,
-                transX = (legend.style.right != '0px') ? -50 : 0;
-            legend.style.transform = `scale(2.5) translate(${transX}%, ${transY}%)`;
-        }
-
         // resize map for printing
         var printSize = [width, height];
         map.setSize(printSize);
         var scaling = Math.min(width / size[0], height / size[1]);
         map.getView().setResolution(viewResolution / scaling);
+
+        // if map legend, scale & translate for printing
+        if (legend) {
+            legend.style.transformOrigin = "bottom right"
+            legend.style.transform = `scale(2)`;
+        }
 
         // print once map is resized
         // alternative: listen to 'postcompose' to not await for tiles

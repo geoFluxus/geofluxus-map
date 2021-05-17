@@ -109,7 +109,7 @@ export default class FlowMap extends Map {
 
         // process to render map anew
         this.renderFlows = true;
-        this.renderNodes = true;
+        this.renderNodes = false;
         this._render();
     }
 
@@ -144,6 +144,7 @@ export default class FlowMap extends Map {
             var value = link[_this.groupBy];
             if (!categories.includes(value)) categories.push(value);
         })
+        categories.sort();
 
         // interpolate
         var colors = {};
@@ -253,13 +254,13 @@ export default class FlowMap extends Map {
         this.legend.appendChild(title);
 
         // add selectAll
-        var selectAll = this._getCheckbox(['Select All', 'none']),
-            checkboxes = [];
+        this.selectAll = this._getCheckbox(['Select All', 'none']);
+        this.checkboxes = [];
 
         // checkboxes for groupby property
         Object.entries(this.colors).forEach(function(entry) {
             var checkbox = _this._getCheckbox(entry);
-            checkboxes.push(checkbox);
+            _this.checkboxes.push(checkbox);
 
             // add event
             checkbox.addEventListener('change', function() {
@@ -269,24 +270,52 @@ export default class FlowMap extends Map {
                         return item !== id
                     })
                 } else {
-                    selectAll.checked = false;
+                    _this.selectAll.checked = false;
                     _this.toHide.push(id);
                 }
                 _this._render();
-                if (!_this.toHide.length) selectAll.checked = true;
+                if (!_this.toHide.length) _this.selectAll.checked = true;
             });
             checkbox.checked = true;  // checked by default
         })
 
         // selectAll event
-        selectAll.addEventListener('change', function() {
-            for (var i = 0; i < checkboxes.length; i++) {
-                checkboxes[i].checked = this.checked;
-                var event = new Event('change');
-                checkboxes[i].dispatchEvent(event);
+        this.selectAll.addEventListener('change', function() {
+            // show / hide all properties
+            if (this.checked) {
+                _this.toHide = [];
+            } else {
+                Object.keys(_this.colors).forEach(function(id) {
+                    _this.toHide.push(id)
+                })
             }
+
+            // (un)check all checkboxes
+            for (var i = 0; i < _this.checkboxes.length; i++) {
+                _this.checkboxes[i].checked = this.checked;
+            }
+
+            _this._render();
         })
-        selectAll.checked = true;  // checked by default
+        this.selectAll.checked = true;  // checked by default
+    }
+
+    select(ids) {
+        ids = ids || [];
+
+        this.selectAll.checked = false;
+        var event = new Event('change');
+        this.selectAll.dispatchEvent(event);
+
+        for (var i = 0; i < this.checkboxes.length; i++) {
+            var checkbox = this.checkboxes[i],
+                id = checkbox.id;
+            if (ids.includes(id)) {
+                checkbox.checked = true;
+                var event = new Event('change');
+                checkbox.dispatchEvent(event);
+            }
+        }
     }
 
     // create groupBy checkbox

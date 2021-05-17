@@ -24,7 +24,7 @@ class D3Layer extends Layer {
 
         // draw layer only on moveend
         function onMoveEnd(evt) {
-            _this.map.once('rendercomplete', function() {_this.draw()});
+            _this.draw();
         }
         function onMoveStart(evt) {
             _this.clear();
@@ -179,7 +179,6 @@ export class FlowLayer extends D3Layer {
     draw() {
         var _this = this;
 
-        var num = 0;
         for (var id in this.features) {
             // get grouped flows
             var flows = _this.features[id];
@@ -192,10 +191,8 @@ export class FlowLayer extends D3Layer {
 
             // draw flows
             flows.forEach(function(d) {
-
                 // if no display, proceed to next flow
                 if (!d.visible) return;
-                num++;
 
                 // get flow source & target
                 // convert to pixels
@@ -226,7 +223,6 @@ export class FlowLayer extends D3Layer {
                 yShift += shiftStep;
             })
         }
-        console.log(num)
     }
 
     // animate flows

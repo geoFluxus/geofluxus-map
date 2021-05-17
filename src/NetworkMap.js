@@ -53,8 +53,9 @@ export default class NetworkMap extends Map {
         super(options);
         var _this = this;
 
-        // change button style
+        // change logo & button style
         this.stylizeButtons({color: 'white'});
+        this.addLogo('white');
 
         // network map options
         this.data = JSON.parse(JSON.stringify(options.data || []));
@@ -183,7 +184,7 @@ export default class NetworkMap extends Map {
         this.legend.style.left = "0";
         this.legend.style.right = "0";
         this.legend.style.margin = "auto";
-        this.legend.style.bottom = '0';
+        this.legend.style.bottom = '1.5em';
         this.legend.style.color = 'white';
         //this.legend.style.fontFamily = "'Helvetica', 'Arial', sans-serif";
         this.legend.style.position = 'absolute';
@@ -370,8 +371,9 @@ class ToggleLight extends Control {
         this.target.legendOptions.color = color;
         this.target._drawLegend();
 
-        // change button style
+        // change logo & button style
         this.target.stylizeButtons({color: color});
+        this.target.addLogo(color);
 
         // change network color
         var networkLayer = this.target._getLayer('network'),

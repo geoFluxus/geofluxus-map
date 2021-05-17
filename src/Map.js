@@ -596,7 +596,12 @@ class ExportPNG extends Control {
         logo.style.transform = `scale(2)`;
 
         // if map legend, scale & translate for printing
+        var legendWidth, legendHeight;
         if (legend) {
+            legendWidth = legend.style.maxWidth;
+            legendHeight = legend.style.maxHeight;
+            legend.style.maxWidth = 'none';
+            legend.style.maxHeight = 'none';
             var transX = legend.style.margin == 'auto' ? 25 : 0;
             legend.style.transformOrigin = "bottom right";
             legend.style.transform = `scale(2) translate(${transX}%, 0%)`;
@@ -630,6 +635,8 @@ class ExportPNG extends Control {
             target.style.height = '100%';
             logo.style.transform = 'none';
             if (legend) legend.style.transform = 'none';
+            legend.style.maxWidth = legendWidth;
+            legend.style.maxHeight = legendHeight;
             map.setSize(size);
             map.getView().setResolution(viewResolution);
 

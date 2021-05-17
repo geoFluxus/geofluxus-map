@@ -105,6 +105,7 @@ export class FlowLayer extends D3Layer {
         var _this = this;
 
         var target = this.map.getTarget();
+        var gradRef;
         if (width > 7) {
             // color gradient along path
             var gradient = this.defs.append('linearGradient')
@@ -126,15 +127,14 @@ export class FlowLayer extends D3Layer {
                     .attr('stop-opacity', 1.0)
                     .attr('offset', 1)
 
-            color = `url(#${target}_grad${d._id})`;
+            gradRef = `url(#${target}_grad${d._id})`;
         }
 
         // d3 path
-        //var gradRef = color == 'none' ? 'none' : `url(#${target}_grad${d._id})`;
         var path = this.g.append('path')
                     .attr('d', this.bezier(bezier))
-                    .attr("stroke-opacity", 0.5)
-                    .attr("stroke", color)
+                    .attr("stroke-opacity", gradRef ? 1 : 0.5)
+                    .attr("stroke", gradRef || color)
                     .attr("stroke-width", width)
                     .attr("stroke-linecap", "round")
                     .style("pointer-events", 'stroke')
@@ -156,8 +156,8 @@ export class FlowLayer extends D3Layer {
                             .style("left", (evt.pageX - (tooltipSize.width / 2)) + 'px');
                     })
                     .on("mouseout", function() {
-                        path.attr("stroke-opacity", 0.5);
-                        path.attr("stroke", color);
+                        path.attr("stroke-opacity", gradRef ? 1 : 0.5);
+                        path.attr("stroke", gradRef || color);
                         _this.tooltip.style("visibility", "hidden")
                     })
                     .attr("fill", 'none')

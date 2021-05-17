@@ -30,9 +30,10 @@ export default class FlowMap extends Map {
         }
         super(options);
 
-        // change button style
+        // change button & logo style
         this.buttonColor = 'white';
         this.stylizeButtons({color: this.buttonColor});
+        this.addLogo(this.buttonColor);
 
         // default properties
         var _this = this;
@@ -220,6 +221,7 @@ export default class FlowMap extends Map {
     _drawLegend() {
         var _this = this;
         var options = this.legendOptions;
+        var viewport = this.map.getViewport();
 
         // legend div
         if (this.legend != undefined) this.legend.remove();
@@ -233,6 +235,9 @@ export default class FlowMap extends Map {
         this.legend.style.position = 'absolute';
         //this.legend.style.borderRadius = '1rem';
         this.legend.style.padding = '10px';
+        this.legend.style.maxWidth = `${0.33 * viewport.offsetWidth}px`;
+        this.legend.style.maxHeight = `${0.9 * viewport.offsetHeight}px`;
+        this.legend.style.overflowY = 'auto';
         Object.entries(options).forEach(function(pair) {
             var [key, value] = pair;
             _this.legend.style[key] = value;
@@ -252,6 +257,14 @@ export default class FlowMap extends Map {
         title.style.padding = '10px';
         title.innerHTML = options.title || '<span><b>Legend</b></span>';
         this.legend.appendChild(title);
+
+        // add checkboxes
+        this._addCheckboxes();
+    }
+
+    // add legend checkboxes
+    _addCheckboxes() {
+        var _this = this;
 
         // add selectAll
         this.selectAll = this._getCheckbox(['Select All', 'none']);
@@ -300,24 +313,6 @@ export default class FlowMap extends Map {
         this.selectAll.checked = true;  // checked by default
     }
 
-    select(ids) {
-        ids = ids || [];
-
-        this.selectAll.checked = false;
-        var event = new Event('change');
-        this.selectAll.dispatchEvent(event);
-
-        for (var i = 0; i < this.checkboxes.length; i++) {
-            var checkbox = this.checkboxes[i],
-                id = checkbox.id;
-            if (ids.includes(id)) {
-                checkbox.checked = true;
-                var event = new Event('change');
-                checkbox.dispatchEvent(event);
-            }
-        }
-    }
-
     // create groupBy checkbox
     _getCheckbox(entry) {
         var _this = this,
@@ -338,6 +333,7 @@ export default class FlowMap extends Map {
         var checkbox = document.createElement('input');
         var label = document.createElement('label');
         label.innerHTML = property;
+        label.style.fontSize = '15px';
         checkbox.type = 'checkbox';
         checkbox.id = property;
         checkbox.style.cursor = 'pointer';
@@ -349,6 +345,25 @@ export default class FlowMap extends Map {
         this.legend.appendChild(div);
 
         return checkbox;
+    }
+
+    // select groupby value(s) to show
+    select(ids) {
+        ids = ids || [];
+
+        this.selectAll.checked = false;
+        var event = new Event('change');
+        this.selectAll.dispatchEvent(event);
+
+        for (var i = 0; i < this.checkboxes.length; i++) {
+            var checkbox = this.checkboxes[i],
+                id = checkbox.id;
+            if (ids.includes(id)) {
+                checkbox.checked = true;
+                var event = new Event('change');
+                checkbox.dispatchEvent(event);
+            }
+        }
     }
 
     // get flows
@@ -672,5 +687,8 @@ class ToggleLight extends Control {
         // change button style
         this.target.buttonColor = this.target.buttonColor == 'white' ? 'black' : 'white';
         this.target.stylizeButtons({color: this.target.buttonColor});
+
+        // change logo
+        this.target.addLogo(this.target.buttonColor)
     }
 }

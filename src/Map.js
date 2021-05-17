@@ -23,6 +23,8 @@ import saveAs from 'file-saver';
 import '@fortawesome/fontawesome-free/js/all.js';
 import { _default } from './utils.js';
 import './base.css';
+import logo_dark from "./logo_dark.png";
+import logo_light from "./logo_light.png";
 
 
 // map bases
@@ -93,26 +95,50 @@ export default class Map {
             controls: defaultControls()
         });
 
+        // add controls & logo
+        this._addControls(controls, options.controlClasses);
+        this.addLogo('dark');
+
+        // activate highlight & tooltips
+        this._onHover(options.hover);
+    }
+
+    _addControls(controls, classes) {
+        var _this = this;
+
         // add custom controls
         if (controls.fullscreen) this.map.addControl(new FullScreen());
-        var controlClasses = _default(options.controlClasses, {
+        var classes = _default(classes, {
             reset: Reset,
             exportPNG: ExportPNG
         })
         var topPos = 7; // position from screen top
         Object.entries(controls).forEach(function(pair) {
             var [key, value] = pair;
-            if (controls[key] && controlClasses[key]) {
-                _this.map.addControl(new controlClasses[key]({
+            if (controls[key] && classes[key]) {
+                _this.map.addControl(new classes[key]({
                     target: _this,
                     top: `${topPos}em`
                 }));
                 topPos += 2.5;
             }
         })
+    }
 
-        // activate highlight & tooltips
-        this._onHover(options.hover);
+    addLogo(color) {
+        // add logo
+        if (this.logo != undefined) this.map.removeControl(this.logo);
+        var div = document.createElement('div');
+        var logo = color == 'white' ? logo_light : logo_dark;
+        div.innerHTML = `<img src=${logo} style='height: 100px;'/>`;
+        div.id = 'logo';
+        div.style.bottom = '1.5em';
+        div.style.left = '1.5em';
+        div.style.position = 'absolute';
+        this.logo = new Control({
+            element: div
+        });
+        this.map.addControl(this.logo);
     }
 
     // activate tooltips
@@ -462,7 +488,8 @@ export default class Map {
         var controls = this.map.getControls();
         controls.forEach(function(control) {
             control.element.childNodes.forEach(function(button) {
-                if (button.tagName.toLowerCase() == 'button') {
+                var tag = button.tagName;
+                if (tag && tag.toLowerCase() == 'button') {
                     Object.entries(options).forEach(function(pair) {
                         var [key, value] = pair;
                         button.style[key] = value;
@@ -541,6 +568,7 @@ class ExportPNG extends Control {
         var _this = this,
             map = this.map_,
             target = map.getViewport(),
+            logo = this.target.logo.element,
             legend = this.target.legend;
 
         // disable button / cursor
@@ -563,10 +591,15 @@ class ExportPNG extends Control {
         var scaling = Math.min(width / size[0], height / size[1]);
         map.getView().setResolution(viewResolution / scaling);
 
+        // scale logo
+        logo.style.transformOrigin = "bottom left";
+        logo.style.transform = `scale(2)`;
+
         // if map legend, scale & translate for printing
         if (legend) {
-            legend.style.transformOrigin = "bottom right"
-            legend.style.transform = `scale(2)`;
+            var transX = legend.style.margin == 'auto' ? 25 : 0;
+            legend.style.transformOrigin = "bottom right";
+            legend.style.transform = `scale(2) translate(${transX}%, 0%)`;
         }
 
         // print once map is resized
@@ -592,9 +625,10 @@ class ExportPNG extends Control {
                     });
             });
 
-            // reset map / legend / viewport
+            // reset map / logo / legend / viewport
             target.style.width = '100%';
             target.style.height = '100%';
+            logo.style.transform = 'none';
             if (legend) legend.style.transform = 'none';
             map.setSize(size);
             map.getView().setResolution(viewResolution);

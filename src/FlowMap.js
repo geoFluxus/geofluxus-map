@@ -235,8 +235,8 @@ export default class FlowMap extends Map {
         this.legend.style.position = 'absolute';
         //this.legend.style.borderRadius = '1rem';
         this.legend.style.padding = '10px';
-        this.legend.style.maxWidth = `${0.33 * viewport.offsetWidth}px`;
-        this.legend.style.maxHeight = `${0.9 * viewport.offsetHeight}px`;
+        this.legend.style.maxWidth = '33%';
+        this.legend.style.maxHeight = '90%';
         this.legend.style.overflowY = 'auto';
         Object.entries(options).forEach(function(pair) {
             var [key, value] = pair;

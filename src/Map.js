@@ -23,8 +23,6 @@ import saveAs from 'file-saver';
 import '@fortawesome/fontawesome-free/js/all.js';
 import { _default } from './utils.js';
 import './base.css';
-import logo_dark from "./logo_dark.png";
-import logo_light from "./logo_light.png";
 
 
 // map bases
@@ -129,8 +127,10 @@ export default class Map {
         // add logo
         if (this.logo != undefined) this.map.removeControl(this.logo);
         var div = document.createElement('div');
-        var logo = color == 'white' ? logo_light : logo_dark;
-        div.innerHTML = `<img src=${logo} style='height: 100px;'/>`;
+        var logo = color == 'white' ? 'logo_light' : 'logo_dark';
+        var version = require('../package.json').version;
+        var src = `https://cdn.jsdelivr.net/npm/geofluxus-map@${version}/src/${logo}.png`;
+        div.innerHTML = `<img src=${src} style='height: 100px;'/>`;
         div.id = 'logo';
         div.style.bottom = '1.5em';
         div.style.left = '1.5em';

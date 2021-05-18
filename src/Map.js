@@ -25,6 +25,16 @@ import { _default } from './utils.js';
 import './base.css';
 
 
+// logo
+const version = require('../package.json').version;
+const source = "https://cdn.jsdelivr.net/npm/geofluxus-map@" + version + "/src/";
+var logo_light = new Image();
+logo_light.src = source + "logo_light.png";
+logo_light.style.height = '100px';
+var logo_dark = new Image();
+logo_dark.src = source + "logo_dark.png";
+logo_dark.style.height = '100px';
+
 // map bases
 var attributions = {
     osm: '© <a style="color:#0078A8" href="https://www.openstreetmap.org/copyright">OSM</a>',
@@ -127,10 +137,9 @@ export default class Map {
         // add logo
         if (this.logo != undefined) this.map.removeControl(this.logo);
         var div = document.createElement('div');
-        var logo = color == 'white' ? 'logo_light' : 'logo_dark';
-        var version = require('../package.json').version;
-        var src = `https://cdn.jsdelivr.net/npm/geofluxus-map@${version}/src/${logo}.png`;
-        div.innerHTML = `<img src=${src} style='height: 100px;'/>`;
+        var logo = color == 'white' ? logo_light : logo_dark;
+
+        div.appendChild(logo)
         div.id = 'logo';
         div.style.bottom = '1.5em';
         div.style.left = '1.5em';
@@ -622,6 +631,7 @@ class ExportPNG extends Control {
                     return klasses.contains('ol-control');
                 },
                 logging: false,
+                useCORS: true
             };
             html2canvas(target, configOptions)
                 .then(function(canvas) {

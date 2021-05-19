@@ -28,12 +28,13 @@ import './base.css';
 // logo
 const version = require('../package.json').version;
 const source = "https://cdn.jsdelivr.net/npm/geofluxus-map@" + version + "/src/";
+const logo_width = '150px';
 var logo_light = new Image();
 logo_light.src = source + "logo_light.png";
-logo_light.style.height = '100px';
+logo_light.style.width = logo_width;
 var logo_dark = new Image();
 logo_dark.src = source + "logo_dark.png";
-logo_dark.style.height = '100px';
+logo_dark.style.width = logo_width;
 
 // map bases
 var attributions = {
@@ -120,7 +121,7 @@ export default class Map {
             reset: Reset,
             exportPNG: ExportPNG
         })
-        var topPos = 7; // position from screen top
+        var topPos = 9.5; // position from screen top
         Object.entries(controls).forEach(function(pair) {
             var [key, value] = pair;
             if (controls[key] && classes[key]) {
@@ -141,8 +142,8 @@ export default class Map {
 
         div.appendChild(logo)
         div.id = 'logo';
-        div.style.bottom = '1.5em';
-        div.style.left = '1.5em';
+        div.style.bottom = '1em';
+        div.style.left = '1em';
         div.style.position = 'absolute';
         this.logo = new Control({
             element: div

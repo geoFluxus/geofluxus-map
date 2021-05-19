@@ -245,9 +245,9 @@ export class FlowLayer extends D3Layer {
                 num++;
 
                  // buffer path for very thin lines (easier mouseover)
-                if (d.strokeWidth < 7) {
-                    _this.drawPath(d, bezier, 'none', 7);
-                }
+                //if (d.strokeWidth < 7) {
+                //    _this.drawPath(d, bezier, 'none', 7);
+                //}
 
                 // shift curve
                 xShift -= shiftStep;

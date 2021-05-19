@@ -184,7 +184,7 @@ export default class NetworkMap extends Map {
         this.legend.style.left = "0";
         this.legend.style.right = "0";
         this.legend.style.margin = "auto";
-        this.legend.style.bottom = '1.5em';
+        this.legend.style.bottom = '0';
         this.legend.style.color = 'white';
         //this.legend.style.fontFamily = "'Helvetica', 'Arial', sans-serif";
         this.legend.style.position = 'absolute';

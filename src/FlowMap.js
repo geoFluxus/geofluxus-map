@@ -228,15 +228,15 @@ export default class FlowMap extends Map {
         this.legend = document.createElement('div');
 
         // default & custom legend style
-        this.legend.style.right = "0.5em";
-        this.legend.style.bottom = "0.5em";
+        this.legend.style.right = "0";
+        this.legend.style.bottom = "0";
         this.legend.style.color = 'white';
         this.legend.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
         this.legend.style.position = 'absolute';
         //this.legend.style.borderRadius = '1rem';
         this.legend.style.padding = '10px';
         this.legend.style.maxWidth = '33%';
-        this.legend.style.maxHeight = '90%';
+        this.legend.style.maxHeight = 'calc(100% - 20px)';
         this.legend.style.overflowY = 'auto';
         Object.entries(options).forEach(function(pair) {
             var [key, value] = pair;

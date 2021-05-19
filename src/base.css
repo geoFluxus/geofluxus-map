@@ -7,15 +7,22 @@
 /* re-position default buttons */
 .ol-full-screen {
     left: .5em;
-    top: 4.5em;
+    top: 7em;
 }
 
 .ol-attribution {
     top: .5em;
+    left: .5em !important;
+    right: auto !important;
+    max-height: 1.5em !important;
 }
 
 .ol-attribution:not(.ol-collapsed) {
     background: transparent;
+}
+
+.ol-zoom {
+    top: 3em;
 }
 
 

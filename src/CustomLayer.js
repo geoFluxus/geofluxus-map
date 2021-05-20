@@ -179,16 +179,20 @@ export class FlowLayer extends D3Layer {
     draw() {
         var _this = this;
 
-        var extent  = this.map.getView().calculateExtent(this.map.getSize())
-        extent = transformExtent(extent, 'EPSG:3857', 'EPSG:4326')
-        var topLeft = [extent[0], extent[1]]
-        var bottomRight = [extent[2], extent[3]]
+        // compute current map extent
+        var extent  = this.map.getView().calculateExtent(this.map.getSize());
+        extent = transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
+        var topLeft = [extent[0], extent[1]],
+            bottomRight = [extent[2], extent[3]];
+
+        // check if point is in map extent
         function within(point) {
             if (point[0] >= topLeft[0] && point[1] >= topLeft[1] &&
                 point[0] <= bottomRight[0] && point[1] <= bottomRight[1]) return true;
             return false;
         }
 
+        // get all amounts for flows within current extent
         var amounts = []
         for (var id in this.features) {
             var flows = _this.features[id];
@@ -197,16 +201,17 @@ export class FlowLayer extends D3Layer {
                 var source = [d.source.lon, d.source.lat],
                     target = [d.target.lon, d.target.lat];
                 if (within(source) || within(target)) {
-                    amounts.push(d.amount)
+                    amounts.push(d.amount);
                 }
             })
         }
-        amounts.sort(function(a, b) {
-            return b - a
-        })
-        var minAmount = amounts[1000] || amounts.pop()
 
-        var num = 0;
+        // sort amounts & keep only the first 1000
+        amounts.sort(function(a, b) {
+            return b - a;
+        })
+        var minAmount = amounts[1000] || amounts.pop();
+
         for (var id in this.features) {
             // get grouped flows
             var flows = _this.features[id];
@@ -242,9 +247,8 @@ export class FlowLayer extends D3Layer {
 
                 // draw path
                 _this.drawPath(d, bezier, d.color, d.strokeWidth);
-                num++;
 
-                 // buffer path for very thin lines (easier mouseover)
+                // buffer path for very thin lines (easier mouseover)
                 //if (d.strokeWidth < 7) {
                 //    _this.drawPath(d, bezier, 'none', 7);
                 //}
@@ -254,7 +258,6 @@ export class FlowLayer extends D3Layer {
                 yShift += shiftStep;
             })
         }
-        //console.log(num)
     }
 
     // animate flows

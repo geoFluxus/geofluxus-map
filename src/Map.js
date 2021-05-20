@@ -25,17 +25,6 @@ import { _default } from './utils.js';
 import './base.css';
 
 
-// logo
-const version = require('../package.json').version;
-const source = "https://cdn.jsdelivr.net/npm/geofluxus-map@" + version + "/src/";
-const logo_width = '150px';
-var logo_light = new Image();
-logo_light.src = source + "logo_light.png";
-logo_light.style.width = logo_width;
-var logo_dark = new Image();
-logo_dark.src = source + "logo_dark.png";
-logo_dark.style.width = logo_width;
-
 // map bases
 var attributions = {
     osm: '© <a style="color:#0078A8" href="https://www.openstreetmap.org/copyright">OSM</a>',
@@ -104,8 +93,19 @@ export default class Map {
             controls: defaultControls()
         });
 
-        // add controls & logo
+        // add controls
         this._addControls(controls, options.controlClasses);
+
+        // add logo
+        const version = require('../package.json').version;
+        const source = "https://cdn.jsdelivr.net/npm/geofluxus-map@" + version + "/src/";
+        const logo_width = '150px';
+        this.logo_light = new Image();
+        this.logo_light.src = source + "logo_light.png";
+        this.logo_light.style.width = logo_width;
+        this.logo_dark = new Image();
+        this.logo_dark.src = source + "logo_dark.png";
+        this.logo_dark.style.width = logo_width;
         this.addLogo('dark');
 
         // activate highlight & tooltips
@@ -136,9 +136,12 @@ export default class Map {
 
     addLogo(color) {
         // add logo
-        if (this.logo != undefined) this.map.removeControl(this.logo);
+        if (this.logo != undefined) {
+            this.map.removeControl(this.logo);
+            console.log('remove')
+        }
         var div = document.createElement('div');
-        var logo = color == 'white' ? logo_light : logo_dark;
+        var logo = color == 'white' ? this.logo_light : this.logo_dark;
 
         div.appendChild(logo)
         div.id = 'logo';
@@ -581,9 +584,26 @@ class ExportPNG extends Control {
             logo = this.target.logo.element,
             legend = this.target.legend;
 
-        // disable button / cursor
-        this.button.disabled = true;
-        target.style.cursor = 'wait';
+        // throw screenshot standby
+        var div = document.createElement('div');
+        div.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+        div.className = 'screenshot-standby';
+        div.style.zIndex = 999999;
+        div.style.position = 'absolute';
+        div.innerHTML = `
+            <p style="position: absolute;
+                      top: 50%;
+                      left: 50%;
+                      margin: 0;
+                      font-size: 30px;
+                      color: white;
+                      transform: translate(-50%, -50%);">
+                Please wait...
+            </p>`;
+        div.style.width = '100%';
+        div.style.height = '100%';
+        div.style.cursor = 'wait';
+        target.appendChild(div);
 
         // print settings
         // A4 landscape - 297 x 210 cm
@@ -618,10 +638,9 @@ class ExportPNG extends Control {
         }
 
         // print once map is resized
-        // alternative: listen to 'postcompose' to not await for tiles
+        // alternative: listen to 'postrender' to not await for tiles
         map.once('rendercomplete', function() {
             // resize map viewport
-            var target = map.getViewport();
             target.style.width = width + 'px';
             target.style.height = height + 'px';
 
@@ -629,7 +648,7 @@ class ExportPNG extends Control {
             var configOptions = {
                 ignoreElements: function(target) {
                     var klasses = target.classList;
-                    return klasses.contains('ol-control');
+                    return klasses.contains('ol-control') || klasses.contains('screenshot-standby');
                 },
                 logging: false,
                 useCORS: true
@@ -637,23 +656,31 @@ class ExportPNG extends Control {
             html2canvas(target, configOptions)
                 .then(function(canvas) {
                     canvas.toBlob(function(blob) {
+                        // save screenshot as png
                         saveAs(blob, 'map.png');
+
+                        // remove screenshot standby
+                        div.remove();
                     });
             });
 
-            // reset map / logo / legend / viewport
+            // reset viewport
             target.style.width = '100%';
             target.style.height = '100%';
-            logo.style.transform = 'none';
-            if (legend) legend.style.transform = 'none';
-            legend.style.maxWidth = legendWidth;
-            legend.style.maxHeight = legendHeight;
+
+            // reset map
             map.setSize(size);
             map.getView().setResolution(viewResolution);
 
-            // enable button / cursor
-            _this.button.disabled = false;
-            target.style.cursor = 'auto';
+            // reset logo
+            logo.style.transform = 'none';
+
+            // reset legend
+            if (legend) {
+                legend.style.transform = 'none';
+                legend.style.maxWidth = legendWidth;
+                legend.style.maxHeight = legendHeight;
+            }
         })
     }
 }

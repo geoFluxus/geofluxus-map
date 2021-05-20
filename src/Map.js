@@ -651,7 +651,10 @@ class ExportPNG extends Control {
                     return klasses.contains('ol-control') || klasses.contains('screenshot-standby');
                 },
                 logging: false,
-                useCORS: true
+                useCORS: true,
+                allowTaint: true,
+                scrollX:0,
+                scrollY: -window.scrollY
             };
             html2canvas(target, configOptions)
                 .then(function(canvas) {

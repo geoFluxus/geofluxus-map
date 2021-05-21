@@ -138,7 +138,6 @@ export default class Map {
         // add logo
         if (this.logo != undefined) {
             this.map.removeControl(this.logo);
-            console.log('remove')
         }
         var div = document.createElement('div');
         var logo = color == 'white' ? this.logo_light : this.logo_dark;
@@ -632,9 +631,8 @@ class ExportPNG extends Control {
             legendHeight = legend.style.maxHeight;
             legend.style.maxWidth = 'none';
             legend.style.maxHeight = 'none';
-            var transX = legend.style.margin == 'auto' ? 25 : 0;
             legend.style.transformOrigin = "bottom right";
-            legend.style.transform = `scale(2) translate(${transX}%, 0%)`;
+            legend.style.transform = `scale(2)`;
         }
 
         // print once map is resized

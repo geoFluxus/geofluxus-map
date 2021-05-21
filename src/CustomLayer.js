@@ -200,8 +200,10 @@ export class FlowLayer extends D3Layer {
                 if (!d.visible) return;
                 var source = [d.source.lon, d.source.lat],
                     target = [d.target.lon, d.target.lat];
+                d.inExtent = false;
                 if (within(source) || within(target)) {
                     amounts.push(d.amount);
+                    d.inExtent = true;
                 }
             })
         }
@@ -227,12 +229,13 @@ export class FlowLayer extends D3Layer {
                 // if no display, proceed to next flow
                 if (!d.visible) return;
 
+                // if not extent or not within first 1000 flows, proceed
+                if (!d.inExtent || d.amount < minAmount) return;
+
                 // get flow source & target
                 // convert to pixels
                 var source = [d.source.lon, d.source.lat],
                     target = [d.target.lon, d.target.lat];
-                if (!within(source) && !within(target)) return;
-                if (d.amount <= minAmount) return;
                 source = _this.getPixelFromCoordinate(source);
                 target = _this.getPixelFromCoordinate(target);
 
@@ -249,9 +252,9 @@ export class FlowLayer extends D3Layer {
                 _this.drawPath(d, bezier, d.color, d.strokeWidth);
 
                 // buffer path for very thin lines (easier mouseover)
-                //if (d.strokeWidth < 7) {
-                //    _this.drawPath(d, bezier, 'none', 7);
-                //}
+                if (d.strokeWidth < 7) {
+                    _this.drawPath(d, bezier, 'none', 7);
+                }
 
                 // shift curve
                 xShift -= shiftStep;

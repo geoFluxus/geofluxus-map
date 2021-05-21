@@ -65,14 +65,14 @@ export default class NetworkMap extends Map {
         // sequential scale
         this.scale = options.scale || [
             'rgb(26, 152, 80)',
-            'rgb(102, 189, 99)',
+            //'rgb(102, 189, 99)',
             'rgb(166, 217, 106)',
-            'rgb(217, 239, 139)',
+            //'rgb(217, 239, 139)',
             'rgb(255, 255, 191)',
-            'rgb(254, 224, 139)',
+            //'rgb(254, 224, 139)',
             'rgb(253, 174, 97)',
-            'rgb(244, 109, 67)',
-            'rgb(215, 48, 39)',
+            //'rgb(244, 109, 67)',
+            //'rgb(215, 48, 39)',
             'rgb(168, 0, 0)'
         ];
 
@@ -181,7 +181,7 @@ export default class NetworkMap extends Map {
         this.legend = document.createElement('div');
 
         // default legend style
-        this.legend.style.left = "0";
+        //this.legend.style.left = "0";
         this.legend.style.right = "0";
         this.legend.style.margin = "auto";
         this.legend.style.bottom = '0';
@@ -194,7 +194,7 @@ export default class NetworkMap extends Map {
             var [key, value] = pair;
             _this.legend.style[key] = value;
         })
-        var width = options.width || 500,
+        var width = options.width || 300,
             height = options.height || 20;
         var rectWidth = width / this.scale.length;
         this.legend.style.width = `${width + rectWidth * 1.1}px`;

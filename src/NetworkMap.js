@@ -37,7 +37,7 @@ export default class NetworkMap extends Map {
 
         // NetworkMap controls
         options.controls = _default(options.controls, {
-            toggleNetwork: false,
+            toggleNetwork: true,
             toggleLegend: true,
             toggleLight: true,
             exportCSV: false,

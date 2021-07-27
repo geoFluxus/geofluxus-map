@@ -1,6 +1,6 @@
 import {Map} from '../index.js'
 import data from '../data/data'
-import areas from '../data/areas'
+import areas from '../data/areasData'
 
 // define tooltip, hover style
 var tooltipStyle = {

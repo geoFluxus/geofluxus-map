@@ -1,5 +1,5 @@
 import {NetworkMap} from '../index.js'
-import data from '../data/data'
+import data from '../data/networkData'
 
 // ColorBrewer scale (https://colorbrewer2.org)
 var scale = [

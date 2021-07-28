@@ -1,7 +1,5 @@
 import NetworkMap from "./NetworkMap";
-import * as d3 from "d3";
 import Control from 'ol/control/Control';
-import saveAs from 'file-saver';
 import { _default } from './utils.js'
 
 export default class ChoroplethMap extends NetworkMap {
@@ -32,18 +30,24 @@ export default class ChoroplethMap extends NetworkMap {
             }
         });
 
-        // NetworkMap controls
+        // ChoroplethMap controls
         options.controls = _default(options.controls, {
             toggleNetwork: false,
             toggleLegend: true,
+            toggleTransparency: true,   // new control
             toggleLight: true,
             exportCSV: false,
-        });        
+        });  
+        options.controlClasses = {
+            toggleTransparency: ToggleTransparency,
+        }  
 
         // color scale (https://colorbrewer2.org/#type=sequential&scheme=PuBuGn&n=5)
         // sequential scale
+        options.transparency = 1.0;
+
         options.scale = options.scale || [
-            'rgb(246,239,247)',
+            `rgba(246,239,247,${options.transparency})`,
             'rgb(189,201,225)',
             'rgb(103,169,207)',
             'rgb(28,144,153)',
@@ -52,8 +56,10 @@ export default class ChoroplethMap extends NetworkMap {
 
         // initialize map
         super(options);
+        console.log(options.transparency)
     }
 
+    // overrides original method to work with shapes with fill
     _drawNetwork() {
         var _this = this;
 
@@ -69,7 +75,7 @@ export default class ChoroplethMap extends NetworkMap {
         // define scale
         this._getScale();
 
-        // define network color based on amount
+        // define fill color based on amount
         function assignColor(amount) {
             for (var i = 1; i < _this.values.length; i++) {
                 if (amount <= _this.values[i]) {
@@ -85,7 +91,7 @@ export default class ChoroplethMap extends NetworkMap {
         // create flows layer
         this.addVectorLayer('flows');
 
-        // add ways to map and load with amounts
+        // add areas to map and load with amounts
         this.data.forEach(function (flow) {
             // primary properties
             var amount = flow.amount,
@@ -115,6 +121,47 @@ export default class ChoroplethMap extends NetworkMap {
         // focus on network layer
         this.focusOnLayer('flows');
     }
+}
 
+// toggle transparency
+class ToggleTransparency extends Control {
+    constructor(options) {
+        options = options || {};
 
+        // default button style
+        const button = document.createElement('button');
+        button.innerHTML = '<i class="fas fa-fill-drip"></i>';
+        button.className = 'ol-toggle-transparency';
+        button.title = "Toggle Transparency"
+
+        const element = document.createElement('div');
+        element.className = 'ol-toggle-transparency ol-unselectable ol-control';
+        element.style.top = options.top;
+        element.style.left = '.5em';
+        element.appendChild(button);
+
+        super({
+            element: element
+        });
+
+        // target ChoroplethMap
+        this.target = options.target;
+
+        button.addEventListener('click', this.toggleTransparency.bind(this), false);
+    }
+
+    toggleTransparency() {
+        console.log('Changing transparency...')
+
+        // change network color
+        var networkLayer = this.target._getLayer('network'),
+            features = networkLayer.getSource().getFeatures();
+        features.forEach(function(feature) {
+            networkLayer.getSource().removeFeature(feature); // remove feature from layer
+
+            var color = feature.getStyle().getFill().getColor();
+            feature.getStyle().getFill().setColor(color);    // change feature fill
+        })
+        networkLayer.getSource().addFeatures(features);      // add features back to layer
+    }
 }

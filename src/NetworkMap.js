@@ -42,12 +42,12 @@ export default class NetworkMap extends Map {
             toggleLight: true,
             exportCSV: false,
         });
-        options.controlClasses = {
+        options.controlClasses = _default(options.controlClasses, {
             toggleNetwork: ToggleNetwork,
             toggleLegend: ToggleLegend,
             toggleLight: ToggleLight,
             exportCSV: ExportCSV
-        }
+        });
 
         // initialize map
         super(options);

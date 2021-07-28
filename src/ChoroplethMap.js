@@ -44,19 +44,17 @@ export default class ChoroplethMap extends NetworkMap {
 
         // color scale (https://colorbrewer2.org/#type=sequential&scheme=PuBuGn&n=5)
         // sequential scale
-        options.transparency = 1.0;
 
         options.scale = options.scale || [
-            `rgba(246,239,247,${options.transparency})`,
-            'rgb(189,201,225)',
-            'rgb(103,169,207)',
-            'rgb(28,144,153)',
-            'rgb(1,108,89)'
+            'rgba(246,239,247,1)',
+            'rgba(189,201,225,1)',
+            'rgba(103,169,207,1)',
+            'rgba(28,144,153,1)',
+            'rgba(1,108,89,1)'
         ];
 
         // initialize map
         super(options);
-        console.log(options.transparency)
     }
 
     // overrides original method to work with shapes with fill
@@ -132,7 +130,7 @@ class ToggleTransparency extends Control {
         const button = document.createElement('button');
         button.innerHTML = '<i class="fas fa-fill-drip"></i>';
         button.className = 'ol-toggle-transparency';
-        button.title = "Toggle Transparency"
+        button.title = "Transparency (on/off)"
 
         const element = document.createElement('div');
         element.className = 'ol-toggle-transparency ol-unselectable ol-control';
@@ -151,17 +149,43 @@ class ToggleTransparency extends Control {
     }
 
     toggleTransparency() {
-        console.log('Changing transparency...')
+        const transparency = 0.6;   // set transparency value
 
         // change network color
-        var networkLayer = this.target._getLayer('network'),
-            features = networkLayer.getSource().getFeatures();
-        features.forEach(function(feature) {
-            networkLayer.getSource().removeFeature(feature); // remove feature from layer
+        var flowsLayer = this.target._getLayer('flows'),
+            features = flowsLayer.getSource().getFeatures();
 
-            var color = feature.getStyle().getFill().getColor();
-            feature.getStyle().getFill().setColor(color);    // change feature fill
+        features.forEach(function(feature){
+            var color = feature.getStyle().getFill().getColor()
+            
+            // check if color in Hex 
+            var RegExp = /^#([0-9A-F]{6}|[0-9A-F]{8})$/i;
+            const testHex = RegExp.test(color) == true ? true : false ;
+
+            // check if color in RGBA
+            var RegExp = /^rgba/i;
+            const testRGBA = RegExp.test(color) == true ? true : false ;
+            
+            if (!testHex && testRGBA) {
+                var rgba = color.match(/\d+/g);                             // extract RGBA data
+                var alpha = rgba[3] == 1 ? transparency : 1 ;               // change transparency value
+                color = `rgba(${rgba[0]},${rgba[1]},${rgba[2]},${alpha})`;  // recreate color
+
+            } else if (testHex && !testRGBA) {
+                var alpha = (transparency * 255).toString(16);  // convert transparency to HEX
+                if (color.length == 7) {                                                
+                    color = color.replace('#',`#${alpha}`);     // prepend transparency value to HEX color                    
+                } else { 
+                    var preAlpha = color.substring(1,3);
+                    var postAlpha = preAlpha == alpha ? '' : alpha ;  // change transparency value
+                    color = '#' + postAlpha + color.substring(3);   // recrete HEX color with new transparancy values
+                }
+
+            } else { console.log('The color must be either in RGBA or HEX format...')}  // currently the system only allows for RGBA or HEX formats...
+
+            flowsLayer.getSource().removeFeature(feature);  // remove feature from layer
+            feature.getStyle().getFill().setColor(color);   // change feature fill
         })
-        networkLayer.getSource().addFeatures(features);      // add features back to layer
+        flowsLayer.getSource().addFeatures(features);       // add features back to layer
     }
 }

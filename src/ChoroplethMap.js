@@ -163,15 +163,19 @@ class ToggleTransparency extends Control {
             const testHex = RegExp.test(color) == true ? true : false ;
 
             // check if color in RGBA
-            var RegExp = /^rgba/i;
-            const testRGBA = RegExp.test(color) == true ? true : false ;
+            var RegExp = /^rgb/i;
+            const testRGB = RegExp.test(color) == true ? true : false ;
             
-            if (!testHex && testRGBA) {
-                var rgba = color.match(/\d+/g);                             // extract RGBA data
-                var alpha = rgba[3] == 1 ? transparency : 1 ;               // change transparency value
-                color = `rgba(${rgba[0]},${rgba[1]},${rgba[2]},${alpha})`;  // recreate color
+            if (!testHex && testRGB) {
+                var rgba = color.match(/\d+/g);                                        // extract RGB(A) data
+                if (rgba.length == 4) {
+                    color = `rgba(${rgba[0]},${rgba[1]},${rgba[2]},${transparency})`;  // add alpha channel to RGB code
+                } else {
+                    var alpha = rgba[3] == 1 ? transparency : 1 ;                      // change transparency value
+                    color = `rgba(${rgba[0]},${rgba[1]},${rgba[2]},${alpha})`;         // recreate color
+                }
 
-            } else if (testHex && !testRGBA) {
+            } else if (testHex && !testRGB) {
                 var alpha = (transparency * 255).toString(16);  // convert transparency to HEX
                 if (color.length == 7) {                                                
                     color = color.replace('#',`#${alpha}`);     // prepend transparency value to HEX color                    

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import {Map} from '../index.js';
-import areas from '../data/areas'
+import areas from '../data/areasData'
 
 class ReactMap extends Component {
   constructor(props) {

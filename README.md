@@ -15,6 +15,7 @@ or add the following in vanilla:
 The following visualizations are available:
 * [**Map**](#map): A basic visualization for creating and styling simple maps with tooltips
 * [**NetworkMap**](#networkmap): A map visualization for distributions along road networks
+* [**ChoroplethMap**](#choroplethmap): A map visualization for distributions over areas
 * [**FlowMap**](#flowmap): A map visualization for data flows
 
 To initialize any visualization, first create a target HTML element with id to host the map:
@@ -167,6 +168,25 @@ new NetworkMap(options)
   * **<a id="networkmap-controls-togglelegend">toggleLegend</a>** (_boolean_): Allows to show/hide the map legend
   * **<a id="networkmap-controls-togglelight">toggleLight</a>** (_boolean_): Allows to interchange between dark & light mode map
 * **<a id="networkmap-data">data</a>** (_Array_): Loads the network map data
+* **<a id="networkmap-scale">scale</a>** (_Array_): A array of strings which defines the map color scale. Default color scale provided by
+  [ColorBrewer](https://colorbrewer2.org)
+* **<a id="networkmap-legend">legend</a>** (_object_): Defines the legend title, width, height and other CSS properties
+  * **<a id="networkmap-legend-title">title</a>** (_string_): The legend title
+  * **<a id="networkmap-legend-width">width</a>** (_float_): The legend width provided in pixels
+  * **<a id="networkmap-legend-height">height</a>** (_float_): The legend height provided in pixels
+<br></br>  
+  
+ 
+## <a id="choroplethmap"></a>ChoroplethMap (extends NetworkMap)
+new ChoroplethMap(options)
+
+### Options
+* **<a id="networkmap-controls">controls</a>** (_object_): Enables / disables control on top of basic map controls
+  (check [here](#map-controls))
+  * **<a id="networkmap-controls-togglelegend">toggleLegend</a>** (_boolean_): Allows to show/hide the map legend
+  * **<a id="networkmap-controls-togglelight">toggleLight</a>** (_boolean_): Allows to interchange between dark & light mode map
+  * **<a id="networkmap-controls-toggletransparency">toggleTransparency</a>** (_boolean_): Allows to interchange between transparent and opaque fills
+* **<a id="choropleth-data">data</a>** (_Array_): Loads the choropleth map data
 * **<a id="networkmap-scale">scale</a>** (_Array_): A array of strings which defines the map color scale. Default color scale provided by
   [ColorBrewer](https://colorbrewer2.org)
 * **<a id="networkmap-legend">legend</a>** (_object_): Defines the legend title, width, height and other CSS properties

@@ -1,5 +1,5 @@
 import {FlowMap} from '../index.js'
-import flows from '../data/flows'
+import flows from '../data/flowsData'
 
 // custom scale
 var scale = {

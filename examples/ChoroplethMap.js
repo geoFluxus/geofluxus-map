@@ -1,7 +1,7 @@
-import {NetworkMap} from '../index.js'
-import data from '../data/networkData'
+import {ChoroplethMap} from '../index.js'
+import {CHOROPLETH_DATA as data} from '../data/choroplethData'
 
-// ColorBrewer scale (https://colorbrewer2.org)
+// new ColorBrewer scale (https://colorbrewer2.org)
 var scale = [
     '#9e0142',
     '#d53e4f',
@@ -16,14 +16,14 @@ var scale = [
 ].reverse()
 
 // initialize map (default options)
-const map1 = new NetworkMap({
+const map1 = new ChoroplethMap({
     target: "root1",
     data: data
 })
 
 
 // initialize map (customize)
-const map2 = new NetworkMap({
+const map2 = new ChoroplethMap({
     target: "root2",
     controls: {
         exportCSV: false

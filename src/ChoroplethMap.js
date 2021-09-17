@@ -1,6 +1,8 @@
 import NetworkMap from "./NetworkMap";
 import Control from 'ol/control/Control';
 import { _default } from './utils.js'
+import * as d3 from "d3";
+
 
 export default class ChoroplethMap extends NetworkMap {
     constructor(options) {
@@ -9,7 +11,7 @@ export default class ChoroplethMap extends NetworkMap {
         options.hover = _default(options.hover, {
             style: {
                 stroke: {
-                    width: 1
+                    width: 2
                 },
                 zIndex: 9999
             },
@@ -44,17 +46,48 @@ export default class ChoroplethMap extends NetworkMap {
 
         // color scale (https://colorbrewer2.org/#type=sequential&scheme=PuBuGn&n=5)
         // sequential scale
-
         options.scale = options.scale || [
-            'rgba(246,239,247,1)',
-            'rgba(189,201,225,1)',
-            'rgba(103,169,207,1)',
-            'rgba(28,144,153,1)',
-            'rgba(1,108,89,1)'
+            'rgb(178,24,43,1)',
+            'rgb(239,138,98,1)',
+            'rgb(253,219,199,1)',
+            'rgb(209,229,240,1)',
+            'rgb(103,169,207,1)',
+            'rgb(33,102,172,1)'
         ];
 
         // initialize map
         super(options);
+    }
+
+    _getScale() {
+        var _this = this;
+
+        // scale of equal frequency intervals
+        this.max = Math.max(...this.amounts);
+        this.min = Math.min(...this.amounts);
+        var quantile = d3.scaleQuantile()
+                         .domain(this.amounts)
+                         .range(this.scale);
+
+        // prettify scale intervals
+        function prettify(val) {
+            var sign = Math.sign(val);
+            val = Math.abs(val);
+            if (val < 1) return parseFloat(val.toFixed(2));
+            var int = ~~(val),
+                digits = int.toString().length - 1,
+                base = 10 ** digits;
+            return sign * Math.round(val / base) * base;
+        }
+
+        this.values = [];
+        Object.values(quantile.quantiles()).forEach(function (val) {
+            _this.values.push(prettify(val));
+        });
+        this.values.unshift(prettify(this.min));
+        this.values.push(prettify(this.max));
+        var middle = Math.round((this.values.length - 1) / 2);
+        this.values[middle] = 0;
     }
 
     // overrides original method to work with shapes with fill
@@ -65,9 +98,7 @@ export default class ChoroplethMap extends NetworkMap {
         this.amounts = [];
         this.data.forEach(function (flow) {
             // exclude zero values from scale definition
-            if (flow.amount > 0) {
-                _this.amounts.push(flow.amount);
-            }
+            _this.amounts.push(flow.amount);
         })
 
         // define scale
@@ -109,7 +140,7 @@ export default class ChoroplethMap extends NetworkMap {
                         color: 'black',
                         width: 0.5,
                     },
-                    fill: {color: amount > 0 ? assignColor(amount) : _this.defaultColor},
+                    fill: {color: assignColor(amount)},
                     zIndex: amount,
                 },
                 props: props
@@ -149,7 +180,7 @@ class ToggleTransparency extends Control {
     }
 
     toggleTransparency() {
-        const transparency = 0.6;   // set transparency value
+        const transparency = 0.5;   // set transparency value
 
         // change network color
         var flowsLayer = this.target._getLayer('flows'),

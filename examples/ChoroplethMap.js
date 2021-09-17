@@ -1,5 +1,5 @@
 import {ChoroplethMap} from '../index.js'
-import {CHOROPLETH_DATA as data} from '../data/choroplethData'
+import data from '../data/choroplethData.js'
 
 // new ColorBrewer scale (https://colorbrewer2.org)
 var scale = [
@@ -14,6 +14,7 @@ var scale = [
     '#3288bd',
     '#5e4fa2'
 ].reverse()
+
 
 // initialize map (default options)
 const map1 = new ChoroplethMap({

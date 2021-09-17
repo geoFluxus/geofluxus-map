@@ -219,3 +219,9 @@ new FlowMap(options)
 * **<a id="flowmap-tooltip">tooltip</a>** (_object_): The map tooltip. Overrides the map hover option.
   * **<a id="flowmap-tooltip-body">body</a>** (_function_): A function which iterates through the map features and load the tooltip content in HTML
   * **<a id="flowmap-tooltip-style">style</a>** (_object_): Define tooltip style as an object with CSS properties such as borderRadius, fontFamily etc.
+
+
+#Release
+- Change version in package.json
+- npm run build
+- npm publish

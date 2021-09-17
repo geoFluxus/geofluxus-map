@@ -252,7 +252,7 @@ export default class NetworkMap extends Map {
                          .append('text')
                          .text(function (d) {
                             var prefix = d3.format("~s");
-                            return d < 1 ? d : prefix(d);
+                            return Math.abs(d) < 1 ? d : prefix(d);
                          })
                          .attr("x", function (d, i) {
                             return (i+0.45) * rectWidth;

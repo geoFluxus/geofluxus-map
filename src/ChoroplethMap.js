@@ -144,23 +144,22 @@ export default class ChoroplethMap extends NetworkMap {
         // create network layer
         this.addVectorLayer('network');
 
-        // create flows layer
-        this.addVectorLayer('flows');
+        // create areas layer
+        this.addVectorLayer('areas');
 
         // add areas to map and load with amounts
-        this.data.forEach(function (flow) {
+        this.data.forEach(function(area) {
             // primary properties
-            var amount = flow.amount,
-                layer = amount ? 'flows' : 'network',
-                geometry = flow.geometry;
+            var amount = area.amount,
+                geometry = area.geometry;
 
             // secondary properties
             var props = {amount: amount.toFixed(2)}
-            Object.keys(flow).forEach(function(key) {
-                if (!['amount', 'geometry'].includes(key)) props[key] = flow[key];
+            Object.keys(area).forEach(function(key) {
+                if (!['amount', 'geometry'].includes(key)) props[key] = area[key];
             })
 
-            _this.addFeature(layer, geometry, {
+            _this.addFeature('areas', geometry, {
                 style: {
                     // color, width & zIndex based on amount
                     stroke:  {
@@ -174,8 +173,8 @@ export default class ChoroplethMap extends NetworkMap {
             });
         });
 
-        // focus on network layer
-        this.focusOnLayer('flows');
+        // focus on areass layer
+        this.focusOnLayer('areas');
     }
 }
 
@@ -209,9 +208,9 @@ class ToggleTransparency extends Control {
     toggleTransparency() {
         const transparency = 0.5;   // set transparency value
 
-        // change network color
-        var flowsLayer = this.target._getLayer('flows'),
-            features = flowsLayer.getSource().getFeatures();
+        // change areas color
+        var areasLayer = this.target._getLayer('areas'),
+            features = areasLayer.getSource().getFeatures();
 
         features.forEach(function(feature){
             var color = feature.getStyle().getFill().getColor()
@@ -245,9 +244,9 @@ class ToggleTransparency extends Control {
 
             } else { console.log('The color must be either in RGBA or HEX format...')}  // currently the system only allows for RGBA or HEX formats...
 
-            flowsLayer.getSource().removeFeature(feature);  // remove feature from layer
+            areasLayer.getSource().removeFeature(feature);  // remove feature from layer
             feature.getStyle().getFill().setColor(color);   // change feature fill
         })
-        flowsLayer.getSource().addFeatures(features);       // add features back to layer
+        areasLayer.getSource().addFeatures(features);       // add features back to layer
     }
 }

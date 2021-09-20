@@ -3,16 +3,16 @@ import data from '../data/choroplethData.js'
 
 // new ColorBrewer scale (https://colorbrewer2.org)
 var scale = [
-    '#9e0142',
-    '#d53e4f',
-    '#f46d43',
-    '#fdae61',
-    '#fee08b',
-    '#e6f598',
-    '#abdda4',
-    '#66c2a5',
-    '#3288bd',
-    '#5e4fa2'
+    'rgb(158,1,66)',
+    'rgb(213,62,79)',
+    'rgb(244,109,67)',
+    'rgb(253,174,97)',
+    'rgb(254,224,139)',
+    'rgb(230,245,152)',
+    'rgb(171,221,164)',
+    'rgb(102,194,165)',
+    'rgb(50,136,189)',
+    'rgb(94,79,162)'
 ].reverse()
 
 

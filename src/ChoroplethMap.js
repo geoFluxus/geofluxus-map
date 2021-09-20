@@ -80,14 +80,41 @@ export default class ChoroplethMap extends NetworkMap {
             return sign * Math.round(val / base) * base;
         }
 
+        // apply prettify
         this.values = [];
         Object.values(quantile.quantiles()).forEach(function (val) {
             _this.values.push(prettify(val));
         });
-        this.values.unshift(prettify(this.min));
-        this.values.push(prettify(this.max));
-        var middle = Math.round((this.values.length - 1) / 2);
-        this.values[middle] = 0;
+
+        // if only positive values, scale start on zero
+        if (this.values.every(v => v > 0)) {
+            this.values.unshift(0);
+            this.values.push(prettify(this.max));
+        }
+        // if only positive values, scale end on zero
+        else if (this.values.every(v => v < 0)) {
+            this.values.unshift(prettify(this.min));
+            this.values.push(0);
+        }
+        // if both positive & negative
+        else {
+            // add min & max
+            this.values.unshift(prettify(this.min));
+            this.values.push(prettify(this.max));
+
+            // convert middle value to zero
+            var middle = Math.round((this.values.length - 1) / 2);
+            this.values[middle] = 0;
+
+            // change values left & right of middle zero
+            this.values[middle-1] = -Math.abs(this.values[middle-2]) / 2.0
+            this.values[middle+1] = Math.abs(this.values[middle+2]) / 2.0
+
+            // sort
+            this.values.sort(function(a, b) {
+              return a - b;
+            })
+        }
     }
 
     // overrides original method to work with shapes with fill

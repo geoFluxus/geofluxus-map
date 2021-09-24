@@ -2,13 +2,17 @@ import NetworkMap from "./NetworkMap";
 import Control from 'ol/control/Control';
 import { _default } from './utils.js'
 import * as d3 from "d3";
+import {Icon, Style, Fill} from 'ol/style';
+import center from '@turf/center';
+import centroid from '@turf/centroid';
+import centerOfMass from '@turf/center-of-mass';
 
 
 export default class ChoroplethMap extends NetworkMap {
     constructor(options) {
-
         // hover
         options.hover = _default(options.hover, {
+            //ignore: ['arrows'],
             style: {
                 stroke: {
                     width: 2
@@ -147,6 +151,13 @@ export default class ChoroplethMap extends NetworkMap {
         // create areas layer
         this.addVectorLayer('areas');
 
+//        // create arrows layers
+//        this.addVectorLayer('arrows', {
+//            style: {
+//                zIndex: 9999
+//            }
+//        });
+
         // add areas to map and load with amounts
         this.data.forEach(function(area) {
             // primary properties
@@ -158,6 +169,16 @@ export default class ChoroplethMap extends NetworkMap {
             Object.keys(area).forEach(function(key) {
                 if (!['amount', 'geometry'].includes(key)) props[key] = area[key];
             })
+
+//            var point = centerOfMass(geometry)
+//            _this.addFeature('arrows', point.geometry, {
+//                style: {
+//                    text: {
+//                        text: amount >= 0 ? (amount ? '\u2191' : '\u2192') : '\u2193',
+//                        fontSize: 20
+//                    }
+//                }
+//            })
 
             _this.addFeature('areas', geometry, {
                 style: {
@@ -173,7 +194,7 @@ export default class ChoroplethMap extends NetworkMap {
             });
         });
 
-        // focus on areass layer
+        // focus on areas layer
         this.focusOnLayer('areas');
     }
 }

@@ -5,7 +5,7 @@ import TileLayer from 'ol/layer/Tile';
 import XYZ from 'ol/source/XYZ';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
-import Style from 'ol/style/Style';
+import {Style, Icon, Text} from 'ol/style';
 import Stroke from 'ol/style/Stroke';
 import Fill from 'ol/style/Fill';
 import Circle from 'ol/style/Circle';
@@ -187,6 +187,9 @@ export default class Map {
             div.style[key] = value;
         })
 
+        // ignore layers
+        var ignore = options.ignore || [];
+
         // initialize selection highlighting
         var selected, initialStyle;
         function displayTooltip(evt) {
@@ -200,6 +203,13 @@ export default class Map {
             });
             var feature, layer;
             if (res != undefined) [feature, layer] = res;
+
+            // ignore layers
+            if (layer) {
+                ignore.forEach(function(i) {
+                    if (layer.get('name') == i) feature = null;
+                })
+            }
 
             // update tooltip style & highlight
             if (feature) {
@@ -220,26 +230,29 @@ export default class Map {
                     stroke = highlightStyle.stroke || {},
                     fill = highlightStyle.fill || {},
                     zIndex = highlightStyle.zIndex,
-                    image = highlightStyle.image || {};
+                    image = highlightStyle.image;
 
                 // special marker for points
-                var imageRadius = image.radius,
+                if (image) {
+                    var imageRadius = image.radius,
                     imageStroke = image.stroke || {},
                     imageFill = image.fill || {};
-                // get initial marker style
-                var initialImageStyle = initialStyle.getImage();
-                var initialImageStroke = initialImageStyle.getStroke(),
-                    initialImageFill = initialImageStyle.getFill();
-                image = new Circle({
-                    radius: imageRadius || initialImageStyle.getRadius(),
-                    fill: new Fill({
-                        color: imageFill.color || initialImageFill.getColor()
-                    }),
-                    stroke: new Stroke({
-                        color: imageStroke.color || initialImageStroke.getColor(),
-                        width: imageStroke.width || initialImageStroke.getWidth()
-                    })
-                });
+
+                    // get initial marker style
+                    var initialImageStyle = initialStyle.getImage();
+                    var initialImageStroke = initialImageStyle.getStroke(),
+                        initialImageFill = initialImageStyle.getFill();
+                    image = new Circle({
+                        radius: imageRadius || initialImageStyle.getRadius(),
+                        fill: new Fill({
+                            color: imageFill.color || initialImageFill.getColor()
+                        }),
+                        stroke: new Stroke({
+                            color: imageStroke.color || initialImageStroke.getColor(),
+                            width: imageStroke.width || initialImageStroke.getWidth()
+                        })
+                    });
+                }
 
                 // get initial style of feature
                 var initialStroke = initialStyle.getStroke(),
@@ -295,36 +308,51 @@ export default class Map {
         var style = options.style || {},
             stroke = style.stroke || {},
             fill = style.fill || {},
-            image = style.image || {};
+            image = style.image,
+            text = style.text;
         stroke.color = stroke.color || 'rgba(100, 150, 250, 1)';
         stroke.width = stroke.width || 1;
         fill.color = fill.color || 'rgb(100, 150, 250, 0.1)';
 
-        // special marker for points
-        var imageRadius = image.radius,
-            imageStroke = image.stroke || {},
-            imageFill = image.fill || {};
-        image = new Circle({
-            radius: imageRadius || 5,
-            fill: new Fill({
-                color: imageFill.color || 'rgb(100, 150, 250, 0.1)'
-            }),
-            stroke: new Stroke({
-                color: imageStroke.color || 'rgba(100, 150, 250, 1)',
-                width: imageStroke.width || 1
-            })
-        });
-
-        var layerStyle = new Style({
+        style = {
             stroke: new Stroke({
                 color: stroke.color,
                 width: stroke.width
             }),
             fill: new Fill({
                 color: fill.color
-            }),
-            image: image
-        });
+            })
+        }
+
+        // special icon marker for points
+        if (image) {
+            style.image = image.icon ? new Icon({
+                crossOrigin: 'anonymous',
+                scale: image.icon.scale || 1,
+                src: image.icon.src
+            }) : new Circle({
+                radius: image.radius || 5,
+                fill: new Fill({
+                    color: image.fill?.color || 'rgb(100, 150, 250, 0.1)'
+                }),
+                stroke: new Stroke({
+                    color: image.stroke?.color || 'rgba(100, 150, 250, 1)',
+                    width: image.stroke?.width || 1
+                })
+            });
+        }
+
+        // vector text
+        if (text) {
+            style.text = new Text({
+                text: text.text || 'text',
+                font: `normal ${text.fontSize || 10}px FontAwesome`,
+                textBaseline: text.textBaseline || 'middle',
+                fill: new Fill({
+                    color: text.color || 'black',
+                })
+            })
+        }
 
         // create & add layer
         var layer = new VectorLayer({
@@ -332,7 +360,7 @@ export default class Map {
             opacity: options.opacity || 1.0,
             source: new VectorSource(),
             crossOrigin: 'anonymous',
-            style: layerStyle
+            style: new Style(style)
         });
         this.map.addLayer(layer);
 
@@ -387,13 +415,16 @@ export default class Map {
                 defaultStroke = defaultStyle.getStroke(),
                 defaultFill = defaultStyle.getFill(),
                 defaultZIndex = defaultStyle.getZIndex(),
-                defaultImage = defaultStyle.getImage();
+                defaultImage = defaultStyle.getImage(),
+                defaultText = defaultStyle.getText();
 
             var stroke = style.stroke || {},
                 fill = style.fill || {},
-                zIndex = style.zIndex || {};
+                zIndex = style.zIndex || {},
+                image = style.image,
+                text = style.text;
 
-            style = new Style({
+            style = {
                 stroke: new Stroke({
                     color: stroke.color || defaultStroke.getColor(),
                     width: stroke.width || defaultStroke.getWidth()
@@ -401,10 +432,40 @@ export default class Map {
                 fill: new Fill({
                     color: fill.color || defaultFill.getColor()
                 }),
-                zIndex: style.zIndex || defaultZIndex,
-                image: defaultImage
-            });
-            feature.setStyle(style);
+                zIndex: style.zIndex || defaultZIndex
+            };
+
+            // special icon marker for points
+            if (image) {
+                style.image = image.icon ? new Icon({
+                    crossOrigin: 'anonymous',
+                    scale: image.icon.scale || 1,
+                    src: image.icon.src
+                }) : new Circle({
+                    radius: image.radius || 5,
+                    fill: new Fill({
+                        color: image.fill?.color || 'rgb(100, 150, 250, 0.1)'
+                    }),
+                    stroke: new Stroke({
+                        color: image.stroke?.color || 'rgba(100, 150, 250, 1)',
+                        width: image.stroke?.width || 1
+                    })
+                });
+            }
+
+            // vector text
+            if (text) {
+                style.text = new Text({
+                    text: text.text || 'text',
+                    font: `normal ${text.fontSize || 10}px FontAwesome`,
+                    textBaseline: text.textBaseline || 'middle',
+                    fill: new Fill({
+                        color: text.color || 'black',
+                    })
+                })
+            }
+
+            feature.setStyle(new Style(style));
         }
 
         // get layer & add feature
@@ -435,6 +496,7 @@ export default class Map {
             var source = layer.getSource();
             extent = source.getExtent();
         }
+
         // fit to given extent
         else {
             extent = arguments[0];

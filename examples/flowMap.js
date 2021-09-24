@@ -1,5 +1,5 @@
 import {FlowMap} from '../index.js'
-import flows from '../data/flowsData'
+import flows from '../data/flowsData.js'
 
 // custom scale
 var scale = {
@@ -14,7 +14,7 @@ var scale = {
 const map1 = new FlowMap({
     target: "root1",
     data: flows,
-    groupBy: 'processgroup',
+    groupBy: 'process',
 })
 
 
@@ -23,7 +23,7 @@ const map2 = new FlowMap({
     target: "root2",
     data: flows,
     animate: 1,
-    groupBy: 'processgroup',
+    groupBy: 'process',
     legend: {
         title: "<span><b>Process groups</b></span>",
     },

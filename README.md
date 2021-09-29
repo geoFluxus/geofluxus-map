@@ -274,6 +274,7 @@ new FlowMap(options)
   * **<a id="flowmap-tooltip-style">style</a>** (_object_): Define tooltip style as an object with CSS properties such as borderRadius, fontFamily etc.
 
 
+
 #Release
 - Change version in package.json
 - npm run build (Builds index.js & index.css for vanillaJS)

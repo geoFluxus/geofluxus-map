@@ -275,7 +275,7 @@ new FlowMap(options)
 
 
 
-#Release
+# Release
 - Change version in package.json
 - npm run build (Builds index.js & index.css for vanillaJS)
 - npm publish (Releases npm package)

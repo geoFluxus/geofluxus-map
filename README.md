@@ -15,7 +15,8 @@ or add the following in vanilla:
 The following visualizations are available:
 * [**Map**](#map): A basic visualization for creating and styling simple maps with tooltips
 * [**NetworkMap**](#networkmap): A map visualization for distributions along road networks
-* [**ChoroplethMap**](#choroplethmap): A map visualization for distributions over areas
+* [**MapChart**](#mapchart): A map visualization for qualitative information over areas
+* [**ChoroplethMap**](#choroplethmap): A map visualization for quantitative information over areas
 * [**FlowMap**](#flowmap): A map visualization for data flows
 
 To initialize any visualization, first create a target HTML element with id to host the map:
@@ -95,13 +96,27 @@ new Map(options)
       * **<a id="map-addvectorlayer-options-style-fill">fill</a>** (_object_): Style of feature surface
         * **<a id="map-addvectorlayer-options-style-fill-color">color</a>** (_string_): Fill color. Available formats: RGB, RGBA, HEX
       * **<a id="map-addvectorlayer-options-style-zindex">zIndex</a>** (_float_): Define z-index for layer features    
-      * **<a id="map-addvectorlayer-options-style-image">image</a>** (_object_): (For point layers) Define circle style
-        * **<a id="map-addvectorlayer-options-style-image-radius">radius</a>** (_float_): Circle radius
-          * **<a id="map-addvectorlayer-options-style-image-stroke">stroke</a>** (_object_): Style of feature boundary
-            * **<a id="map-addvectorlayer-options-style-image-stroke-color">color</a>** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
-            * **<a id="map-addvectorlayer-options-style-image-stroke-width">width</a>** (_float_): Stroke width
-          * **<a id="map-addvectorlayer-options-style-image-fill">fill</a>** (_object_): Style of feature surface
-            * **<a id="map-addvectorlayer-options-style-image-fill-color">color</a>** (_string_): Fill color. Available formats: RGB, RGBA, HEX
+      * **<a id="map-addvectorlayer-options-style-image">image</a>** (_object_): (**For point layers**) Define one of the following:
+        1) Circle (for simple representation)
+           * **<a id="map-addvectorlayer-options-style-image-radius">radius</a>** (_float_): Circle radius
+           * **<a id="map-addvectorlayer-options-style-image-stroke">stroke</a>** (_object_): Style of feature boundary
+             * **<a id="map-addvectorlayer-options-style-image-stroke-color">color</a>** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
+             * **<a id="map-addvectorlayer-options-style-image-stroke-width">width</a>** (_float_): Stroke width
+           * **<a id="map-addvectorlayer-options-style-image-fill">fill</a>** (_object_): Style of feature surface
+             * **<a id="map-addvectorlayer-options-style-image-fill-color">color</a>** (_string_): Fill color. Available formats: RGB, RGBA, HEX
+        2) Icon (for shapes other than circle)
+           * **<a id="map-addvectorlayer-options-style-image-icon">icon</a>** (_object_): Defines icon properties
+             * **<a id="map-addvectorlayer-options-style-image-icon-scale">scale</a>** (_float_): Icon scale
+             * **<a id="map-addvectorlayer-options-style-image-src">radius</a>** (_string_): A url to the icon to be used (svg, png etc.)
+        3) Text (for labels instead of shapes - for example, for labels over polygon centroids)
+           * **<a id="map-addvectorlayer-options-style-image-text">text</a>** (_object_): Defines text properties
+             * **<a id="map-addvectorlayer-options-style-image-text-text">text</a>** (_string_): Text content
+             * **<a id="map-addvectorlayer-options-style-image-text-font">font</a>** (_float_): Font size
+             * **<a id="map-addvectorlayer-options-style-image-textBaseline">textBaseline</a>** (_string_): Anchor of text from geometry. Available options: 'bottom', 'top', 'middle'
+             * **<a id="map-addvectorlayer-options-style-image-textBaseline">textBaseline</a>** (_string_): Anchor of text from geometry. Available options: 'bottom', 'top', 'middle'
+             * **<a id="map-addvectorlayer-options-style-image-text-fill">fill</a>** (_object_): Text fill
+               * **<a id="map-addvectorlayer-options-style-image-text-fill-color">color</a>** (_string_): Fill color. Available formats: RGB, RGBA, HEX
+
 ***    
 
 * **<a id="map-addfeature">addFeature(layer, geometry, options)</a>**
@@ -120,8 +135,28 @@ new Map(options)
       * **<a id="map-addfeature-options-style-fill">fill</a>** (_object_): Style of feature surface.
         * **<a id="map-addfeature-options-style-fill-color">color</a>** (_string_): Fill color. Available formats: RGB, RGBA, HEX.
       * **<a id="map-addfeature-options-style-zindex">zIndex</a>** (_float_): Layer z-index. By default, OpenLayers renders features in Last In, FirstOut order (the last layer declared is rendered on canvas top).
-    * **<a id="map-addfeature-options-props">props</a>** (_object_): Add to feature properties other than geometry with key-value pairs (ie. if you want to later call
-      them in the map tooltip)
+      * **<a id="map-addfeature-options-style-image">image</a>** (_object_): (**For point layers**) Define one of the following:
+        1) Circle (for simple representation)
+           * **<a id="map-addfeature-options-style-image-radius">radius</a>** (_float_): Circle radius
+           * **<a id="map-addfeature-options-style-image-stroke">stroke</a>** (_object_): Style of feature boundary
+             * **<a id="map-addfeature-options-style-image-stroke-color">color</a>** (_string_): Stroke color. Available formats: RGB, RGBA, HEX.
+             * **<a id="map-addfeature-options-style-image-stroke-width">width</a>** (_float_): Stroke width
+           * **<a id="map-addfeature-options-style-image-fill">fill</a>** (_object_): Style of feature surface
+             * **<a id="map-addfeature-options-style-image-fill-color">color</a>** (_string_): Fill color. Available formats: RGB, RGBA, HEX
+        2) Icon (for shapes other than circle)
+           * **<a id="map-addfeature-options-style-image-icon">icon</a>** (_object_): Defines icon properties
+             * **<a id="map-addfeature-options-style-image-icon-scale">scale</a>** (_float_): Icon scale
+             * **<a id="map-addfeature-options-style-image-src">radius</a>** (_string_): A url to the icon to be used (svg, png etc.)
+        3) Text (for labels instead of shapes - for example, for labels over polygon centroids)
+           * **<a id="map-addfeature-options-style-image-text">text</a>** (_object_): Defines text properties
+             * **<a id="map-addfeature-options-style-image-text-text">text</a>** (_string_): Text content
+             * **<a id="map-addfeature-options-style-image-text-font">font</a>** (_float_): Font size
+             * **<a id="map-addfeature-options-style-image-textBaseline">textBaseline</a>** (_string_): Anchor of text from geometry. Available options: 'bottom', 'top', 'middle'
+             * **<a id="map-addfeature-options-style-image-textBaseline">textBaseline</a>** (_string_): Anchor of text from geometry. Available options: 'bottom', 'top', 'middle'
+             * **<a id="map-addfeature-options-style-image-text-fill">fill</a>** (_object_): Text fill
+               * **<a id="map-addfeature-options-style-image-text-fill-color">color</a>** (_string_): Fill color. Available formats: RGB, RGBA, HEX
+  * **<a id="map-addfeature-options-props">props</a>** (_object_): Add to feature properties other than geometry with key-value pairs (ie. if you want to later call
+    them in the map tooltip)
 ***
 
 * **<a id="map-focusonlayer">focusOnLayer(name)</a>**
@@ -174,7 +209,25 @@ new NetworkMap(options)
   * **<a id="networkmap-legend-title">title</a>** (_string_): The legend title
   * **<a id="networkmap-legend-width">width</a>** (_float_): The legend width provided in pixels
   * **<a id="networkmap-legend-height">height</a>** (_float_): The legend height provided in pixels
-<br></br>  
+<br></br>
+
+
+## <a id="mapchart"></a>MapChart (extends Map)
+new MapChart(options)
+
+### Options
+* **<a id="mapchart-controls">controls</a>** (_object_): Enables / disables control on top of basic map controls
+  (check [here](#map-controls))
+  * **<a id="mapchart-controls-togglelegend">toggleLegend</a>** (_boolean_): Allows to show/hide the map legend
+  * **<a id="mapchart-controls-togglelight">toggleLight</a>** (_boolean_): Allows to interchange between dark & light mode map
+* **<a id="mapchart-data">data</a>** (_Array_): Loads the map chart data
+* **<a id="mapchart-scale">scale</a>** (_Object_): An object which assigns a color to each value of the groupBy property
+* **<a id="mapchart-groupby">groupBy</a>** (_Array_): The property for splitting and coloring flows into groups
+* **<a id="mapchart-legend">legend</a>** (_object_): Defines the legend title, width, height and other CSS properties
+  * **<a id="mapchart-legend-title">title</a>** (_string_): The legend title
+  * **<a id="mapchart-legend-width">width</a>** (_float_): The legend width provided in pixels
+  * **<a id="mapchart-legend-height">height</a>** (_float_): The legend height provided in pixels
+<br></br> 
   
  
 ## <a id="choroplethmap"></a>ChoroplethMap (extends NetworkMap)
@@ -223,5 +276,5 @@ new FlowMap(options)
 
 #Release
 - Change version in package.json
-- npm run build
-- npm publish
+- npm run build (Builds index.js & index.css for vanillaJS)
+- npm publish (Releases npm package)

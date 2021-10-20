@@ -16,6 +16,7 @@ import MultiLineString from 'ol/geom/MultiLineString';
 import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
 import * as olInteraction from 'ol/interaction';
+import * as olCondition from 'ol/events/condition'
 import {Control, FullScreen, defaults as defaultControls} from 'ol/control';
 import Overlay from 'ol/Overlay';
 import html2canvas from 'html2canvas';
@@ -155,7 +156,8 @@ export default class Map {
 
     // activate tooltips
     _onHover(options) {
-        var options = options || {};
+        var options = options;
+        if (options == undefined) return;
 
         var _this = this,
             target = this.map.getTargetElement();
@@ -366,6 +368,73 @@ export default class Map {
 
         // define z-index
         layer.setZIndex(style.zIndex);
+
+        // selectable layer
+        var select = options.select;
+        if (select != undefined) {
+            this.addSelectInteraction(layer, select);
+        }
+    }
+
+    // add select interaction
+    // DO NOT ADD WITH HOVER!!!
+    addSelectInteraction(layer, options) {
+        var _this =  this;
+
+        // pointer cursor over features
+        this.map.on('pointermove', function (e) {
+            if (e.dragging) return;
+
+            var pixel = _this.map.getEventPixel(e.originalEvent);
+            var hit = _this.map.hasFeatureAtPixel(pixel);
+
+            _this.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
+        });
+
+        // define select style
+        var style = options.style || {},
+            stroke = style.stroke || {},
+            fill = style.fill || {},
+            image = style.image,
+            text = style.text;
+        stroke.color = stroke.color || 'rgba(100, 150, 250, 1)';
+        stroke.width = stroke.width || 1;
+        fill.color = fill.color || 'rgb(100, 150, 250, 0.1)';
+
+        style = {
+            stroke: new Stroke({
+                color: stroke.color,
+                width: stroke.width
+            }),
+            fill: new Fill({
+                color: fill.color
+            }),
+            zIndex: options.zIndex
+        }
+
+        // define select interaction
+        var multi = (options.multi == undefined) ? true : options.multi;
+        var interaction = new olInteraction.Select({
+            toggleCondition: (multi) ? olCondition.always : olCondition.click,
+            style: new Style(style),
+            layers: [layer],
+            multi: multi
+        });
+        this.map.addInteraction(interaction);
+        layer.select = interaction;
+
+        // onChange function
+        if (options.onChange) {
+            interaction.on('select', function (evt) {
+                var ret = [];
+                // callback with all currently selected
+                interaction.getFeatures().forEach(function (feat) {
+                    ret.push(feat.values_);
+                })
+                options.onChange(ret);
+                layer.getSource().dispatchEvent('change');
+            })
+        }
     }
 
     // add feature to vector layer

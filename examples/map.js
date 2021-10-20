@@ -1,5 +1,4 @@
 import {Map} from '../index.js'
-import data from '../data/data'
 import areas from '../data/areasData'
 
 // define tooltip, hover style
@@ -24,55 +23,78 @@ var tooltipStyle = {
 const map = new Map({
     target: 'root1',
     controls: {
+        //zoom: false,
         exportPNG: false,
+        //fullscreen: false,
+        //reset: false
     },
     view: {
         center: [5, 52],
         zoom: 5
     },
     base: {
-        source: 'cartodb_light'
+        source: 'cartodb_dark'
     },
-    hover: {
-        tooltip: {
-            body: function(d) {
-                return `
-                <table>
-                    <tr>
-                        <th colspan="2">Provincie</th>
-                    <tr>
-                    <tr>
-                        <th>Lower: </th>
-                        <td>${d.get('name')}</td>
-                    </tr>
-                    <tr>
-                        <th>Upper: </th>
-                        <td>${d.get('capital')}</td>
-                    </tr>
-                </table>
-                `;
-            },
-            style: tooltipStyle
-        },
-        style: hoverStyle
-    },
-    reset: true
+//    hover: {
+//        tooltip: {
+//            body: function(d) {
+//                return `
+//                <table>
+//                    <tr>
+//                        <th colspan="2">Provincie</th>
+//                    <tr>
+//                    <tr>
+//                        <th>Lower: </th>
+//                        <td>${d.get('name')}</td>
+//                    </tr>
+//                    <tr>
+//                        <th>Upper: </th>
+//                        <td>${d.get('capital')}</td>
+//                    </tr>
+//                </table>
+//                `;
+//            },
+//            style: tooltipStyle
+//        },
+//        style: hoverStyle
+//    },
 })
+
+map.addLogo('white');
 
 // define POLYGON vector layer 'areas'
 // provide global feature style
 var areaStyle = {
     stroke: {
+        color: 'rgba(255, 255, 255, 0.5)',
+        width: 1
+    },
+    fill: {
+        color: 'rgba(0, 0, 255, 0.5)'
+    },
+    zIndex: 1000
+}
+
+var selectStyle = {
+    stroke: {
         color: 'rgba(255, 255, 255)',
         width: 2
     },
     fill: {
-        color: 'rgba(0, 0, 0, 0.2)'
+        color: 'rgba(0, 0, 255)'
     },
-    zIndex: 1000
+    zIndex: 9999
 }
+
 map.addVectorLayer('areas', {
-    style: areaStyle
+    style: areaStyle,
+    select: {
+        multi: false,
+        style: selectStyle,
+        onChange: function(feat) {
+            console.log(feat)
+        }
+    }
 });
 
 // add features to 'areas'
@@ -93,7 +115,7 @@ map.focusOnLayer('areas');
 // stylize buttons
 var buttonStyle = {
     color: 'white',
-    backgroundColor: 'rgb(0, 125, 125)',
-    borderRadius: '100%'
+//    backgroundColor: 'rgb(0, 125, 125)',
+//    borderRadius: '100%'
 };
 map.stylizeButtons(buttonStyle)

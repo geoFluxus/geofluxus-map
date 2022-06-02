@@ -149,10 +149,15 @@ export default class FlowMap extends Map {
 
         // interpolate
         var colors = {};
-        for (var i = 0; i < categories.length; i++) {
-            var norm = i / (categories.length - 1);
-            colors[categories[i]] = this.scale(norm);
+        if (categories.length > 1) {
+            for (var i = 0; i < categories.length; i++) {
+                var norm = i / (categories.length - 1);
+                colors[categories[i]] = this.scale(norm);
+            }
+        } else {
+            colors[categories[0]] = this.scale(0);
         }
+
 
         return colors;
     }

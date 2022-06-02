@@ -2,6 +2,7 @@ import {FlowMap} from '../index.js'
 import flows from '../data/flowsData.js'
 
 // custom scale
+var data = [flows[0]]
 var scale = {
     'Storage': 'rgb(27,158,119)',
     'Physical processing': 'rgb(217,95,2)',
@@ -13,17 +14,17 @@ var scale = {
 // flow map (default options)
 const map1 = new FlowMap({
     target: "root1",
-    data: flows,
-    groupBy: 'process',
+    data: data,
+    groupBy: 'ewc',
 })
 
 
 // flow map (customize)
 const map2 = new FlowMap({
     target: "root2",
-    data: flows,
+    data: data,
     animate: 1,
-    groupBy: 'process',
+    groupBy: 'ewc',
     legend: {
         title: "<span><b>Process groups</b></span>",
     },

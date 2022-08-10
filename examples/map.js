@@ -119,3 +119,22 @@ var buttonStyle = {
 //    borderRadius: '100%'
 };
 map.stylizeButtons(buttonStyle)
+
+
+var pointStyle = {
+    image: {
+        radius: 10,
+        fill: {
+            color: 'rgb(255, 0, 0)'
+        },
+        stroke: {
+            color: 'rgb(255, 255, 255)',
+            width: 2
+        }
+    }
+}
+map.addVectorLayer('point', {style: pointStyle})
+map.addFeature('point', {
+    type: 'Point',
+    coordinates: [4.9, 52.366667]
+})

@@ -271,7 +271,8 @@ export default class Map {
                         color: fill.color || initialFill.getColor()
                     }),
                     zIndex: zIndex || initialZIndex,
-                    image: image
+                    image: image,
+                    text: initialStyle.getText()
                 });
                 feature.setStyle(highlightStyle);
             } else {

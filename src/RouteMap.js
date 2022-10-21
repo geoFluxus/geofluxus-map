@@ -18,6 +18,15 @@ export default class RouteMap extends Map {
             toggleLight: ToggleLight,
         });
 
+        // hover
+        options.hover = _default(options.hover, {
+            style: {
+                image: {
+                    radius: 7
+                }
+            }
+        });
+
         // initialize map
         super(options)
         var _this = this;
@@ -35,6 +44,10 @@ export default class RouteMap extends Map {
         // address bar
         this.addressBarOptions = options.addressBar || {};
         this._drawAddressBar();
+
+        // route bar
+        this.routeBarOptions = options.routeBar || {};
+        this._drawRouteBar();
 
         this._addLayers();
         this.focusOnLayer([
@@ -56,12 +69,15 @@ export default class RouteMap extends Map {
 
     // geocode
     _geocode(e) {
+        // get input
         var _this = this;
-        var address = document.getElementById("map-address-bar").value;
+        var address = document.getElementById("map-address-input").value;
         if (!address.length) {
             alert("Please provide address...")
             return;
         }
+
+        // fetch
         let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${address}.json?access_token=${_this.apiKey}`;
         fetch(url)
         .then((response) => response.json())
@@ -105,10 +121,8 @@ export default class RouteMap extends Map {
         // div
         // default style options
         var div = document.createElement('div');
-        div.style.right = "1em";
-        div.style.top = "1em";
-        div.style.maxWidth = '33%';
-        div.style.maxHeight = 'calc(100% - 20px)';
+        div.style.right = "10px";
+        div.style.top = "10px";
         div.style.position = 'absolute';
         div.style.backgroundColor = 'white';
         div.style.padding = "10px";
@@ -117,7 +131,7 @@ export default class RouteMap extends Map {
         _this._loadCustomOptions(div, options?.div);
 
         // add div to map
-        div.id = 'address';
+        div.id = 'map-address';
         var controlPanel = new Control({
             element: div
         });
@@ -133,8 +147,8 @@ export default class RouteMap extends Map {
         input.style.marginRight = "10px";
         input.setAttribute("type", "text");
         input.setAttribute("name", "address");
-        input.setAttribute("placeholder", "Fill address");
-        input.setAttribute("id", "map-address-bar");
+        input.setAttribute("placeholder", "Add address");
+        input.setAttribute("id", "map-address-input");
         _this._loadCustomOptions(input, options?.input);
 
         var submit = document.createElement("button");
@@ -147,6 +161,83 @@ export default class RouteMap extends Map {
 
         // add to document
         form.append(input);
+        form.append(submit);
+        div.append(form);
+    }
+
+    // route
+    _route(e) {
+        var _this = this,
+            origin = document.getElementById("map-route-origin").value,
+            destination = document.getElementById("map-route-destination").value;
+        if (!origin.length || !destination.length) {
+            alert("Either origin or destination missing...")
+            return;
+        }
+    }
+
+    // draw route bar
+    _drawRouteBar() {
+        var _this = this;
+        var options =  this.addressBarOptions;
+        var viewport = this.map.getViewport();
+
+        // div
+        // default style options
+        var div = document.createElement('div');
+        div.style.right = "10px";
+        div.style.top = "70px";
+        div.style.position = 'absolute';
+        div.style.backgroundColor = 'white';
+        div.style.padding = "10px";
+        div.style.borderRadius = "5px";
+        // load custom style options
+        _this._loadCustomOptions(div, options?.div);
+
+        // add div to map
+        div.id = 'map-address';
+        var controlPanel = new Control({
+            element: div
+        });
+        this.map.addControl(controlPanel);
+
+        // form
+        var form = document.createElement('form');
+
+        // form address
+        var input1 = document.createElement("input");
+        input1.style.height = "20px";
+        input1.style.width = "200px";
+        input1.style.marginRight = "10px";
+        input1.style.marginBottom = "10px";
+        input1.setAttribute("type", "text");
+        input1.setAttribute("name", "address");
+        input1.setAttribute("placeholder", "Add origin");
+        input1.setAttribute("id", "map-route-origin");
+        _this._loadCustomOptions(input1, options?.input);
+
+        var input2 = document.createElement("input");
+        input2.style.height = "20px";
+        input2.style.width = "200px";
+        input2.style.marginRight = "10px";
+        input2.setAttribute("type", "text");
+        input2.setAttribute("name", "address");
+        input2.setAttribute("placeholder", "Add destination");
+        input2.setAttribute("id", "map-route-destination");
+        _this._loadCustomOptions(input2, options?.input);
+
+        var submit = document.createElement("button");
+        submit.innerHTML = '<i class="fas fa-arrows-alt-h"</i>';
+        submit.onclick = function(e) {
+            e.preventDefault();
+            _this._route(e);
+        }
+        _this._loadCustomOptions(submit, options?.submit);
+
+        // add to document
+        form.append(input1);
+        form.innerHTML += "<br>";
+        form.append(input2);
         form.append(submit);
         div.append(form);
     }

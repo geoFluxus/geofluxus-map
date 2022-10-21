@@ -18,15 +18,6 @@ export default class RouteMap extends Map {
             toggleLight: ToggleLight,
         });
 
-        // hover
-        options.hover = _default(options.hover, {
-            style: {
-                image: {
-                    radius: 7
-                }
-            }
-        });
-
         // initialize map
         super(options)
         var _this = this;
@@ -58,6 +49,17 @@ export default class RouteMap extends Map {
 
     _addLayers() {
         this.addVectorLayer('address');
+        this.addSelectInteraction('address', {style: {
+            image: {
+                fill: {
+                  color: 'green'
+                },
+                stroke: {
+                  color: 'green',
+                  width: 2
+                },
+            }
+        }});
     }
 
     _loadCustomOptions(elem, options) {

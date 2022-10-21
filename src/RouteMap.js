@@ -48,7 +48,20 @@ export default class RouteMap extends Map {
     }
 
     _addLayers() {
-        this.addVectorLayer('address');
+        this.addVectorLayer('address',
+//            {style: {
+//                image: {
+//                    fill: {
+//                      color: 'red'
+//                    },
+//                    stroke: {
+//                      color: 'green',
+//                      width: 2
+//                    },
+//                },
+//                zIndex: 2000
+//            }}
+        );
         this.addSelectInteraction('address', {style: {
             image: {
                 fill: {
@@ -89,29 +102,7 @@ export default class RouteMap extends Map {
 
     // draw point
     _drawPoint(a, d) {
-        this.addFeature('address', d.geometry, {
-            props: {
-                address: a
-            },
-            style: {
-                image: {
-                    fill: {
-                      color: 'red'
-                    },
-                    stroke: {
-                      color: 'red',
-                      width: 2
-                    },
-                },
-                text: {
-                    text: a,
-                    fontSize: 15,
-                    textAlign: 'left',
-                    offsetX: 10,
-                    color: 'red'
-                }
-            }
-        });
+        this.addFeature('address', d.geometry);
     }
 
     // draw address bar

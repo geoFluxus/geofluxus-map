@@ -298,71 +298,71 @@ export default class Map {
         return response;
     }
 
-    _setStroke() {
+    // set style stroke
+    _setStroke(s) {
+        return new Stroke({
+            color: s?.stroke?.color || 'rgba(100, 150, 250, 1)',
+            width: s?.stroke?.width || 1
+        });
+    }
 
+    // set style fill
+    _setFill(s) {
+        return new Fill({
+            color: s?.fill?.color || 'rgb(100, 150, 250, 0.1)'
+        });
+    }
+
+    // set style image
+    _setImage(s) {
+        var _this = this,
+            image = s.image;
+        return image?.icon ? new Icon({
+            crossOrigin: 'anonymous',
+            scale: image?.icon?.scale || 1,
+            src: image?.icon?.src
+        }) : new Circle({
+                radius: image?.radius || 5,
+                fill: _this._setFill(image),
+                stroke: _this._setStroke(image)
+        });
+    }
+
+    // set style
+    _setStyle(s) {
+        var _this = this;
+        var style = {
+            stroke: _this._setStroke(s),
+            fill: _this._setFill(s)
+        }
+        if (s?.image) style.image = _this._setImage(s);
+        return new Style(style);
     }
 
     // add vector layer to map
     addVectorLayer(name, options) {
         var options = options || {};
+        var _this = this;
 
         // check if layer exists
         if (this._getLayer(name) != undefined) {
             throw Error(`Layer "${name}" already exists!`);
         }
 
-        // define style
-        var style = options.style || {},
-            stroke = style.stroke || {},
-            fill = style.fill || {},
-            image = style.image,
-            text = style.text;
-        stroke.color = stroke.color || 'rgba(100, 150, 250, 1)';
-        stroke.width = stroke.width || 1;
-        fill.color = fill.color || 'rgb(100, 150, 250, 0.1)';
-
-        style = {
-            stroke: new Stroke({
-                color: stroke.color,
-                width: stroke.width
-            }),
-            fill: new Fill({
-                color: fill.color
-            })
-        }
-
-        // special icon marker for points
-        if (image) {
-            style.image = image.icon ? new Icon({
-                crossOrigin: 'anonymous',
-                scale: image.icon.scale || 1,
-                src: image.icon.src
-            }) : new Circle({
-                radius: image.radius || 5,
-                fill: new Fill({
-                    color: image.fill?.color || 'rgb(100, 150, 250, 0.1)'
-                }),
-                stroke: new Stroke({
-                    color: image.stroke?.color || 'rgba(100, 150, 250, 1)',
-                    width: image.stroke?.width || 1
-                })
-            });
-        }
-
-        // vector text
-        if (text) {
-            style.text = new Text({
-                text: text.text || 'text',
-                font: `normal ${text.fontSize || 10}px FontAwesome`,
-                textBaseline: text.textBaseline || 'middle',
-                textAlign: text.textAlign || 'center',
-                offsetX: text.offsetX || 0,
-                offsetY: text.offsetY || 0,
-                fill: new Fill({
-                    color: text.color || 'black',
-                })
-            })
-        }
+//        // vector text
+//        if (text) {
+//            style.text = new Text({
+//                text: text.text || 'text',
+//                font: `normal ${text.fontSize || 10}px FontAwesome`,
+//                textBaseline: text.textBaseline || 'middle',
+//                textAlign: text.textAlign || 'center',
+//                offsetX: text.offsetX || 0,
+//                offsetY: text.offsetY || 0,
+//                fill: new Fill({
+//                    color: text.color || 'black',
+//                })
+//            })
+//        }
 
         // create & add layer
         var layer = new VectorLayer({
@@ -370,12 +370,12 @@ export default class Map {
             opacity: options.opacity || 1.0,
             source: new VectorSource(),
             crossOrigin: 'anonymous',
-            style: new Style(style)
+            style: _this._setStyle(options.style)
         });
         this.map.addLayer(layer);
 
         // define z-index
-        layer.setZIndex(style.zIndex);
+        layer.setZIndex(options?.style?.zIndex);
 
         // selectable layer
         var select = options.select;
@@ -505,68 +505,68 @@ export default class Map {
             geometry: geometry.transform(this.projection, 'EPSG:3857')
         });
 
-        // individual feature style
-        var style = options.style;
-        if (style != undefined) {
-            var defaultStyle = layer.getStyle(),
-                defaultStroke = defaultStyle.getStroke(),
-                defaultFill = defaultStyle.getFill(),
-                defaultZIndex = defaultStyle.getZIndex(),
-                defaultImage = defaultStyle.getImage(),
-                defaultText = defaultStyle.getText();
-
-            var stroke = style.stroke || {},
-                fill = style.fill || {},
-                zIndex = style.zIndex || {},
-                image = style.image,
-                text = style.text;
-
-            style = {
-                stroke: new Stroke({
-                    color: stroke.color || defaultStroke.getColor(),
-                    width: stroke.width || defaultStroke.getWidth()
-                }),
-                fill: new Fill({
-                    color: fill.color || defaultFill.getColor()
-                }),
-                zIndex: style.zIndex || defaultZIndex
-            };
-
-            // special icon marker for points
-            if (image) {
-                style.image = image.icon ? new Icon({
-                    crossOrigin: 'anonymous',
-                    scale: image.icon.scale || 1,
-                    src: image.icon.src
-                }) : new Circle({
-                    radius: image.radius || 5,
-                    fill: new Fill({
-                        color: image.fill?.color || 'rgb(100, 150, 250, 0.1)'
-                    }),
-                    stroke: new Stroke({
-                        color: image.stroke?.color || 'rgba(100, 150, 250, 1)',
-                        width: image.stroke?.width || 1
-                    })
-                });
-            }
-
-            // vector text
-            if (text) {
-                style.text = new Text({
-                    text: text.text || 'text',
-                    font: `normal ${text.fontSize || 10}px FontAwesome`,
-                    textBaseline: text.textBaseline || 'middle',
-                    textAlign: text.textAlign || 'center',
-                    offsetX: text.offsetX || 0,
-                    offsetY: text.offsetY || 0,
-                    fill: new Fill({
-                        color: text.color || 'black',
-                    })
-                })
-            }
-
-            feature.setStyle(new Style(style));
-        }
+//        // individual feature style
+//        var style = options.style;
+//        if (style != undefined) {
+//            var defaultStyle = layer.getStyle(),
+//                defaultStroke = defaultStyle.getStroke(),
+//                defaultFill = defaultStyle.getFill(),
+//                defaultZIndex = defaultStyle.getZIndex(),
+//                defaultImage = defaultStyle.getImage(),
+//                defaultText = defaultStyle.getText();
+//
+//            var stroke = style.stroke || {},
+//                fill = style.fill || {},
+//                zIndex = style.zIndex || {},
+//                image = style.image,
+//                text = style.text;
+//
+//            style = {
+//                stroke: new Stroke({
+//                    color: stroke.color || defaultStroke.getColor(),
+//                    width: stroke.width || defaultStroke.getWidth()
+//                }),
+//                fill: new Fill({
+//                    color: fill.color || defaultFill.getColor()
+//                }),
+//                zIndex: style.zIndex || defaultZIndex
+//            };
+//
+//            // special icon marker for points
+//            if (image) {
+//                style.image = image.icon ? new Icon({
+//                    crossOrigin: 'anonymous',
+//                    scale: image.icon.scale || 1,
+//                    src: image.icon.src
+//                }) : new Circle({
+//                    radius: image.radius || 5,
+//                    fill: new Fill({
+//                        color: image.fill?.color || 'rgb(100, 150, 250, 0.1)'
+//                    }),
+//                    stroke: new Stroke({
+//                        color: image.stroke?.color || 'rgba(100, 150, 250, 1)',
+//                        width: image.stroke?.width || 1
+//                    })
+//                });
+//            }
+//
+//            // vector text
+//            if (text) {
+//                style.text = new Text({
+//                    text: text.text || 'text',
+//                    font: `normal ${text.fontSize || 10}px FontAwesome`,
+//                    textBaseline: text.textBaseline || 'middle',
+//                    textAlign: text.textAlign || 'center',
+//                    offsetX: text.offsetX || 0,
+//                    offsetY: text.offsetY || 0,
+//                    fill: new Fill({
+//                        color: text.color || 'black',
+//                    })
+//                })
+//            }
+//
+//            feature.setStyle(new Style(style));
+//        }
 
         // get layer & add feature
         layer.getSource().addFeature(feature);

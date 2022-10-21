@@ -62,56 +62,56 @@ const map = new Map({
 
 map.addLogo('white');
 
-// define POLYGON vector layer 'areas'
-// provide global feature style
-var areaStyle = {
-    stroke: {
-        color: 'rgba(255, 255, 255, 0.5)',
-        width: 1
-    },
-    fill: {
-        color: 'rgba(0, 0, 255, 0.5)'
-    },
-    zIndex: 1000
-}
-
-var selectStyle = {
-    stroke: {
-        color: 'rgba(255, 255, 255)',
-        width: 2
-    },
-    fill: {
-        color: 'rgba(0, 0, 255)'
-    },
-    zIndex: 9999
-}
-
-map.addVectorLayer('areas', {
-    style: areaStyle,
-    select: {
-        multi: false,
-        style: selectStyle,
-        onChange: function(feat) {
-            console.log(feat)
-        }
-    }
-});
-
-// add features to 'areas'
-areas.features.forEach(function(area) {
-    var geometry = area.geometry,
-        name = area.properties.name;
-    map.addFeature('areas', geometry, {
-        props: {
-            name: name,
-            capital: name.toUpperCase()
-        }
-    });
-})
-
-// focus on 'areas'
-map.focusOnLayer('areas');
-
+//// define POLYGON vector layer 'areas'
+//// provide global feature style
+//var areaStyle = {
+//    stroke: {
+//        color: 'rgba(255, 255, 255, 0.5)',
+//        width: 1
+//    },
+//    fill: {
+//        color: 'rgba(0, 0, 255, 0.5)'
+//    },
+//    zIndex: 1000
+//}
+//
+//var selectStyle = {
+//    stroke: {
+//        color: 'rgba(255, 255, 255)',
+//        width: 2
+//    },
+//    fill: {
+//        color: 'rgba(0, 0, 255)'
+//    },
+//    zIndex: 9999
+//}
+//
+//map.addVectorLayer('areas', {
+//    style: areaStyle,
+//    select: {
+//        multi: false,
+//        style: selectStyle,
+//        onChange: function(feat) {
+//            console.log(feat)
+//        }
+//    }
+//});
+//
+//// add features to 'areas'
+//areas.features.forEach(function(area) {
+//    var geometry = area.geometry,
+//        name = area.properties.name;
+//    map.addFeature('areas', geometry, {
+//        props: {
+//            name: name,
+//            capital: name.toUpperCase()
+//        }
+//    });
+//})
+//
+//// focus on 'areas'
+//map.focusOnLayer('areas');
+//
 // stylize buttons
 var buttonStyle = {
     color: 'white',

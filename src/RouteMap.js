@@ -22,19 +22,68 @@ export default class RouteMap extends Map {
         super(options)
         var _this = this;
 
+        // provide API key
+        this.apiKey = options.apiKey;
+        if (this.apiKey === undefined) {
+            alert("Please provide API key")
+        }
+
         // change logo & button style
         this.stylizeButtons({color: 'white'});
         this.addLogo('white');
 
         // address bar
-        this.addressOptions = options.address || {};
-        this._drawAddress();
+        this.addressBarOptions = options.addressBar || {};
+        this._drawAddressBar();
+
+        this._addLayers();
+        this.focusOnLayer([
+          3.31497114423, 50.803721015,
+          7.09205325687, 53.5104033474
+        ]);
+    }
+
+    _addLayers() {
+        this.addVectorLayer('address', {style: {
+            image: {
+              fill: {
+                  color: 'red'
+              },
+              stroke: {
+                  color: 'red',
+                  width: 2
+              },
+            }
+        }});
+    }
+
+    _loadCustomOptions(elem, options) {
+        Object.entries(options || {}).forEach(function(pair) {
+            var [key, value] = pair;
+            elem.style[key] = value;
+        })
+    }
+
+    // geocode
+    _geocode(e) {
+        var _this = this;
+        var address = document.getElementById("map-address-bar").value;
+        let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${address}.json?access_token=${_this.apiKey}`;
+        fetch(url)
+        .then((response) => response.json())
+        .then((data) => _this._drawPoint(data.features[0]))
+        .catch(error => alert(error));
+    }
+
+    // draw point
+    _drawPoint(d) {
+        this.addFeature('address', d.geometry);
     }
 
     // draw address bar
-    _drawAddress() {
+    _drawAddressBar() {
         var _this = this;
-        var options =  this.addressOptions;
+        var options =  this.addressBarOptions;
         var viewport = this.map.getViewport();
 
         // div
@@ -49,10 +98,7 @@ export default class RouteMap extends Map {
         div.style.padding = "10px";
         div.style.borderRadius = "5px";
         // load custom style options
-        Object.entries(options).forEach(function(pair) {
-            var [key, value] = pair;
-            _this.legend.style[key] = value;
-        })
+        _this._loadCustomOptions(div, options?.div);
 
         // add div to map
         div.id = 'address';
@@ -63,13 +109,29 @@ export default class RouteMap extends Map {
 
         // form
         var form = document.createElement('form');
-        var address = document.createElement("input");
-        address.style.height = "20px";
-        address.style.width = "200px";
-        address.setAttribute("type", "text");
-        address.setAttribute("name", "address");
-        address.setAttribute("placeholder", "Fill address");
-        form.append(address);
+
+        // form address
+        var input = document.createElement("input");
+        input.style.height = "20px";
+        input.style.width = "200px";
+        input.style.marginRight = "10px";
+        input.setAttribute("type", "text");
+        input.setAttribute("name", "address");
+        input.setAttribute("placeholder", "Fill address");
+        input.setAttribute("id", "map-address-bar");
+        _this._loadCustomOptions(input, options?.input);
+
+        var submit = document.createElement("button");
+        submit.innerHTML = "Submit";
+        submit.onclick = function(e) {
+            e.preventDefault();
+            _this._geocode(e);
+        }
+        _this._loadCustomOptions(submit, options?.submit);
+
+        // add to document
+        form.append(input);
+        form.append(submit);
         div.append(form);
     }
 }

@@ -44,17 +44,7 @@ export default class RouteMap extends Map {
     }
 
     _addLayers() {
-        this.addVectorLayer('address', {style: {
-            image: {
-              fill: {
-                  color: 'red'
-              },
-              stroke: {
-                  color: 'red',
-                  width: 2
-              },
-            }
-        }});
+        this.addVectorLayer('address');
     }
 
     _loadCustomOptions(elem, options) {
@@ -68,16 +58,42 @@ export default class RouteMap extends Map {
     _geocode(e) {
         var _this = this;
         var address = document.getElementById("map-address-bar").value;
+        if (!address.length) {
+            alert("Please provide address...")
+            return;
+        }
         let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${address}.json?access_token=${_this.apiKey}`;
         fetch(url)
         .then((response) => response.json())
-        .then((data) => _this._drawPoint(data.features[0]))
+        .then((data) => _this._drawPoint(address, data.features[0]))
         .catch(error => alert(error));
     }
 
     // draw point
-    _drawPoint(d) {
-        this.addFeature('address', d.geometry);
+    _drawPoint(a, d) {
+        this.addFeature('address', d.geometry, {
+            props: {
+                address: a
+            },
+            style: {
+                image: {
+                    fill: {
+                      color: 'red'
+                    },
+                    stroke: {
+                      color: 'red',
+                      width: 2
+                    },
+                },
+                text: {
+                    text: a,
+                    fontSize: 15,
+                    textAlign: 'left',
+                    offsetX: 10,
+                    color: 'red'
+                }
+            }
+        });
     }
 
     // draw address bar
@@ -122,7 +138,7 @@ export default class RouteMap extends Map {
         _this._loadCustomOptions(input, options?.input);
 
         var submit = document.createElement("button");
-        submit.innerHTML = "Submit";
+        submit.innerHTML = '<i class="fas fa-search"></i>';
         submit.onclick = function(e) {
             e.preventDefault();
             _this._geocode(e);

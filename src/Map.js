@@ -350,6 +350,9 @@ export default class Map {
                 text: text.text || 'text',
                 font: `normal ${text.fontSize || 10}px FontAwesome`,
                 textBaseline: text.textBaseline || 'middle',
+                textAlign: text.textAlign || 'center',
+                offsetX: text.offsetX || 0,
+                offsetY: text.offsetY || 0,
                 fill: new Fill({
                     color: text.color || 'black',
                 })
@@ -528,6 +531,9 @@ export default class Map {
                     text: text.text || 'text',
                     font: `normal ${text.fontSize || 10}px FontAwesome`,
                     textBaseline: text.textBaseline || 'middle',
+                    textAlign: text.textAlign || 'center',
+                    offsetX: text.offsetX || 0,
+                    offsetY: text.offsetY || 0,
                     fill: new Fill({
                         color: text.color || 'black',
                     })

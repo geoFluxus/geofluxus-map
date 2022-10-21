@@ -316,7 +316,7 @@ export default class Map {
     // set style image
     _setImage(s) {
         var _this = this,
-            image = s.image;
+            image = s?.image;
         return image?.icon ? new Icon({
             crossOrigin: 'anonymous',
             scale: image?.icon?.scale || 1,
@@ -328,14 +328,32 @@ export default class Map {
         });
     }
 
+    // set style text
+    _setText(s) {
+        var _this = this,
+            text = s?.text;
+        return new Text({
+            text: text.text || 'text',
+            font: `normal ${text.fontSize || 10}px FontAwesome`,
+            textBaseline: text.textBaseline || 'middle',
+            textAlign: text.textAlign || 'center',
+            offsetX: text.offsetX || 0,
+            offsetY: text.offsetY || 0,
+            fill: new Fill({
+                color: text.color || 'black',
+            })
+        })
+    }
+
     // set style
     _setStyle(s) {
         var _this = this;
         var style = {
             stroke: _this._setStroke(s),
-            fill: _this._setFill(s)
+            fill: _this._setFill(s),
+            image: _this._setImage(s)
         }
-        if (s?.image) style.image = _this._setImage(s);
+        if (s?.text) style.text = _this._setText(s);
         return new Style(style);
     }
 
@@ -348,21 +366,6 @@ export default class Map {
         if (this._getLayer(name) != undefined) {
             throw Error(`Layer "${name}" already exists!`);
         }
-
-//        // vector text
-//        if (text) {
-//            style.text = new Text({
-//                text: text.text || 'text',
-//                font: `normal ${text.fontSize || 10}px FontAwesome`,
-//                textBaseline: text.textBaseline || 'middle',
-//                textAlign: text.textAlign || 'center',
-//                offsetX: text.offsetX || 0,
-//                offsetY: text.offsetY || 0,
-//                fill: new Fill({
-//                    color: text.color || 'black',
-//                })
-//            })
-//        }
 
         // create & add layer
         var layer = new VectorLayer({

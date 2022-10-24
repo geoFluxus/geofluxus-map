@@ -70,13 +70,13 @@ const map = new Map({
     base: {
         source: 'cartodb_dark'
     },
-    hover: {
-        tooltip: {
-            body: tooltipBody,
-            style: tooltipStyle
-        },
-        style: hoverStyle
-    },
+//    hover: {
+//        tooltip: {
+//            body: tooltipBody,
+//            style: tooltipStyle
+//        },
+//        style: hoverStyle
+//    },
 })
 
 map.addLogo('white');
@@ -113,7 +113,22 @@ var customStyle = {
         color: 'red',
     }
 }
-map.addVectorLayer('point', {style: pointStyle})
+var pointSelect = {
+    text: {
+        text: 'SELECTED',
+        color: 'red',
+    }
+}
+map.addVectorLayer('point', {
+    style: pointStyle,
+    select: {
+        multi: false,
+        style: pointSelect,
+        onChange: function(feat) {
+            console.log(feat)
+        }
+    }
+})
 map.addFeature('point', {
     type: 'Point',
     coordinates: [4.9, 52.366667]

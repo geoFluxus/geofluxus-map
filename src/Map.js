@@ -341,7 +341,6 @@ export default class Map {
     addSelectInteraction(layer, options) {
         var _this =  this;
         options = options || {};
-        layer = _this._getLayer(layer);
 
         // pointer cursor over features
         this.map.on('pointermove', function (e) {
@@ -353,50 +352,11 @@ export default class Map {
             _this.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
         });
 
-        // define select style
-        var style = options.style || {},
-            stroke = style.stroke || {},
-            fill = style.fill || {},
-            image = style.image || {},
-            text = style.text || {};
-        stroke.color = stroke.color || 'rgba(100, 150, 250, 1)';
-        stroke.width = stroke.width || 1;
-        fill.color = fill.color || 'rgb(100, 150, 250, 0.1)';
-
-        style = {
-            stroke: new Stroke({
-                color: stroke.color,
-                width: stroke.width
-            }),
-            fill: new Fill({
-                color: fill.color
-            }),
-            zIndex: options.zIndex || 0,
-        }
-
-        // special icon marker for points
-        if (image) {
-            style.image = image.icon ? new Icon({
-                crossOrigin: 'anonymous',
-                scale: image.icon.scale || 1,
-                src: image.icon.src
-            }) : new Circle({
-                radius: image.radius || 5,
-                fill: new Fill({
-                    color: image.fill?.color || 'rgb(100, 150, 250, 0.1)'
-                }),
-                stroke: new Stroke({
-                    color: image.stroke?.color || 'rgba(100, 150, 250, 1)',
-                    width: image.stroke?.width || 1
-                })
-            });
-        }
-
         // define select interaction
         var multi = (options?.multi) ? false : true;
         var interaction = new olInteraction.Select({
             toggleCondition: (multi) ? olCondition.always : olCondition.click,
-            style: new Style(style),
+            style: _this._setStyle(options.style, layer.getStyle()),
             layers: [layer],
             multi: multi
         });

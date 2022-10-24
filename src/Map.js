@@ -299,61 +299,63 @@ export default class Map {
     }
 
     // set style stroke
-    _setStroke(s) {
+    _setStroke(cs, ls) {
         return new Stroke({
-            color: s?.stroke?.color || 'rgba(100, 150, 250, 1)',
-            width: s?.stroke?.width || 1
+            color: cs?.stroke?.color || ls?.getStroke()?.getColor() || 'rgba(100, 150, 250, 1)',
+            width: cs?.stroke?.width || ls?.getStroke()?.getWidth() || 1
         });
     }
 
     // set style fill
-    _setFill(s) {
+    _setFill(cs, ls) {
         return new Fill({
-            color: s?.fill?.color || 'rgb(100, 150, 250, 0.1)'
+            color: cs?.fill?.color || ls?.getFill()?.getColor() || 'rgb(100, 150, 250, 0.1)'
         });
     }
 
     // set style image
-    _setImage(s) {
+    _setImage(cs, ls) {
         var _this = this,
-            image = s?.image;
-        return image?.icon ? new Icon({
+            icon = cs?.image?.icon;
+        return icon ? new Icon({
             crossOrigin: 'anonymous',
-            scale: image?.icon?.scale || 1,
-            src: image?.icon?.src
+            scale: icon?.scale || 1,
+            src: icon?.src
         }) : new Circle({
-                radius: image?.radius || 5,
-                fill: _this._setFill(image),
-                stroke: _this._setStroke(image)
+                radius: cs?.image?.radius || ls?.getImage()?.getRadius() || 5,
+                fill: _this._setFill(cs?.image, ls?.getImage()),
+                stroke: _this._setStroke(cs?.image, ls?.getImage())
         });
     }
 
     // set style text
-    _setText(s) {
-        var _this = this,
-            text = s?.text;
+    _setText(cs, ls) {
+        var _this = this;
         return new Text({
-            text: text.text || 'text',
-            font: `normal ${text.fontSize || 10}px FontAwesome`,
-            textBaseline: text.textBaseline || 'middle',
-            textAlign: text.textAlign || 'center',
-            offsetX: text.offsetX || 0,
-            offsetY: text.offsetY || 0,
+            text: cs?.text?.text || ls?.getText()?.getText(),
+            font: `normal ${cs?.text?.fontSize || ls?.getText()?.getFont() || 10}px FontAwesome`,
+            textBaseline: cs?.text?.textBaseline || ls?.getText()?.getTextBaseline() || 'middle',
+            textAlign: cs?.text?.textAlign || ls?.getText()?.getTextAlign() || 'center',
+            offsetX: cs?.text?.offsetX || ls?.getText()?.getOffsetX() || 0,
+            offsetY: cs?.text?.offsetY || ls?.getText()?.getOffsetY() || 0,
             fill: new Fill({
-                color: text.color || 'black',
+                color: cs?.text?.color || ls?.getText()?.getFill()?.getColor() || 'black',
             })
         })
     }
 
     // set style
-    _setStyle(s) {
+    _setStyle(cs, ls) {
+        // cs: custom style
+        // ls: layer style
+        // style order: custom -> layer -> default
         var _this = this;
         var style = {
-            stroke: _this._setStroke(s),
-            fill: _this._setFill(s),
-            image: _this._setImage(s)
+            stroke: _this._setStroke(cs, ls),
+            fill: _this._setFill(cs, ls),
+            image: _this._setImage(cs, ls),
+            text: _this._setText(cs, ls)
         }
-        if (s?.text) style.text = _this._setText(s);
         return new Style(style);
     }
 
@@ -376,8 +378,6 @@ export default class Map {
             style: _this._setStyle(options.style)
         });
         this.map.addLayer(layer);
-
-        // define z-index
         layer.setZIndex(options?.style?.zIndex);
 
         // selectable layer
@@ -471,6 +471,7 @@ export default class Map {
     // add feature to vector layer
     addFeature(layer, geometry, options) {
         var options = options || {};
+        var _this = this;
 
         // check if input layer does exist
         if (this._getLayer(layer) == undefined) {
@@ -508,70 +509,8 @@ export default class Map {
             geometry: geometry.transform(this.projection, 'EPSG:3857')
         });
 
-//        // individual feature style
-//        var style = options.style;
-//        if (style != undefined) {
-//            var defaultStyle = layer.getStyle(),
-//                defaultStroke = defaultStyle.getStroke(),
-//                defaultFill = defaultStyle.getFill(),
-//                defaultZIndex = defaultStyle.getZIndex(),
-//                defaultImage = defaultStyle.getImage(),
-//                defaultText = defaultStyle.getText();
-//
-//            var stroke = style.stroke || {},
-//                fill = style.fill || {},
-//                zIndex = style.zIndex || {},
-//                image = style.image,
-//                text = style.text;
-//
-//            style = {
-//                stroke: new Stroke({
-//                    color: stroke.color || defaultStroke.getColor(),
-//                    width: stroke.width || defaultStroke.getWidth()
-//                }),
-//                fill: new Fill({
-//                    color: fill.color || defaultFill.getColor()
-//                }),
-//                zIndex: style.zIndex || defaultZIndex
-//            };
-//
-//            // special icon marker for points
-//            if (image) {
-//                style.image = image.icon ? new Icon({
-//                    crossOrigin: 'anonymous',
-//                    scale: image.icon.scale || 1,
-//                    src: image.icon.src
-//                }) : new Circle({
-//                    radius: image.radius || 5,
-//                    fill: new Fill({
-//                        color: image.fill?.color || 'rgb(100, 150, 250, 0.1)'
-//                    }),
-//                    stroke: new Stroke({
-//                        color: image.stroke?.color || 'rgba(100, 150, 250, 1)',
-//                        width: image.stroke?.width || 1
-//                    })
-//                });
-//            }
-//
-//            // vector text
-//            if (text) {
-//                style.text = new Text({
-//                    text: text.text || 'text',
-//                    font: `normal ${text.fontSize || 10}px FontAwesome`,
-//                    textBaseline: text.textBaseline || 'middle',
-//                    textAlign: text.textAlign || 'center',
-//                    offsetX: text.offsetX || 0,
-//                    offsetY: text.offsetY || 0,
-//                    fill: new Fill({
-//                        color: text.color || 'black',
-//                    })
-//                })
-//            }
-//
-//            feature.setStyle(new Style(style));
-//        }
-
         // get layer & add feature
+        feature.setStyle(_this._setStyle(options.style, layer.getStyle()));
         layer.getSource().addFeature(feature);
 
         // set feature properties

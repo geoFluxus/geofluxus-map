@@ -176,111 +176,60 @@ export default class Map {
         this.map.addOverlay(overlay);
 
         // initialize tooltip
-        var tooltip = options.tooltip || {},
-            tooltipBody = tooltip.body,
-            tooltipStyle = tooltip.style || {};
-
-        // default style options
-        //div.style.fontFamily = "'Helvetica', 'Arial', sans-serif";
-
-        // change style options
-        Object.entries(tooltipStyle).forEach(function(pair) {
-            var [key, value] = pair;
-            div.style[key] = value;
-        })
+        var tooltip,
+            tooltipBody,
+            tooltipStyle;
 
         // ignore layers
         var ignore = options.ignore || [];
 
         // initialize selection highlighting
-        var selected, initialStyle;
+        var selected, defaultStyle;
         function displayTooltip(evt) {
             // reset style of last selection
-            if (selected) selected.setStyle(initialStyle);
+            if (selected) selected.setStyle(defaultStyle);
+            // hide tooltip
+            div.style.display = 'none';
+            // reset pointer style
+            this.getViewport().style.cursor = 'auto';
 
             // get feature & layer by pixel
             var pixel = evt.pixel;
             var res = _this.map.forEachFeatureAtPixel(pixel, function (feature, layer) {
                 return [feature, layer];
             });
-            var feature, layer;
-            if (res != undefined) [feature, layer] = res;
+            var feature, layer, lname;
+            if (res !== undefined) {
+                [feature, layer] = res;
+                lname = layer.get('name');
 
-            // ignore layers
-            if (layer) {
-                ignore.forEach(function(i) {
-                    if (layer.get('name') == i) feature = null;
+                // hide tooltip
+                div.style = {};
+
+                tooltip = options.tooltip,
+                tooltipBody = tooltip.body[lname],
+                tooltipStyle = tooltip.style[lname] || {};
+
+                // change style options
+                Object.entries(tooltipStyle).forEach(function(pair) {
+                    var [key, value] = pair;
+                    div.style[key] = value;
                 })
-            }
 
-            // update tooltip style & highlight
-            if (feature) {
                 // change cursor style
                 this.getViewport().style.cursor = 'pointer';
 
                 // set tooltip body
-                overlay.setPosition(evt.coordinate);
-                div.style.display = 'block'; // show tooltip
-                if (tooltipBody != undefined) div.innerHTML = tooltipBody(feature);
-
-                // initialize feature highlight
-                selected = feature;
-                initialStyle = feature.getStyle() || layer.getStyle();
-
-                // get optional styling
-                var highlightStyle = options.style || {},
-                    stroke = highlightStyle.stroke || {},
-                    fill = highlightStyle.fill || {},
-                    zIndex = highlightStyle.zIndex,
-                    image = highlightStyle.image;
-
-                // special marker for points
-                if (image) {
-                    var imageRadius = image.radius,
-                    imageStroke = image.stroke || {},
-                    imageFill = image.fill || {};
-
-                    // get initial marker style
-                    var initialImageStyle = initialStyle.getImage();
-                    var initialImageStroke = initialImageStyle.getStroke(),
-                        initialImageFill = initialImageStyle.getFill();
-                    image = new Circle({
-                        radius: imageRadius || initialImageStyle.getRadius(),
-                        fill: new Fill({
-                            color: imageFill.color || initialImageFill.getColor()
-                        }),
-                        stroke: new Stroke({
-                            color: imageStroke.color || initialImageStroke.getColor(),
-                            width: imageStroke.width || initialImageStroke.getWidth()
-                        })
-                    });
+                if (tooltipBody) {
+                    overlay.setPosition(evt.coordinate);
+                    div.innerHTML = tooltipBody(feature);
+                    div.style.display = 'block'; // show tooltip
                 }
 
-                // get initial style of feature
-                var initialStroke = initialStyle.getStroke(),
-                    initialFill = initialStyle.getFill(),
-                    initialZIndex = initialStyle.getZIndex();
-
-                // define OpenLayers style
-                highlightStyle = new Style({
-                    stroke: new Stroke({
-                        color: stroke.color || initialStroke.getColor(),
-                        width: stroke.width || initialStroke.getWidth()
-                    }),
-                    fill: new Fill({
-                        color: fill.color || initialFill.getColor()
-                    }),
-                    zIndex: zIndex || initialZIndex,
-                    image: image,
-                    text: initialStyle.getText()
-                });
-                feature.setStyle(highlightStyle);
-            } else {
-                // reset pointer style
-                this.getViewport().style.cursor = 'auto';
-
-                // hide tooltip
-                div.style.display = 'none';
+                // set hover
+                selected = feature;
+                defaultStyle = feature.getStyle() || layer.getStyle();
+                feature.setStyle(_this._setStyle(options.style[lname], defaultStyle));
             }
         };
 

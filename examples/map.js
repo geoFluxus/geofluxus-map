@@ -3,20 +3,55 @@ import areas from '../data/areasData'
 
 // define tooltip, hover style
 var tooltipStyle = {
-        backgroundColor: 'rgba(255, 255, 0, 1)',
-        fontFamily: 'MedievalSharp',
-        border: 'solid',
-        fontSize: '30px',
+        areas: {
+            backgroundColor: 'rgba(255, 255, 0, 1)',
+            fontFamily: 'MedievalSharp',
+            border: 'solid',
+            fontSize: '30px',
+        },
+        point: {
+            fontSize: '50px',
+            color: 'red'
+        }
     },
     hoverStyle = {
-        stroke: {
-            color: 'rgba(255, 0, 0)',
-            width: 6
+        areas: {
+            stroke: {
+                color: 'rgba(255, 0, 0)',
+                width: 6
+            },
+            fill: {
+                color: 'rgba(255, 0, 0, 0.6)',
+            },
+            zIndex: 9999
         },
-        fill: {
-            color: 'rgba(255, 0, 0, 0.6)',
+        point: {
+            image: {
+                radius: 100
+            }
+        }
+    },
+    tooltipBody = {
+        areas: function(d) {
+            return `
+            <table>
+                <tr>
+                    <th colspan="2">Provincie</th>
+                <tr>
+                <tr>
+                    <th>Lower: </th>
+                    <td>${d.get('name')}</td>
+                </tr>
+                <tr>
+                    <th>Upper: </th>
+                    <td>${d.get('capital')}</td>
+                </tr>
+            </table>
+            `;
         },
-        zIndex: 9999
+        point: function(d) {
+            return `<span>Tooltip!</span>`;
+        }
     }
 
 // initialize map
@@ -35,29 +70,13 @@ const map = new Map({
     base: {
         source: 'cartodb_dark'
     },
-//    hover: {
-//        tooltip: {
-//            body: function(d) {
-//                return `
-//                <table>
-//                    <tr>
-//                        <th colspan="2">Provincie</th>
-//                    <tr>
-//                    <tr>
-//                        <th>Lower: </th>
-//                        <td>${d.get('name')}</td>
-//                    </tr>
-//                    <tr>
-//                        <th>Upper: </th>
-//                        <td>${d.get('capital')}</td>
-//                    </tr>
-//                </table>
-//                `;
-//            },
-//            style: tooltipStyle
-//        },
-//        style: hoverStyle
-//    },
+    hover: {
+        tooltip: {
+            body: tooltipBody,
+            style: tooltipStyle
+        },
+        style: hoverStyle
+    },
 })
 
 map.addLogo('white');

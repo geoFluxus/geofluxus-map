@@ -3,6 +3,7 @@ import { _default } from './utils.js';
 import Control from 'ol/control/Control';
 import { wrapText } from './utils.js';
 import {transform, transformExtent} from 'ol/proj';
+import Overlay from 'ol/Overlay';
 
 
 export default class RouteMap extends Map {
@@ -55,8 +56,6 @@ export default class RouteMap extends Map {
           3.31497114423, 50.803721015,
           7.09205325687, 53.5104033474
         ]);
-
-        console.log(this.map.getView().getZoom())
     }
 
     _addLayers() {
@@ -126,6 +125,7 @@ export default class RouteMap extends Map {
         _this.addVectorLayer('route', {
             style: routeStyle
         });
+        _this._getPopup();
     }
 
     _loadCustomOptions(elem, options) {
@@ -133,6 +133,61 @@ export default class RouteMap extends Map {
             var [key, value] = pair;
             elem.style[key] = value;
         })
+    }
+
+    _getPopup() {
+        var _this = this,
+            target = this.map.getTargetElement(),
+            div = target.querySelector('.ol-popup');
+        if (!div) {
+            div = document.createElement('div');
+            div.classList.add('ol-popup');
+            target.appendChild(div);
+        }
+        var popup = new Overlay({
+            element: div,
+            offset: [10, 0],
+            positioning: 'bottom-center'
+        });
+        _this.map.addOverlay(popup);
+
+        div.style.color = 'white';
+        div.style.textAlign = 'center';
+        div.style.padding = '0.5em';
+        div.style.fontSize = '15px';
+        div.style.backgroundColor = 'rgba(139, 138, 138, 1)';
+        div.style.borderRadius = '1.5rem';
+
+        function displayPopup(evt) {
+            var pixel = evt.pixel;
+            var res = _this.map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+                return [feature, layer];
+            });
+
+            var feat, layer, lname;
+            if (res !== undefined) {
+                [feat, layer] = res;
+                lname = layer.get('name');
+
+                popup.setPosition(evt.coordinate);
+                div.style.display = (lname === 'route') ? 'block' : 'none';
+                div.innerHTML = `
+                    <table>
+                        <tr>
+                            <th>Distance: </th>
+                            <td>${(feat.get('distance') / 1000).toFixed(1)} km</td>
+                        </tr>
+                        <tr>
+                            <th>Duration: </th>
+                            <td>${(feat.get('duration') / 60).toFixed(1)} mins</td>
+                        </tr>
+                    </table>
+                `;
+            } else {
+                div.style.display = 'none';
+            }
+        };
+        this.map.on('pointermove', displayPopup);
     }
 
     // geocode
@@ -249,7 +304,12 @@ export default class RouteMap extends Map {
     // draw point
     _drawRoute(r, e) {
         var _this = this;
-        this.addFeature('route', r.geometry);
+        this.addFeature('route', r.geometry, {
+            props: {
+                distance: r.distance,
+                duration: r.duration
+            }
+        });
         this.focusOnLayer(e);
         this.map.getView().setZoom(this.map.getView().getZoom() - 1);
     }

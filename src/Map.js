@@ -353,10 +353,12 @@ export default class Map {
         });
 
         // define select interaction
-        var multi = (options?.multi) ? false : true;
+        var multi = options?.multi || false;
         var interaction = new olInteraction.Select({
             toggleCondition: (multi) ? olCondition.always : olCondition.click,
-            style: _this._setStyle(options.style, layer.getStyle()),
+            style: function(feat) {
+                return _this._setStyle(options.style, feat.originalStyle || layer.getStyle())
+            },
             layers: [layer],
             multi: multi
         });
@@ -369,9 +371,10 @@ export default class Map {
                 var ret = [];
                 // callback with all currently selected
                 interaction.getFeatures().forEach(function (feat) {
+                    feat.setStyle(feat.getStyle())
                     ret.push(feat.values_);
                 })
-                options.onChange(ret);
+                options.onChange(ret, interaction);
                 layer.getSource().dispatchEvent('change');
             })
         }
@@ -420,6 +423,7 @@ export default class Map {
 
         // get layer & add feature
         feature.setStyle(_this._setStyle(options.style, layer.getStyle()));
+        feature.originalStyle = feature.getStyle(); // store feature style as property
         layer.getSource().addFeature(feature);
 
         // set feature properties

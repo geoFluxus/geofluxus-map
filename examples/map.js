@@ -114,9 +114,8 @@ var customStyle = {
     }
 }
 var pointSelect = {
-    text: {
-        text: 'SELECTED',
-        color: 'red',
+    image: {
+        radius: 50
     }
 }
 map.addVectorLayer('point', {

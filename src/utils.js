@@ -31,3 +31,25 @@ export function _default(options, def) {
 
     return res;
 }
+
+
+// https://stackoverflow.com/questions/14484787/wrap-text-in-javascript
+export function wrapText(str, width, spaceReplacer) {
+  if (str.length > width) {
+    let p = width;
+    while (p > 0 && str[p] != ' ' && str[p] != '-') {
+      p--;
+    }
+    if (p > 0) {
+      let left;
+      if (str.substring(p, p + 1) == '-') {
+        left = str.substring(0, p + 1);
+      } else {
+        left = str.substring(0, p);
+      }
+      const right = str.substring(p + 1);
+      return left + spaceReplacer + wrapText(right, width, spaceReplacer);
+    }
+  }
+  return str;
+}

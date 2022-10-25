@@ -1,6 +1,7 @@
 import Map from "./Map";
 import { _default } from './utils.js';
 import Control from 'ol/control/Control';
+import { wrapText } from './utils.js';
 
 
 export default class RouteMap extends Map {
@@ -40,6 +41,14 @@ export default class RouteMap extends Map {
         this.routeBarOptions = options.routeBar || {};
         this._drawRouteBar();
 
+        // add click event on inputs
+        [...document.getElementsByTagName('input')].forEach((item) => {
+          item.addEventListener('click', function() {
+            _this.input = item.id;
+          })
+        })
+
+        // draw layers
         this._addLayers();
         this.focusOnLayer([
           3.31497114423, 50.803721015,
@@ -48,31 +57,46 @@ export default class RouteMap extends Map {
     }
 
     _addLayers() {
-        this.addVectorLayer('address',
-//            {style: {
-//                image: {
-//                    fill: {
-//                      color: 'red'
-//                    },
-//                    stroke: {
-//                      color: 'green',
-//                      width: 2
-//                    },
-//                },
-//                zIndex: 2000
-//            }}
-        );
-        this.addSelectInteraction('address', {style: {
+        var _this = this;
+        var addressStyle = {
             image: {
                 fill: {
-                  color: 'green'
+                  color: 'red'
                 },
                 stroke: {
-                  color: 'green',
+                  color: 'white',
                   width: 2
                 },
+            },
+            text: {
+                fontSize: 15,
+                color: 'red',
+                offsetY: 30,
+                textAlign: 'center'
             }
-        }});
+        }
+        _this.addVectorLayer('address', {
+            style: addressStyle,
+            select: {
+                multi: true,
+                style: {
+                    image: {
+                        fill: {
+                            color: 'green'
+                        }
+                    },
+                    text: {
+                        color: 'green'
+                    }
+                },
+                onChange: function(feats, select) {
+                    if (feats.length > 2) {
+                        alert("You can select only 2 points...")
+                        select.getFeatures().pop();
+                    }
+                }
+            }
+        });
     }
 
     _loadCustomOptions(elem, options) {
@@ -97,12 +121,19 @@ export default class RouteMap extends Map {
         fetch(url)
         .then((response) => response.json())
         .then((data) => _this._drawPoint(address, data.features[0]))
-        .catch(error => alert(error));
+        .catch(error => console.log(error));
     }
 
     // draw point
     _drawPoint(a, d) {
-        this.addFeature('address', d.geometry);
+        var _this = this;
+        this.addFeature('address', d.geometry, {
+            style: {
+                text: {
+                    text: wrapText(a, 20, '\n')
+                }
+            }
+        });
     }
 
     // draw address bar
@@ -159,7 +190,7 @@ export default class RouteMap extends Map {
     }
 
     // route
-    _route(e) {
+    _route() {
         var _this = this,
             origin = document.getElementById("map-route-origin").value,
             destination = document.getElementById("map-route-destination").value;

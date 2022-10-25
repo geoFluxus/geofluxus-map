@@ -2,6 +2,7 @@ import Map from "./Map";
 import { _default } from './utils.js';
 import Control from 'ol/control/Control';
 import { wrapText } from './utils.js';
+import {transform, transformExtent} from 'ol/proj';
 
 
 export default class RouteMap extends Map {
@@ -41,12 +42,12 @@ export default class RouteMap extends Map {
         this.routeBarOptions = options.routeBar || {};
         this._drawRouteBar();
 
-        // add click event on inputs
-        [...document.getElementsByTagName('input')].forEach((item) => {
-          item.addEventListener('click', function() {
-            _this.input = item.id;
-          })
-        })
+//        // add click event on inputs
+//        [...document.getElementsByTagName('input')].forEach((item) => {
+//          item.addEventListener('click', function() {
+//            _this.input = item.id;
+//          })
+//        })
 
         // draw layers
         this._addLayers();
@@ -54,10 +55,14 @@ export default class RouteMap extends Map {
           3.31497114423, 50.803721015,
           7.09205325687, 53.5104033474
         ]);
+
+        console.log(this.map.getView().getZoom())
     }
 
     _addLayers() {
         var _this = this;
+
+        // address layer
         var addressStyle = {
             image: {
                 fill: {
@@ -73,7 +78,8 @@ export default class RouteMap extends Map {
                 color: 'red',
                 offsetY: 30,
                 textAlign: 'center'
-            }
+            },
+            zIndex: 1000
         }
         _this.addVectorLayer('address', {
             style: addressStyle,
@@ -93,9 +99,32 @@ export default class RouteMap extends Map {
                     if (feats.length > 2) {
                         alert("You can select only 2 points...")
                         select.getFeatures().pop();
+                        return;
                     }
+                    var inputs = [
+                        document.getElementById('map-route-origin'),
+                        document.getElementById('map-route-destination')
+                    ]
+                    inputs.forEach(i => i.value = '');
+                    var coords;
+                    feats.forEach(function(f, i) {
+                        coords = transform(f.geometry.getCoordinates(), 'EPSG:3857', 'EPSG:4326');
+                        inputs[i].setAttribute('coords', `${coords[0]},${coords[1]}`);
+                        inputs[i].value = f.name;
+                    });
                 }
             }
+        });
+
+        // route layer
+        var routeStyle = {
+            stroke: {
+                color: 'blue',
+                width: 5
+            }
+        }
+        _this.addVectorLayer('route', {
+            style: routeStyle
         });
     }
 
@@ -117,7 +146,8 @@ export default class RouteMap extends Map {
         }
 
         // fetch
-        let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${address}.json?access_token=${_this.apiKey}`;
+        let url = `https://api.mapbox.com/geocoding/v5/mapbox.places/
+                   ${address}.json?access_token=${_this.apiKey}`;
         fetch(url)
         .then((response) => response.json())
         .then((data) => _this._drawPoint(address, data.features[0]))
@@ -132,6 +162,9 @@ export default class RouteMap extends Map {
                 text: {
                     text: wrapText(a, 20, '\n')
                 }
+            },
+            props: {
+                name: a
             }
         });
     }
@@ -162,7 +195,7 @@ export default class RouteMap extends Map {
         this.map.addControl(controlPanel);
 
         // form
-        var form = document.createElement('form');
+        var form = document.createElement('div');
 
         // form address
         var input = document.createElement("input");
@@ -192,12 +225,33 @@ export default class RouteMap extends Map {
     // route
     _route() {
         var _this = this,
-            origin = document.getElementById("map-route-origin").value,
-            destination = document.getElementById("map-route-destination").value;
-        if (!origin.length || !destination.length) {
+            origin = document.getElementById("map-route-origin"),
+            destination = document.getElementById("map-route-destination");
+        if (!origin.value || !destination.value) {
             alert("Either origin or destination missing...")
             return;
         }
+
+        // fetch
+        let extent = [
+            origin.getAttribute('coords'),
+            destination.getAttribute('coords')
+        ].join(',').split(',').map(Number);
+        let url = `https://api.mapbox.com/directions/v5/mapbox/driving/
+                   ${origin.getAttribute('coords')};${destination.getAttribute('coords')}
+                   ?geometries=geojson&access_token=${_this.apiKey}`;
+        fetch(url)
+        .then((response) => response.json())
+        .then((data) => _this._drawRoute(data.routes[0], extent))
+        .catch(error => console.log(error));
+    }
+
+    // draw point
+    _drawRoute(r, e) {
+        var _this = this;
+        this.addFeature('route', r.geometry);
+        this.focusOnLayer(e);
+        this.map.getView().setZoom(this.map.getView().getZoom() - 1);
     }
 
     // draw route bar
@@ -226,9 +280,9 @@ export default class RouteMap extends Map {
         this.map.addControl(controlPanel);
 
         // form
-        var form = document.createElement('form');
+        var form = document.createElement('div');
 
-        // form address
+        // form route
         var input1 = document.createElement("input");
         input1.style.height = "20px";
         input1.style.width = "200px";
@@ -239,6 +293,18 @@ export default class RouteMap extends Map {
         input1.setAttribute("placeholder", "Add origin");
         input1.setAttribute("id", "map-route-origin");
         _this._loadCustomOptions(input1, options?.input);
+
+        var reverse = document.createElement("button");
+        reverse.innerHTML = '<i class="fas fa-arrows-alt-v"</i>';
+        reverse.onclick = function(e) {
+            e.preventDefault();
+            var origin = getElementById('map-route-origin'),
+                destination = getElementById('map-route-destination'),
+                temp = origin.value;
+            origin.value = destination.value;
+            destination.value = temp;
+        }
+        _this._loadCustomOptions(reverse, options?.reverse);
 
         var input2 = document.createElement("input");
         input2.style.height = "20px";
@@ -251,7 +317,7 @@ export default class RouteMap extends Map {
         _this._loadCustomOptions(input2, options?.input);
 
         var submit = document.createElement("button");
-        submit.innerHTML = '<i class="fas fa-arrows-alt-h"</i>';
+        submit.innerHTML = '<i class="fas fa-arrow-right"</i>';
         submit.onclick = function(e) {
             e.preventDefault();
             _this._route(e);
@@ -260,6 +326,7 @@ export default class RouteMap extends Map {
 
         // add to document
         form.append(input1);
+        form.append(reverse);
         form.innerHTML += "<br>";
         form.append(input2);
         form.append(submit);

@@ -165,22 +165,34 @@ export default class RouteMap extends Map {
                 return [feature, layer];
             });
 
-            var feat, layer, lname;
+            var feat, layer, lname,
+                distance, distanceUnit, duration, durationUnit;
             if (res !== undefined) {
                 [feat, layer] = res;
                 lname = layer.get('name');
 
                 popup.setPosition(evt.coordinate);
                 div.style.display = (lname === 'route') ? 'block' : 'none';
+
+                distance = feat.get('distance');
+                [distance, distanceUnit] = (distance <= 1000) ? [distance, 'm']
+                                                              : [distance / 1000, 'km'];
+                distance = distance.toFixed(1);
+
+                duration = feat.get('duration');
+                [duration, durationUnit] = (duration <= 3600) ? [duration / 60, 'min']
+                                                              : [duration / 3600, 'h'];
+                duration = duration.toFixed(1);
+
                 div.innerHTML = `
                     <table>
                         <tr>
                             <th>Distance: </th>
-                            <td>${(feat.get('distance') / 1000).toFixed(1)} km</td>
+                            <td>${distance} ${distanceUnit}</td>
                         </tr>
                         <tr>
                             <th>Duration: </th>
-                            <td>${(feat.get('duration') / 60).toFixed(1)} mins</td>
+                            <td>${duration} ${durationUnit}</td>
                         </tr>
                     </table>
                 `;

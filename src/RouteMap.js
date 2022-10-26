@@ -314,6 +314,17 @@ export default class RouteMap extends Map {
         this.map.getView().setZoom(this.map.getView().getZoom() - 1);
     }
 
+    _changeDirection(e) {
+        var origin = document.getElementById('map-route-origin'),
+            destination = document.getElementById('map-route-destination'),
+            tempValue = origin.value,
+            tempCoords = origin.getAttribute('coords');
+        origin.value = destination.value;
+        origin.setAttribute('coords', destination.getAttribute('coords'));
+        destination.value = tempValue;
+        destination.setAttribute('coords', tempCoords);
+    }
+
     // draw route bar
     _drawRouteBar() {
         var _this = this;
@@ -342,7 +353,7 @@ export default class RouteMap extends Map {
         // form
         var form = document.createElement('div');
 
-        // form route
+        // origin
         var input1 = document.createElement("input");
         input1.style.height = "20px";
         input1.style.width = "200px";
@@ -354,18 +365,19 @@ export default class RouteMap extends Map {
         input1.setAttribute("id", "map-route-origin");
         _this._loadCustomOptions(input1, options?.input);
 
-        var reverse = document.createElement("button");
-        reverse.innerHTML = '<i class="fas fa-arrows-alt-v"</i>';
-        reverse.onclick = function(e) {
+        var change = document.createElement("button");
+        change.innerHTML = '<i class="fas fa-arrows-alt-v"</i>';
+        change.onclick = function(e) {
             e.preventDefault();
-            var origin = getElementById('map-route-origin'),
-                destination = getElementById('map-route-destination'),
-                temp = origin.value;
-            origin.value = destination.value;
-            destination.value = temp;
+            _this._changeDirection(e);
         }
-        _this._loadCustomOptions(reverse, options?.reverse);
+        _this._loadCustomOptions(change, options?.change);
 
+        var origin = document.createElement('div');
+        origin.append(input1);
+        origin.append(change);
+
+        // destination
         var input2 = document.createElement("input");
         input2.style.height = "20px";
         input2.style.width = "200px";
@@ -384,12 +396,13 @@ export default class RouteMap extends Map {
         }
         _this._loadCustomOptions(submit, options?.submit);
 
+        var destination = document.createElement('div');
+        destination.append(input2);
+        destination.append(submit);
+
         // add to document
-        form.append(input1);
-        form.append(reverse);
-        form.innerHTML += "<br>";
-        form.append(input2);
-        form.append(submit);
+        form.append(origin);
+        form.append(destination);
         div.append(form);
     }
 }

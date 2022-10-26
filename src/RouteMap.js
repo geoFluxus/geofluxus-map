@@ -4,6 +4,7 @@ import Control from 'ol/control/Control';
 import { wrapText } from './utils.js';
 import {transform, transformExtent} from 'ol/proj';
 import Overlay from 'ol/Overlay';
+import * as olExtent from 'ol/extent';
 
 
 export default class RouteMap extends Map {
@@ -212,7 +213,7 @@ export default class RouteMap extends Map {
     // draw point
     _drawPoint(a, d) {
         var _this = this;
-        this.addFeature('address', d.geometry, {
+        var feature = this.addFeature('address', d.geometry, {
             style: {
                 text: {
                     text: wrapText(a, 20, '\n')
@@ -222,6 +223,8 @@ export default class RouteMap extends Map {
                 name: a
             }
         });
+        _this.map.getView().setCenter(olExtent.getCenter(feature.getGeometry().getExtent()));
+        _this.map.getView().setZoom(16);
     }
 
     // draw address bar

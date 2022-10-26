@@ -334,6 +334,8 @@ export default class Map {
         if (select != undefined) {
             this.addSelectInteraction(layer, select);
         }
+
+        return layer;
     }
 
     // add select interaction
@@ -432,6 +434,8 @@ export default class Map {
             var [key, value] = pair;
             feature.set(key, value);
         })
+
+        return feature;
     }
 
     // focus on layer

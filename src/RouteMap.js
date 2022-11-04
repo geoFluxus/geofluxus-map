@@ -309,7 +309,7 @@ export default class RouteMap extends Map {
         ].join(',').split(',').map(Number);
         let url = `https://api.mapbox.com/directions/v5/mapbox/driving/
                    ${origin.getAttribute('coords')};${destination.getAttribute('coords')}
-                   ?geometries=geojson&access_token=${_this.apiKey}`;
+                   ?geometries=geojson&access_token=${_this.apiKey}&overview=full`;
         fetch(url)
         .then((response) => response.json())
         .then((data) => _this._drawRoute(data.routes[0], extent))

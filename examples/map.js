@@ -3,20 +3,55 @@ import areas from '../data/areasData'
 
 // define tooltip, hover style
 var tooltipStyle = {
-        backgroundColor: 'rgba(255, 255, 0, 1)',
-        fontFamily: 'MedievalSharp',
-        border: 'solid',
-        fontSize: '30px',
+        areas: {
+            backgroundColor: 'rgba(255, 255, 0, 1)',
+            fontFamily: 'MedievalSharp',
+            border: 'solid',
+            fontSize: '30px',
+        },
+        point: {
+            fontSize: '50px',
+            color: 'red'
+        }
     },
     hoverStyle = {
-        stroke: {
-            color: 'rgba(255, 0, 0)',
-            width: 6
+        areas: {
+            stroke: {
+                color: 'rgba(255, 0, 0)',
+                width: 6
+            },
+            fill: {
+                color: 'rgba(255, 0, 0, 0.6)',
+            },
+            zIndex: 9999
         },
-        fill: {
-            color: 'rgba(255, 0, 0, 0.6)',
+        point: {
+            image: {
+                radius: 100
+            }
+        }
+    },
+    tooltipBody = {
+        areas: function(d) {
+            return `
+            <table>
+                <tr>
+                    <th colspan="2">Provincie</th>
+                <tr>
+                <tr>
+                    <th>Lower: </th>
+                    <td>${d.get('name')}</td>
+                </tr>
+                <tr>
+                    <th>Upper: </th>
+                    <td>${d.get('capital')}</td>
+                </tr>
+            </table>
+            `;
         },
-        zIndex: 9999
+        point: function(d) {
+            return `<span>Tooltip!</span>`;
+        }
     }
 
 // initialize map
@@ -37,23 +72,7 @@ const map = new Map({
     },
 //    hover: {
 //        tooltip: {
-//            body: function(d) {
-//                return `
-//                <table>
-//                    <tr>
-//                        <th colspan="2">Provincie</th>
-//                    <tr>
-//                    <tr>
-//                        <th>Lower: </th>
-//                        <td>${d.get('name')}</td>
-//                    </tr>
-//                    <tr>
-//                        <th>Upper: </th>
-//                        <td>${d.get('capital')}</td>
-//                    </tr>
-//                </table>
-//                `;
-//            },
+//            body: tooltipBody,
 //            style: tooltipStyle
 //        },
 //        style: hoverStyle
@@ -61,6 +80,59 @@ const map = new Map({
 })
 
 map.addLogo('white');
+
+var pointStyle = {
+    image: {
+        radius: 5,
+        fill: {
+            color: 'rgb(255, 0, 0)'
+        },
+        stroke: {
+            color: 'rgb(255, 255, 255)',
+            width: 2
+        }
+    },
+    text: {
+        text: 'text'
+    },
+    zIndex: 2000
+}
+var customStyle = {
+    image: {
+        radius: 10,
+        fill: {
+            color: 'rgb(255, 255, 0)'
+        },
+        stroke: {
+            color: 'rgb(25, 255, 205)',
+            width: 2
+        }
+    },
+    text: {
+        text: 'hello',
+        color: 'red',
+    }
+}
+var pointSelect = {
+    image: {
+        radius: 50
+    }
+}
+map.addVectorLayer('point', {
+    style: pointStyle,
+    select: {
+        multi: false,
+        style: pointSelect,
+        onChange: function(feat) {
+            console.log(feat)
+        }
+    }
+})
+map.addFeature('point', {
+    type: 'Point',
+    coordinates: [4.9, 52.366667]
+}, {style: customStyle})
+
 
 // define POLYGON vector layer 'areas'
 // provide global feature style
@@ -88,13 +160,13 @@ var selectStyle = {
 
 map.addVectorLayer('areas', {
     style: areaStyle,
-    select: {
-        multi: false,
-        style: selectStyle,
-        onChange: function(feat) {
-            console.log(feat)
-        }
-    }
+//    select: {
+//        multi: false,
+//        style: selectStyle,
+//        onChange: function(feat) {
+//            console.log(feat)
+//        }
+//    }
 });
 
 // add features to 'areas'
@@ -119,22 +191,3 @@ var buttonStyle = {
 //    borderRadius: '100%'
 };
 map.stylizeButtons(buttonStyle)
-
-
-var pointStyle = {
-    image: {
-        radius: 10,
-        fill: {
-            color: 'rgb(255, 0, 0)'
-        },
-        stroke: {
-            color: 'rgb(255, 255, 255)',
-            width: 2
-        }
-    }
-}
-map.addVectorLayer('point', {style: pointStyle})
-map.addFeature('point', {
-    type: 'Point',
-    coordinates: [4.9, 52.366667]
-})

@@ -176,110 +176,60 @@ export default class Map {
         this.map.addOverlay(overlay);
 
         // initialize tooltip
-        var tooltip = options.tooltip || {},
-            tooltipBody = tooltip.body,
-            tooltipStyle = tooltip.style || {};
-
-        // default style options
-        //div.style.fontFamily = "'Helvetica', 'Arial', sans-serif";
-
-        // change style options
-        Object.entries(tooltipStyle).forEach(function(pair) {
-            var [key, value] = pair;
-            div.style[key] = value;
-        })
+        var tooltip,
+            tooltipBody,
+            tooltipStyle;
 
         // ignore layers
         var ignore = options.ignore || [];
 
         // initialize selection highlighting
-        var selected, initialStyle;
+        var selected, defaultStyle;
         function displayTooltip(evt) {
             // reset style of last selection
-            if (selected) selected.setStyle(initialStyle);
+            if (selected) selected.setStyle(defaultStyle);
+            // hide tooltip
+            div.style.display = 'none';
+            // reset pointer style
+            this.getViewport().style.cursor = 'auto';
 
             // get feature & layer by pixel
             var pixel = evt.pixel;
             var res = _this.map.forEachFeatureAtPixel(pixel, function (feature, layer) {
                 return [feature, layer];
             });
-            var feature, layer;
-            if (res != undefined) [feature, layer] = res;
+            var feature, layer, lname;
+            if (res !== undefined) {
+                [feature, layer] = res;
+                lname = layer.get('name');
 
-            // ignore layers
-            if (layer) {
-                ignore.forEach(function(i) {
-                    if (layer.get('name') == i) feature = null;
+                // hide tooltip
+                div.style = {};
+
+                tooltip = options.tooltip,
+                tooltipBody = tooltip.body[lname],
+                tooltipStyle = tooltip.style[lname] || {};
+
+                // change style options
+                Object.entries(tooltipStyle).forEach(function(pair) {
+                    var [key, value] = pair;
+                    div.style[key] = value;
                 })
-            }
 
-            // update tooltip style & highlight
-            if (feature) {
                 // change cursor style
                 this.getViewport().style.cursor = 'pointer';
 
                 // set tooltip body
-                overlay.setPosition(evt.coordinate);
-                div.style.display = 'block'; // show tooltip
-                if (tooltipBody != undefined) div.innerHTML = tooltipBody(feature);
-
-                // initialize feature highlight
-                selected = feature;
-                initialStyle = feature.getStyle() || layer.getStyle();
-
-                // get optional styling
-                var highlightStyle = options.style || {},
-                    stroke = highlightStyle.stroke || {},
-                    fill = highlightStyle.fill || {},
-                    zIndex = highlightStyle.zIndex,
-                    image = highlightStyle.image;
-
-                // special marker for points
-                if (image) {
-                    var imageRadius = image.radius,
-                    imageStroke = image.stroke || {},
-                    imageFill = image.fill || {};
-
-                    // get initial marker style
-                    var initialImageStyle = initialStyle.getImage();
-                    var initialImageStroke = initialImageStyle.getStroke(),
-                        initialImageFill = initialImageStyle.getFill();
-                    image = new Circle({
-                        radius: imageRadius || initialImageStyle.getRadius(),
-                        fill: new Fill({
-                            color: imageFill.color || initialImageFill.getColor()
-                        }),
-                        stroke: new Stroke({
-                            color: imageStroke.color || initialImageStroke.getColor(),
-                            width: imageStroke.width || initialImageStroke.getWidth()
-                        })
-                    });
+                if (tooltipBody) {
+                    overlay.setPosition(evt.coordinate);
+                    div.innerHTML = tooltipBody(feature);
+                    div.style.display = 'block'; // show tooltip
                 }
 
-                // get initial style of feature
-                var initialStroke = initialStyle.getStroke(),
-                    initialFill = initialStyle.getFill(),
-                    initialZIndex = initialStyle.getZIndex();
-
-                // define OpenLayers style
-                highlightStyle = new Style({
-                    stroke: new Stroke({
-                        color: stroke.color || initialStroke.getColor(),
-                        width: stroke.width || initialStroke.getWidth()
-                    }),
-                    fill: new Fill({
-                        color: fill.color || initialFill.getColor()
-                    }),
-                    zIndex: zIndex || initialZIndex,
-                    image: image
-                });
-                feature.setStyle(highlightStyle);
-            } else {
-                // reset pointer style
-                this.getViewport().style.cursor = 'auto';
-
-                // hide tooltip
-                div.style.display = 'none';
+                // set hover
+                selected = feature;
+                defaultStyle = feature.getStyle() || layer.getStyle();
+                feature.setStyle(_this._setStyle(options.style[lname], defaultStyle));
             }
         };
 
@@ -297,63 +247,75 @@ export default class Map {
         return response;
     }
 
+    // set style stroke
+    _setStroke(cs, ls) {
+        return new Stroke({
+            color: cs?.stroke?.color || ls?.getStroke()?.getColor() || 'rgba(100, 150, 250, 1)',
+            width: cs?.stroke?.width || ls?.getStroke()?.getWidth() || 1
+        });
+    }
+
+    // set style fill
+    _setFill(cs, ls) {
+        return new Fill({
+            color: cs?.fill?.color || ls?.getFill()?.getColor() || 'rgb(100, 150, 250, 0.1)'
+        });
+    }
+
+    // set style image
+    _setImage(cs, ls) {
+        var _this = this,
+            icon = cs?.image?.icon;
+        return icon ? new Icon({
+            crossOrigin: 'anonymous',
+            scale: icon?.scale || 1,
+            src: icon?.src
+        }) : new Circle({
+                radius: cs?.image?.radius || ls?.getImage()?.getRadius() || 5,
+                fill: _this._setFill(cs?.image, ls?.getImage()),
+                stroke: _this._setStroke(cs?.image, ls?.getImage())
+        });
+    }
+
+    // set style text
+    _setText(cs, ls) {
+        var _this = this;
+        return new Text({
+            text: cs?.text?.text || ls?.getText()?.getText(),
+            font: `normal ${cs?.text?.fontSize || ls?.getText()?.getFont() || 10}px FontAwesome`,
+            textBaseline: cs?.text?.textBaseline || ls?.getText()?.getTextBaseline() || 'middle',
+            textAlign: cs?.text?.textAlign || ls?.getText()?.getTextAlign() || 'center',
+            offsetX: cs?.text?.offsetX || ls?.getText()?.getOffsetX() || 0,
+            offsetY: cs?.text?.offsetY || ls?.getText()?.getOffsetY() || 0,
+            fill: new Fill({
+                color: cs?.text?.color || ls?.getText()?.getFill()?.getColor() || 'black',
+            })
+        })
+    }
+
+    // set style
+    _setStyle(cs, ls) {
+        // cs: custom style
+        // ls: layer style
+        // style order: custom -> layer -> default
+        var _this = this;
+        var style = {
+            stroke: _this._setStroke(cs, ls),
+            fill: _this._setFill(cs, ls),
+            image: _this._setImage(cs, ls),
+            text: _this._setText(cs, ls)
+        }
+        return new Style(style);
+    }
+
     // add vector layer to map
     addVectorLayer(name, options) {
         var options = options || {};
+        var _this = this;
 
         // check if layer exists
         if (this._getLayer(name) != undefined) {
             throw Error(`Layer "${name}" already exists!`);
-        }
-
-        // define style
-        var style = options.style || {},
-            stroke = style.stroke || {},
-            fill = style.fill || {},
-            image = style.image,
-            text = style.text;
-        stroke.color = stroke.color || 'rgba(100, 150, 250, 1)';
-        stroke.width = stroke.width || 1;
-        fill.color = fill.color || 'rgb(100, 150, 250, 0.1)';
-
-        style = {
-            stroke: new Stroke({
-                color: stroke.color,
-                width: stroke.width
-            }),
-            fill: new Fill({
-                color: fill.color
-            })
-        }
-
-        // special icon marker for points
-        if (image) {
-            style.image = image.icon ? new Icon({
-                crossOrigin: 'anonymous',
-                scale: image.icon.scale || 1,
-                src: image.icon.src
-            }) : new Circle({
-                radius: image.radius || 5,
-                fill: new Fill({
-                    color: image.fill?.color || 'rgb(100, 150, 250, 0.1)'
-                }),
-                stroke: new Stroke({
-                    color: image.stroke?.color || 'rgba(100, 150, 250, 1)',
-                    width: image.stroke?.width || 1
-                })
-            });
-        }
-
-        // vector text
-        if (text) {
-            style.text = new Text({
-                text: text.text || 'text',
-                font: `normal ${text.fontSize || 10}px FontAwesome`,
-                textBaseline: text.textBaseline || 'middle',
-                fill: new Fill({
-                    color: text.color || 'black',
-                })
-            })
         }
 
         // create & add layer
@@ -362,24 +324,25 @@ export default class Map {
             opacity: options.opacity || 1.0,
             source: new VectorSource(),
             crossOrigin: 'anonymous',
-            style: new Style(style)
+            style: _this._setStyle(options.style)
         });
         this.map.addLayer(layer);
-
-        // define z-index
-        layer.setZIndex(style.zIndex);
+        layer.setZIndex(options?.style?.zIndex);
 
         // selectable layer
         var select = options.select;
         if (select != undefined) {
             this.addSelectInteraction(layer, select);
         }
+
+        return layer;
     }
 
     // add select interaction
     // DO NOT ADD WITH HOVER!!!
     addSelectInteraction(layer, options) {
         var _this =  this;
+        options = options || {};
 
         // pointer cursor over features
         this.map.on('pointermove', function (e) {
@@ -391,32 +354,13 @@ export default class Map {
             _this.map.getTargetElement().style.cursor = hit ? 'pointer' : '';
         });
 
-        // define select style
-        var style = options.style || {},
-            stroke = style.stroke || {},
-            fill = style.fill || {},
-            image = style.image,
-            text = style.text;
-        stroke.color = stroke.color || 'rgba(100, 150, 250, 1)';
-        stroke.width = stroke.width || 1;
-        fill.color = fill.color || 'rgb(100, 150, 250, 0.1)';
-
-        style = {
-            stroke: new Stroke({
-                color: stroke.color,
-                width: stroke.width
-            }),
-            fill: new Fill({
-                color: fill.color
-            }),
-            zIndex: options.zIndex
-        }
-
         // define select interaction
-        var multi = (options.multi == undefined) ? true : options.multi;
+        var multi = options?.multi || false;
         var interaction = new olInteraction.Select({
             toggleCondition: (multi) ? olCondition.always : olCondition.click,
-            style: new Style(style),
+            style: function(feat) {
+                return _this._setStyle(options.style, feat.originalStyle || layer.getStyle())
+            },
             layers: [layer],
             multi: multi
         });
@@ -429,9 +373,10 @@ export default class Map {
                 var ret = [];
                 // callback with all currently selected
                 interaction.getFeatures().forEach(function (feat) {
+                    feat.setStyle(feat.getStyle())
                     ret.push(feat.values_);
                 })
-                options.onChange(ret);
+                options.onChange(ret, interaction);
                 layer.getSource().dispatchEvent('change');
             })
         }
@@ -440,6 +385,7 @@ export default class Map {
     // add feature to vector layer
     addFeature(layer, geometry, options) {
         var options = options || {};
+        var _this = this;
 
         // check if input layer does exist
         if (this._getLayer(layer) == undefined) {
@@ -477,67 +423,9 @@ export default class Map {
             geometry: geometry.transform(this.projection, 'EPSG:3857')
         });
 
-        // individual feature style
-        var style = options.style;
-        if (style != undefined) {
-            var defaultStyle = layer.getStyle(),
-                defaultStroke = defaultStyle.getStroke(),
-                defaultFill = defaultStyle.getFill(),
-                defaultZIndex = defaultStyle.getZIndex(),
-                defaultImage = defaultStyle.getImage(),
-                defaultText = defaultStyle.getText();
-
-            var stroke = style.stroke || {},
-                fill = style.fill || {},
-                zIndex = style.zIndex || {},
-                image = style.image,
-                text = style.text;
-
-            style = {
-                stroke: new Stroke({
-                    color: stroke.color || defaultStroke.getColor(),
-                    width: stroke.width || defaultStroke.getWidth()
-                }),
-                fill: new Fill({
-                    color: fill.color || defaultFill.getColor()
-                }),
-                zIndex: style.zIndex || defaultZIndex
-            };
-
-            // special icon marker for points
-            if (image) {
-                style.image = image.icon ? new Icon({
-                    crossOrigin: 'anonymous',
-                    scale: image.icon.scale || 1,
-                    src: image.icon.src
-                }) : new Circle({
-                    radius: image.radius || 5,
-                    fill: new Fill({
-                        color: image.fill?.color || 'rgb(100, 150, 250, 0.1)'
-                    }),
-                    stroke: new Stroke({
-                        color: image.stroke?.color || 'rgba(100, 150, 250, 1)',
-                        width: image.stroke?.width || 1
-                    })
-                });
-            }
-
-            // vector text
-            if (text) {
-                style.text = new Text({
-                    text: text.text || 'text',
-                    font: `normal ${text.fontSize || 10}px FontAwesome`,
-                    textBaseline: text.textBaseline || 'middle',
-                    fill: new Fill({
-                        color: text.color || 'black',
-                    })
-                })
-            }
-
-            feature.setStyle(new Style(style));
-        }
-
         // get layer & add feature
+        feature.setStyle(_this._setStyle(options.style, layer.getStyle()));
+        feature.originalStyle = feature.getStyle(); // store feature style as property
         layer.getSource().addFeature(feature);
 
         // set feature properties
@@ -546,6 +434,8 @@ export default class Map {
             var [key, value] = pair;
             feature.set(key, value);
         })
+
+        return feature;
     }
 
     // focus on layer

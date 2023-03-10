@@ -12,25 +12,38 @@ export default class NetworkMap extends Map {
             source: 'cartodb_dark'
         });
 
-        // hover
-        options.hover = _default(options.hover, {
-            style: {
+        var hoverStyle = {
                 stroke: {
                     width: 10
                 },
                 zIndex: 9999
             },
+            tooltipBody = function(d) {
+                return `<span>${d.get('amount')}</span>`;
+            },
+            tooltipStyle = {
+                color: 'white',
+                textAlign: 'center',
+                padding: '0.5em',
+                fontSize: '15px',
+                backgroundColor: 'rgba(139, 138, 138, 1)',
+                borderRadius: '1.5rem'
+            }
+
+        // hover
+        options.hover = _default(options.hover, {
+            style: {
+                flows: hoverStyle,
+                network: hoverStyle
+            },
             tooltip: {
-                body: function(d) {
-                    return `<span>${d.get('amount')}</span>`;
+                body: {
+                    flows: tooltipBody,
+                    network: tooltipBody
                 },
                 style: {
-                    color: 'white',
-                    textAlign: 'center',
-                    padding: '0.5em',
-                    fontSize: '15px',
-                    backgroundColor: 'rgba(139, 138, 138, 1)',
-                    borderRadius: '1.5rem'
+                    flows: tooltipStyle,
+                    network: tooltipStyle
                 },
             }
         });

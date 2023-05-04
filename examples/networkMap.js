@@ -30,23 +30,26 @@ const map2 = new NetworkMap({
     },
     hover: {
         tooltip: {
-            body: function(d) {
-                return `
-                <span>${d.get('amount')} tn waste</span>
-                `;
+            body: {
+                flows: function(d) {
+                    return `
+                    <span>${d.get('amount')} tn waste</span>
+                    `;
+                }
             }
         }
     },
     data: data,
     scale: scale,
     legend: {
-        title: '<span style="font-size: 20px;">Waste (tonnes)</span>',
-        width: 600,
-        height: 20,
+        title: '<span style="font-size: 15px;">Waste (tonnes)</span>',
+        width: 400,
+        height: 15,
         borderRadius: '1rem',
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
         bottom: '1em',
+        right: '1em',
         paddingBottom: '10px',
-        fontSize: 15,
+        fontSize: 10,
     }
 })

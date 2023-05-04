@@ -2,7 +2,7 @@ import {FlowMap} from '../index.js'
 import flows from '../data/flowsData.js'
 
 // custom scale
-var data = [flows[0]]
+var data = flows
 var scale = {
     'Storage': 'rgb(27,158,119)',
     'Physical processing': 'rgb(217,95,2)',

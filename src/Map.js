@@ -178,7 +178,8 @@ export default class Map {
         // initialize tooltip
         var tooltip,
             tooltipBody,
-            tooltipStyle;
+            tooltipStyle,
+            hoverStyle;
 
         // ignore layers
         var ignore = options.ignore || [];
@@ -211,22 +212,26 @@ export default class Map {
 
                 tooltip = options.tooltip,
                 tooltipBody = tooltip.body[lname],
-                tooltipStyle = tooltip.style[lname];
+                tooltipStyle = tooltip.style[lname],
+                hoverStyle = options.style[lname];
 
-                if (tooltipBody && tooltipStyle) {
+                // set tooltip style
+                if (tooltipStyle) {
                     // change style options
                     Object.entries(tooltipStyle).forEach(function(pair) {
                         var [key, value] = pair;
                         div.style[key] = value;
                     })
+                }
 
-                    // set tooltip body
-                    if (tooltipBody) {
-                        overlay.setPosition(evt.coordinate);
-                        div.innerHTML = tooltipBody(feature);
-                        div.style.display = 'block'; // show tooltip
-                    }
+                // set tooltip body
+                if (tooltipBody) {
+                    overlay.setPosition(evt.coordinate);
+                    div.innerHTML = tooltipBody(feature);
+                    div.style.display = 'block'; // show tooltip
+                }
 
+                if (hoverStyle) {
                     // set hover
                     selected = feature;
                     defaultStyle = feature.getStyle() || layer.getStyle();

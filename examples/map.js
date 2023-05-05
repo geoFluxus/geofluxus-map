@@ -70,13 +70,13 @@ const map = new Map({
     base: {
         source: 'cartodb_dark'
     },
-//    hover: {
-//        tooltip: {
-//            body: tooltipBody,
-//            style: tooltipStyle
-//        },
-//        style: hoverStyle
-//    },
+    hover: {
+        tooltip: {
+            body: tooltipBody,
+            style: tooltipStyle
+        },
+        style: hoverStyle
+    },
 })
 
 map.addLogo('white');

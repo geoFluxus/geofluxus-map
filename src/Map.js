@@ -202,34 +202,36 @@ export default class Map {
             if (res !== undefined) {
                 [feature, layer] = res;
                 lname = layer.get('name');
-
-                // hide tooltip
-                div.style = {};
-
-                tooltip = options.tooltip,
-                tooltipBody = tooltip.body[lname],
-                tooltipStyle = tooltip.style[lname] || {};
-
-                // change style options
-                Object.entries(tooltipStyle).forEach(function(pair) {
-                    var [key, value] = pair;
-                    div.style[key] = value;
-                })
-
                 // change cursor style
                 this.getViewport().style.cursor = 'pointer';
 
-                // set tooltip body
-                if (tooltipBody) {
-                    overlay.setPosition(evt.coordinate);
-                    div.innerHTML = tooltipBody(feature);
-                    div.style.display = 'block'; // show tooltip
-                }
+                // hide tooltip
+                div.style = {};
+                div.innerHTML = "";
 
-                // set hover
-                selected = feature;
-                defaultStyle = feature.getStyle() || layer.getStyle();
-                feature.setStyle(_this._setStyle(options.style[lname], defaultStyle));
+                tooltip = options.tooltip,
+                tooltipBody = tooltip.body[lname],
+                tooltipStyle = tooltip.style[lname];
+
+                if (tooltipBody && tooltipStyle) {
+                    // change style options
+                    Object.entries(tooltipStyle).forEach(function(pair) {
+                        var [key, value] = pair;
+                        div.style[key] = value;
+                    })
+
+                    // set tooltip body
+                    if (tooltipBody) {
+                        overlay.setPosition(evt.coordinate);
+                        div.innerHTML = tooltipBody(feature);
+                        div.style.display = 'block'; // show tooltip
+                    }
+
+                    // set hover
+                    selected = feature;
+                    defaultStyle = feature.getStyle() || layer.getStyle();
+                    feature.setStyle(_this._setStyle(options.style[lname], defaultStyle));
+                }
             }
         };
 

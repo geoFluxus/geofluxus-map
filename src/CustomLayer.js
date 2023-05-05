@@ -152,8 +152,8 @@ export class FlowLayer extends D3Layer {
                     .on("mousemove", function(evt) {
                         var tooltipSize = _this.tooltip.node().getBoundingClientRect();
                         _this.tooltip
-                            .style("top", (evt.pageY - tooltipSize.height) + 'px')
-                            .style("left", (evt.pageX - (tooltipSize.width / 2)) + 'px');
+                            .style("top", (evt.y - tooltipSize.height) + 'px')
+                            .style("left", (evt.x - (tooltipSize.width / 2)) + 'px');
                     })
                     .on("mouseout", function() {
                         path.attr("stroke-opacity", gradRef ? 1 : 0.5);

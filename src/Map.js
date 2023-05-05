@@ -210,10 +210,10 @@ export default class Map {
                 div.style = {};
                 div.innerHTML = "";
 
-                tooltip = options.tooltip,
-                tooltipBody = tooltip.body[lname],
-                tooltipStyle = tooltip.style[lname],
-                hoverStyle = options.style[lname];
+                tooltip = options?.tooltip,
+                tooltipBody = tooltip?.body?.[lname],
+                tooltipStyle = tooltip?.style?.[lname],
+                hoverStyle = options?.style?.[lname];
 
                 // set tooltip style
                 if (tooltipStyle) {

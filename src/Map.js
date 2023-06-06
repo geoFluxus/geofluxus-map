@@ -282,7 +282,8 @@ export default class Map {
         return icon ? new Icon({
             crossOrigin: 'anonymous',
             scale: icon?.scale || 1,
-            src: icon?.src
+            src: icon?.src,
+            anchor: icon?.anchor || [0.5, 1.0]
         }) : new Circle({
                 radius: cs?.image?.radius || ls?.getImage()?.getRadius() || 5,
                 fill: _this._setFill(cs?.image, ls?.getImage()),

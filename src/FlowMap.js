@@ -34,6 +34,7 @@ export default class FlowMap extends Map {
         this.buttonColor = 'white';
         this.stylizeButtons({color: this.buttonColor});
         this.addLogo(this.buttonColor);
+        this.addMapboxLogo(this.buttonColor);
 
         // default properties
         var _this = this;
@@ -696,5 +697,6 @@ class ToggleLight extends Control {
 
         // change logo
         this.target.addLogo(this.target.buttonColor)
+        this.target.addMapboxLogo(this.target.buttonColor)
     }
 }

@@ -69,6 +69,7 @@ export default class NetworkMap extends Map {
         // change logo & button style
         this.stylizeButtons({color: 'white'});
         this.addLogo('white');
+        this.addMapboxLogo('white');
 
         // network map options
         this.data = JSON.parse(JSON.stringify(options.data || []));
@@ -387,6 +388,7 @@ class ToggleLight extends Control {
         // change logo & button style
         this.target.stylizeButtons({color: color});
         this.target.addLogo(color);
+        this.target.addMapboxLogo(color);
 
         // change network color
         var networkLayer = this.target._getLayer('network'),

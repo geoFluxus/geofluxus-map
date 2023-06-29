@@ -32,7 +32,7 @@ const key = 'pk.eyJ1IjoicnVzbmUiLCJhIjoiY2xqZ3dnYWVvMDRvbDNpbXg0N3l3aTl2aiJ9.Rml
 var attributions = {
     osm: '© <a style="color:#0078A8" href="https://www.openstreetmap.org/copyright">OSM</a>',
     cartodb: '© <a style="color:#0078A8" href="http://cartodb.com/attributions">CartoDB</a>',
-    mapbox: '<a href="https://www.maptiler.com/copyright/" target="_blank">© MapTiler</a>',
+    mapbox: '<a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a>',
     none: null
 }
 var sources = {
@@ -117,7 +117,10 @@ export default class Map {
         this.logo_dark = new Image();
         this.logo_dark.src = source + "logo_dark.png";
         this.logo_dark.style.width = logo_width;
-        this.addLogo('dark');
+        this.addLogo('black');
+
+        // add mapbox logo
+        this.addMapboxLogo('black');
 
         // activate highlight & tooltips
         this._onHover(options.hover);
@@ -162,6 +165,29 @@ export default class Map {
             element: div
         });
         this.map.addControl(this.logo);
+    }
+
+    addMapboxLogo(color) {
+        // add mapboxlogo
+        if (this.mapboxLogo != undefined) {
+            this.map.removeControl(this.mapboxLogo);
+        }
+        const logo_width = '88px';
+        var div = document.createElement('a');
+        div.href = 'https://www.mapbox.com/about/maps/';
+        var logo = new Image();
+        logo.src = 'https://upload.wikimedia.org/wikipedia/commons/1/1f/Mapbox_logo_2019.svg';
+        logo.style.width = logo_width;
+        logo.style.filter = (color == 'white') ? 'invert(100%)' : '';
+        div.appendChild(logo);
+        div.id = 'mapbox_logo';
+        div.style.top = '.5em';
+        div.style.left = '1em';
+        div.style.position = 'absolute';
+        this.mapboxLogo = new Control({
+            element: div
+        });
+        this.map.addControl(this.mapboxLogo);
     }
 
     // activate tooltips
@@ -526,7 +552,8 @@ export default class Map {
             url: sources[this.base.source],
             attributions: [
                 this.attributions,
-                '<a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap contributors</a>'
+                '<a href="https://www.openstreetmap.org/copyright/" target="_blank">© OpenStreetMap</a>',
+                '<a href="https://www.mapbox.com/contribute/" target="_blank">Improve this map</a>'
             ],
             crossOrigin: 'anonymous'
         });

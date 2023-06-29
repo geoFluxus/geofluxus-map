@@ -8,7 +8,7 @@ export default class MapChart extends Map {
     constructor(options) {
         // base layer
         options.base = _default(options.base, {
-            source: 'cartodb_dark'
+            source: 'mapbox_dark'
         });
 
         // hover
@@ -294,7 +294,7 @@ class ToggleLight extends Control {
         var base = this.target.base;
 
         // change map base layer
-        base.source = base.source == 'cartodb_dark' ? 'cartodb_light' : 'cartodb_dark';
+        base.source = base.source == 'mapbox_dark' ? 'mapbox_light' : 'mapbox_dark';
         this.target.changeBase(base);
 
         // change legend font color

@@ -26,7 +26,7 @@ import { _default } from './utils.js';
 import './base.css';
 
 
-const key = 'pk.eyJ1IjoicnVzbmUiLCJhIjoiY2toZzdjcjAxMHdycTJ6bnZ4dW5jcWl6cSJ9.JEW5GKVNWg3pLhxI-RD4DA';
+const key = 'pk.eyJ1IjoicnVzbmUiLCJhIjoiY2xqZ3dnYWVvMDRvbDNpbXg0N3l3aTl2aiJ9.RmlPCtGgPUzcwAFcQOX8Yg';
 
 // map bases
 var attributions = {

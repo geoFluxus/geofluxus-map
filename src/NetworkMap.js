@@ -9,7 +9,7 @@ export default class NetworkMap extends Map {
     constructor(options) {
         // base layer
         options.base = _default(options.base, {
-            source: 'mapbox_dark'
+            source: 'cartodb_dark'
         });
 
         var hoverStyle = {
@@ -211,7 +211,7 @@ export default class NetworkMap extends Map {
         var width = options.width || 300,
             height = options.height || 20;
         var rectWidth = width / this.scale.length;
-        this.legend.style.width = `${width + rectWidth * 1.1}px`;
+        this.legend.style.width = `${width + rectWidth}px`;
         var fontSize = options.fontSize || 10;
 
         // create OpenLayers control for legend
@@ -243,7 +243,7 @@ export default class NetworkMap extends Map {
                          .enter()
                          .append("rect")
                          .attr("x", function (d, i) {
-                            return (i+0.45) * rectWidth;
+                            return (i+0.5) * rectWidth;
                          })
                          .attr("width", rectWidth)
                          .attr("height", height)
@@ -258,7 +258,7 @@ export default class NetworkMap extends Map {
 
         var textSVG = d3.select(palette)
                         .append("svg")
-                        .attr("width", width + rectWidth * 1.1)
+                        .attr("width", width + rectWidth)
                         .attr("height", height),
             texts = textSVG.selectAll('text')
                          .data(this.values)
@@ -269,11 +269,16 @@ export default class NetworkMap extends Map {
                             return Math.abs(d) < 1 ? d : prefix(d);
                          })
                          .attr("x", function (d, i) {
-                            return (i+0.45) * rectWidth;
+                            return (i+0.5) * rectWidth;
                          })
+
                          .attr('y', fontSize)
                          .attr('fill', this.legend.style.color)
                          .attr('font-size', fontSize);
+            textSVG.selectAll('text')
+                   .attr("transform", function(d, i, nodes) {
+                            return `translate(-${this.getComputedTextLength() * 0.5})`
+                         })
     }
 }
 
@@ -377,7 +382,7 @@ class ToggleLight extends Control {
         var base = this.target.base;
 
         // change map base layer
-        base.source = base.source == 'mapbox_dark' ? 'mapbox_light' : 'mapbox_dark';
+        base.source = base.source == 'cartodb_dark' ? 'cartodb_light' : 'cartodb_dark';
         this.target.changeBase(base);
 
         // change legend font color

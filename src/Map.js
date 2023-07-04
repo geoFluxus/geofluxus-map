@@ -143,7 +143,7 @@ export default class Map {
                     target: _this,
                     top: `${topPos}em`
                 }));
-                topPos += 2.5;
+                topPos += 2;
             }
         })
     }

@@ -204,12 +204,12 @@ export default class Map {
             div.classList.add('ol-tooltip');
             target.appendChild(div);
         }
-//        var overlay = new Overlay({
-//            element: div,
-//            offset: [10, 0],
-//            positioning: 'bottom-center'
-//        });
-//        this.map.addOverlay(overlay);
+        var overlay = new Overlay({
+            element: div,
+            offset: [0, 0],
+            positioning: 'bottom-center'
+        });
+        this.map.addOverlay(overlay);
 
         // initialize tooltip
         var tooltip,
@@ -226,7 +226,7 @@ export default class Map {
             // reset style of last selection
             if (selected) selected.setStyle(defaultStyle);
             // hide tooltip
-            div.style.visibility = 'hidden';
+            div.style.display = 'none';
             // reset pointer style
             this.getViewport().style.cursor = 'auto';
 
@@ -244,7 +244,6 @@ export default class Map {
 
                 // hide tooltip
                 div.style = {};
-                div.style.position = 'fixed';
                 div.innerHTML = "";
 
                 tooltip = options?.tooltip,
@@ -264,13 +263,13 @@ export default class Map {
                 // set tooltip body
                 if (tooltipBody) {
                     div.innerHTML = tooltipBody(feature);
-                    div.style.visibility = 'visible'; // show tooltip
+                    div.style.display = 'block'; // show tooltip
 
-                    let pos = evt.originalEvent;
-                    var tooltipSize = div.getBoundingClientRect();
-                    div.style.top = (pos.y - tooltipSize.height) + 'px';
-                    div.style.left = (pos.x - (tooltipSize.width / 2)) + 'px';
-                    //overlay.setPosition(evt.coordinate);
+//                    let pos = evt.originalEvent;
+//                    var tooltipSize = div.getBoundingClientRect();
+//                    div.style.top = (pos.y - tooltipSize.height) + 'px';
+//                    div.style.left = (pos.x - (tooltipSize.width / 2)) + 'px';
+                    overlay.setPosition(evt.coordinate);
                 }
 
                 if (hoverStyle) {

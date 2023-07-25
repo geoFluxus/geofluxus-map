@@ -5,11 +5,13 @@ import saveAs from 'file-saver';
 import { _default } from './utils.js'
 
 
+const provider = (process.env.NODE_ENV === 'production') ? 'mapbox' : 'cartodb';
+
 export default class NetworkMap extends Map {
     constructor(options) {
         // base layer
         options.base = _default(options.base, {
-            source: 'cartodb_dark'
+            source: `${provider}_dark`
         });
 
         var hoverStyle = {
@@ -382,7 +384,7 @@ class ToggleLight extends Control {
         var base = this.target.base;
 
         // change map base layer
-        base.source = base.source == 'cartodb_dark' ? 'cartodb_light' : 'cartodb_dark';
+        base.source = base.source == `${provider}_dark` ? `${provider}_light` : `${provider}_dark`;
         this.target.changeBase(base);
 
         // change legend font color

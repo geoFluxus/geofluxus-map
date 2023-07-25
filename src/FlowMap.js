@@ -6,11 +6,13 @@ import Point from 'ol/geom/Point';
 import {FlowLayer, NodeLayer} from './CustomLayer.js';
 
 
+const provider = (process.env.NODE_ENV === 'production') ? 'mapbox' : 'cartodb';
+
 export default class FlowMap extends Map {
     constructor(options) {
         // base layer
         options.base = _default(options.base, {
-            source: 'mapbox_dark'
+            source: `${provider}_dark`
         });
 
         // FlowMap controls
@@ -688,7 +690,7 @@ class ToggleLight extends Control {
         var base = this.target.base;
 
         // change map base layer
-        base.source = base.source == 'mapbox_dark' ? 'mapbox_light' : 'mapbox_dark';
+        base.source = base.source == `${provider}_dark` ? `${provider}_light` : `${provider}_dark`;
         this.target.changeBase(base);
 
         // change button style

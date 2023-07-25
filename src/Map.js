@@ -39,13 +39,13 @@ var sources = {
     osm: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     cartodb_dark: 'https://cartodb-basemaps-{a-d}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
     cartodb_light: 'https://cartodb-basemaps-{a-d}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
-    mapbox_streets: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}?access_token=' + key,
-    mapbox_light: 'https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/256/{z}/{x}/{y}?access_token=' + key,
-    mapbox_dark: 'https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/256/{z}/{x}/{y}?access_token=' + key,
-    mapbox_outdoors: 'https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/tiles/256/{z}/{x}/{y}?access_token=' + key,
-    mapbox_satellite_streets: 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/256/{z}/{x}/{y}?access_token=' + key,
-    mapbox_navigation_guidance_day: 'https://api.mapbox.com/styles/v1/mapbox/navigation-guidance-day-v4/tiles/256/{z}/{x}/{y}?access_token=' + key,
-    mapbox_navigation_guidance_night: 'https://api.mapbox.com/styles/v1/mapbox/navigation-guidance-night-v4/tiles/256/{z}/{x}/{y}?access_token=' + key,
+    mapbox_streets: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/512/{z}/{x}/{y}?access_token=' + key,
+    mapbox_light: 'https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/512/{z}/{x}/{y}?access_token=' + key,
+    mapbox_dark: 'https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/512/{z}/{x}/{y}?access_token=' + key,
+    mapbox_outdoors: 'https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/tiles/512/{z}/{x}/{y}?access_token=' + key,
+    mapbox_satellite_streets: 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/512/{z}/{x}/{y}?access_token=' + key,
+    mapbox_navigation_guidance_day: 'https://api.mapbox.com/styles/v1/mapbox/navigation-guidance-day-v4/tiles/512/{z}/{x}/{y}?access_token=' + key,
+    mapbox_navigation_guidance_night: 'https://api.mapbox.com/styles/v1/mapbox/navigation-guidance-night-v4/tiles/512/{z}/{x}/{y}?access_token=' + key,
     none: null
 }
 

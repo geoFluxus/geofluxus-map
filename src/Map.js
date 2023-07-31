@@ -24,6 +24,8 @@ import saveAs from 'file-saver';
 import '@fortawesome/fontawesome-free/js/all.js';
 import { _default } from './utils.js';
 import './base.css';
+import {outerHeight, outerWidth} from 'ol/dom';
+import {containsExtent, coordinateRelationship} from 'ol/extent';
 
 
 const key = 'pk.eyJ1IjoicnVzbmUiLCJhIjoiY2xqZ3dnYWVvMDRvbDNpbXg0N3l3aTl2aiJ9.RmlPCtGgPUzcwAFcQOX8Yg';
@@ -47,6 +49,68 @@ var sources = {
     mapbox_navigation_guidance_day: 'https://api.mapbox.com/styles/v1/mapbox/navigation-guidance-day-v4/tiles/512/{z}/{x}/{y}?access_token=' + key,
     mapbox_navigation_guidance_night: 'https://api.mapbox.com/styles/v1/mapbox/navigation-guidance-night-v4/tiles/512/{z}/{x}/{y}?access_token=' + key,
     none: null
+}
+
+function getRect(element, size) {
+    const box = element.getBoundingClientRect();
+    const offsetX = box.left + window.pageXOffset;
+    const offsetY = box.top + window.pageYOffset;
+    return [offsetX, offsetY, offsetX + size[0], offsetY + size[1]];
+}
+
+function panIntoView(map, overlay) {
+    // reset to default positioning
+    var verPos = 'bottom',
+        horPos = 'center';
+    overlay.setPositioning(`${verPos}-${horPos}`);
+
+    // get map & overlay extent
+    const mapRect = getRect(map.getTargetElement(), map.getSize());
+    const element = overlay.getElement();
+    const overlayRect = getRect(element, [
+      outerWidth(element),
+      outerHeight(element),
+    ]);
+
+    // if map & overlay intersect, change positioning
+    if (!containsExtent(mapRect, overlayRect)) {
+        // check overlay position relative to map
+        var topLeftX, topLeftY, bottomRightX, bottomRightY;
+        [topLeftX, topLeftY, bottomRightX, bottomRightY] = overlayRect;
+        // overlay corners position relative to map extent
+        var TL = coordinateRelationship(mapRect, [topLeftX, topLeftY]),
+            BL = coordinateRelationship(mapRect, [topLeftX, bottomRightY]),
+            TR = coordinateRelationship(mapRect, [bottomRightX, topLeftY]),
+            BR = coordinateRelationship(mapRect, [bottomRightX, bottomRightY]);
+
+        // check positioning & adjust
+        var Relationship = {
+            UNKNOWN: 0,
+            INTERSECTING: 1,
+            ABOVE: 2,
+            RIGHT: 4,
+            ABOVE_RIGHT: 6,
+            BELOW: 8,
+            BELOW_RIGHT: 12,
+            LEFT: 16,
+            ABOVE_LEFT: 18,
+            BELOW_LEFT: 24
+        };
+        // ver pos
+        if (TL === Relationship.BELOW ||
+            TL === Relationship.BELOW_LEFT) {
+            verPos = 'top';
+        } else if (TL === BL || TR === BR) {
+            verPos = 'center';
+        }
+        // hor pos
+        if (TL >= Relationship.LEFT && BL >= Relationship.LEFT) {
+            horPos = 'left';
+        } else if (TR <= Relationship.LEFT && BR <= Relationship.LEFT) {
+            horPos = 'right';
+        }
+        overlay.setPositioning(`${verPos}-${horPos}`);
+    }
 }
 
 export default class Map {
@@ -123,6 +187,19 @@ export default class Map {
         this.addMapboxLogo('black');
 
         // activate highlight & tooltips
+        var target = this.map.getTargetElement();
+        var div = target.querySelector('.ol-tooltip');
+        if (!div) {
+            div = document.createElement('div');
+            div.classList.add('ol-tooltip');
+            target.appendChild(div);
+        }
+        this.overlay = new Overlay({
+            element: div,
+            offset: [0, 0],
+            positioning: 'bottom-center'
+        });
+        this.map.addOverlay(this.overlay);
         this._onHover(options.hover);
     }
 
@@ -195,21 +272,7 @@ export default class Map {
         var options = options;
         if (options == undefined) return;
 
-        var _this = this,
-            target = this.map.getTargetElement();
-
-        var div = target.querySelector('.ol-tooltip');
-        if (!div) {
-            div = document.createElement('div');
-            div.classList.add('ol-tooltip');
-            target.appendChild(div);
-        }
-        var overlay = new Overlay({
-            element: div,
-            offset: [0, 0],
-            positioning: 'bottom-center'
-        });
-        this.map.addOverlay(overlay);
+        var _this = this;
 
         // initialize tooltip
         var tooltip,
@@ -223,6 +286,8 @@ export default class Map {
         // initialize selection highlighting
         var selected, defaultStyle;
         function displayTooltip(evt) {
+            var div = _this.overlay.getElement();
+
             // reset style of last selection
             if (selected) selected.setStyle(defaultStyle);
             // hide tooltip
@@ -263,13 +328,14 @@ export default class Map {
                 // set tooltip body
                 if (tooltipBody) {
                     div.innerHTML = tooltipBody(feature);
+                    _this.overlay.setPosition(evt.coordinate);
+                    panIntoView(_this.map, _this.overlay);
                     div.style.display = 'block'; // show tooltip
 
 //                    let pos = evt.originalEvent;
 //                    var tooltipSize = div.getBoundingClientRect();
 //                    div.style.top = (pos.y - tooltipSize.height) + 'px';
 //                    div.style.left = (pos.x - (tooltipSize.width / 2)) + 'px';
-                    overlay.setPosition(evt.coordinate);
                 }
 
                 if (hoverStyle) {

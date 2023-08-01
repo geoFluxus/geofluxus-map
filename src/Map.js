@@ -106,7 +106,7 @@ function panIntoView(map, overlay) {
         // hor pos
         if (TL >= Relationship.LEFT && BL >= Relationship.LEFT) {
             horPos = 'left';
-        } else if (TR <= Relationship.LEFT && BR <= Relationship.LEFT) {
+        } else if (TL !== TR && BL !== BR) {
             horPos = 'right';
         }
         overlay.setPositioning(`${verPos}-${horPos}`);

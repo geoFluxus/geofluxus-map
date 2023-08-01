@@ -337,15 +337,20 @@ export default class FlowMap extends Map {
         wrapper.style.backgroundColor = `${color}`
         wrapper.style.marginRight = '10px';
         wrapper.style.borderRadius = '3px';
+        wrapper.style.display = 'flex';
+        wrapper.style.alignItems= 'center';
 
         // checkbox
         var checkbox = document.createElement('input');
         var label = document.createElement('label');
         label.innerHTML = property;
         label.style.fontSize = '15px';
+        label.style.display = 'flex';
+        label.style.alignItems = 'flex';
         checkbox.type = 'checkbox';
         checkbox.id = property;
         checkbox.style.cursor = 'pointer';
+        checkbox.style.margin = '3px';
 
         // append elements
         wrapper.appendChild(checkbox);

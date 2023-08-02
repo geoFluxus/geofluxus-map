@@ -59,8 +59,8 @@ function getRect(element, size) {
 }
 
 function panIntoView(map, overlay) {
-    // reset to default positioning
-    var verPos = 'bottom',
+    // set to center-center to check intersection
+    var verPos = 'center',
         horPos = 'center';
     overlay.setPositioning(`${verPos}-${horPos}`);
 
@@ -97,6 +97,7 @@ function panIntoView(map, overlay) {
             BELOW_LEFT: 24
         };
         // ver pos
+        verPos = "bottom";
         if (TL === Relationship.BELOW ||
             TL === Relationship.BELOW_LEFT) {
             verPos = 'top';

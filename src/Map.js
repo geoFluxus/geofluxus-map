@@ -73,6 +73,7 @@ function panIntoView(map, overlay) {
     ]);
 
     // if map & overlay intersect, change positioning
+    verPos = "bottom";
     if (!containsExtent(mapRect, overlayRect)) {
         // check overlay position relative to map
         var topLeftX, topLeftY, bottomRightX, bottomRightY;
@@ -97,7 +98,6 @@ function panIntoView(map, overlay) {
             BELOW_LEFT: 24
         };
         // ver pos
-        verPos = "bottom";
         if (TL === Relationship.BELOW ||
             TL === Relationship.BELOW_LEFT) {
             verPos = 'top';
@@ -110,8 +110,8 @@ function panIntoView(map, overlay) {
         } else if (TL !== TR && BL !== BR) {
             horPos = 'right';
         }
-        overlay.setPositioning(`${verPos}-${horPos}`);
     }
+    overlay.setPositioning(`${verPos}-${horPos}`);
 }
 
 export default class Map {

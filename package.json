@@ -1,6 +1,6 @@
 {
   "name": "geofluxus-map",
-  "version": "1.6.9",
+  "version": "1.6.10",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -34,8 +34,8 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },
-  "staticFiles": {
-    "staticPath": "public",
-    "watcherGlob": "**"
-  }
+  "files": [
+    "index.js",
+    "public/"
+  ]
 }

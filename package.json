@@ -1,6 +1,6 @@
 {
   "name": "geofluxus-map",
-  "version": "1.6.10",
+  "version": "1.6.11",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -36,6 +36,7 @@
   },
   "files": [
     "index.js",
-    "public/"
+    "public/",
+    "src/"
   ]
 }

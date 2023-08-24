@@ -174,13 +174,12 @@ export default class Map {
 
         // add logo
         const version = require('../package.json').version;
-        const source = "https://cdn.jsdelivr.net/npm/geofluxus-map@" + version + "/src/";
         const logo_width = '150px';
         this.logo_light = new Image();
-        this.logo_light.src = source + "logo_light.png";
+        this.logo_light.src = "logo_light.png";
         this.logo_light.style.width = logo_width;
         this.logo_dark = new Image();
-        this.logo_dark.src = source + "logo_dark.png";
+        this.logo_dark.src = "logo_dark.png";
         this.logo_dark.style.width = logo_width;
         this.addLogo('black');
 
@@ -254,7 +253,7 @@ export default class Map {
         var div = document.createElement('a');
         div.href = 'https://www.mapbox.com/about/maps/';
         var logo = new Image();
-        logo.src = 'https://upload.wikimedia.org/wikipedia/commons/1/1f/Mapbox_logo_2019.svg';
+        logo.src = 'mapbox.svg';
         logo.style.width = logo_width;
         logo.style.filter = (color == 'white') ? 'invert(100%)' : '';
         div.appendChild(logo);

@@ -9,3 +9,5 @@ dist/*
 !dist/index.css
 yarn-error.log
 .env
+examples
+react-examples

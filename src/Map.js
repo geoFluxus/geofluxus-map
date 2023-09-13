@@ -67,17 +67,20 @@ function panIntoView(map, overlay) {
     // get map & overlay extent
     const mapRect = getRect(map.getTargetElement(), map.getSize());
     const element = overlay.getElement();
-    const overlayRect = getRect(element, [
+    var overlayRect = getRect(element, [
       outerWidth(element),
       outerHeight(element),
     ]);
+
+    var topLeftX, topLeftY, bottomRightX, bottomRightY;
+    [topLeftX, topLeftY, bottomRightX, bottomRightY] = overlayRect;
+    topLeftY = topLeftY - outerHeight(element) / 2
+    overlayRect = [topLeftX, topLeftY, bottomRightX, bottomRightY]
 
     // if map & overlay intersect, change positioning
     verPos = "bottom";
     if (!containsExtent(mapRect, overlayRect)) {
         // check overlay position relative to map
-        var topLeftX, topLeftY, bottomRightX, bottomRightY;
-        [topLeftX, topLeftY, bottomRightX, bottomRightY] = overlayRect;
         // overlay corners position relative to map extent
         var TL = coordinateRelationship(mapRect, [topLeftX, topLeftY]),
             BL = coordinateRelationship(mapRect, [topLeftX, bottomRightY]),

@@ -765,7 +765,6 @@ class ExportPNG extends Control {
 
         // scale logo
         logo.style.transformOrigin = "bottom left";
-        logo.style.transform = `scale(2)`;
 
         // if map legend, scale & translate for printing
         var legendWidth, legendHeight;
@@ -775,7 +774,6 @@ class ExportPNG extends Control {
             legend.style.maxWidth = 'none';
             legend.style.maxHeight = 'none';
             legend.style.transformOrigin = "bottom right";
-            legend.style.transform = `scale(2)`;
         }
 
         // print once map is resized
@@ -795,7 +793,8 @@ class ExportPNG extends Control {
                 useCORS: true,
                 allowTaint: true,
                 scrollX:0,
-                scrollY: -window.scrollY
+                scrollY: -window.scrollY,
+                foreignObjectRendering: false
             };
             html2canvas(target, configOptions)
                 .then(function(canvas) {

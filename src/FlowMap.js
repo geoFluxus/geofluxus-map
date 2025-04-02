@@ -458,11 +458,11 @@ export default class FlowMap extends Map {
         // focus on Netherlands by default
         var topLeft = [
                 Math.min(...nodes.map(n => n.lon)),
-                Math.max(...nodes.map(n => n.lat))
+                Math.min(...nodes.map(n => n.lat))
             ],
             bottomRight = [
                 Math.max(...nodes.map(n => n.lon)),
-                Math.min(...nodes.map(n => n.lat))
+                Math.max(...nodes.map(n => n.lat))
             ];
 
         return [

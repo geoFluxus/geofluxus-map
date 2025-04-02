@@ -1,6 +1,7 @@
 .idea
 node_modules
 .cache
+.parcel-cache
 package-lock.json
 data/
 index.html

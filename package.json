@@ -1,12 +1,14 @@
 {
   "name": "geofluxus-map",
-  "version": "1.6.13",
+  "version": "1.7.0",
   "description": "",
-  "main": "index.js",
+  "browser": {
+    "global": "gFMap"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel index.html",
-    "build": "parcel build index.js --global gFMap --no-source-maps"
+    "build": "parcel build index.js --no-source-maps"
   },
   "repository": {
     "type": "git",
@@ -19,17 +21,18 @@
   },
   "homepage": "https://github.com/geoFluxus/geofluxus-map#readme",
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.15.4",
-    "@turf/center": "^6.5.0",
-    "@turf/center-of-mass": "^6.5.0",
-    "@turf/centroid": "^6.5.0",
-    "d3": "^6.6.2",
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@turf/center": "^7.2.0",
+    "@turf/center-of-mass": "^7.2.0",
+    "@turf/centroid": "^7.2.0",
+    "d3": "^7.9.0",
     "file-saver": "^2.0.5",
-    "html2canvas": "^1.0.0-rc.7",
-    "ol": "^6.5.0"
+    "html2canvas": "^1.4.1",
+    "ol": "^10.5.0"
   },
   "devDependencies": {
-    "parcel-bundler": "^1.12.5",
+    "buffer": "^6.0.3",
+    "parcel": "^2.14.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   }

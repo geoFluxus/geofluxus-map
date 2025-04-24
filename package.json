@@ -1,6 +1,6 @@
 {
   "name": "geofluxus-map",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "",
   "browser": {
     "global": "gFMap"
@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "buffer": "^6.0.3",
-    "parcel": "^2.14.4",
+    "parcel-bundler": "^1.12.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   }

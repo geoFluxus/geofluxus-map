@@ -138,7 +138,8 @@ export class FlowLayer extends D3Layer {
                     .attr("stroke-width", width)
                     .attr("stroke-linecap", "round")
                     .style("pointer-events", 'stroke')
-                    .on("mouseover", function() {
+                    .on("pointerover", function() {
+                        console.log("mouseover")
                         d3.select(this).node().parentNode.appendChild(this);
                         d3.select(this).style("cursor", "pointer");
                         path.attr("stroke-opacity", 1);
@@ -149,13 +150,15 @@ export class FlowLayer extends D3Layer {
                             .html(_this.tooltipBody(d))
                             .style("visibility", "visible")
                     })
-                    .on("mousemove", function(evt) {
+                    .on("pointermove", function(evt) {
+                        console.log("mousemove")
                         var tooltipSize = _this.tooltip.node().getBoundingClientRect();
                         _this.tooltip
                             .style("top", (evt.y - tooltipSize.height) + 'px')
                             .style("left", (evt.x - (tooltipSize.width / 2)) + 'px');
                     })
                     .on("mouseout", function() {
+                        console.log("mouseout")
                         path.attr("stroke-opacity", gradRef ? 1 : 0.5);
                         path.attr("stroke", gradRef || color);
                         _this.tooltip.style("visibility", "hidden")
@@ -305,7 +308,7 @@ export class NodeLayer extends D3Layer {
                         .attr("cy", point[1])
                         .attr("r", "5px")
                         .attr("fill", "rgba(139, 138, 138, 0.5)")
-                        .on("mouseover", function() {
+                        .on("pointerover", function() {
                             d3.select(this).node().parentNode.appendChild(this);
                             d3.select(this).style("cursor", "pointer");
 
@@ -314,7 +317,7 @@ export class NodeLayer extends D3Layer {
                                 .html(_this.tooltipBody(d))
                                 .style("visibility", "visible")
                         })
-                        .on("mousemove", function(evt) {
+                        .on("pointermove", function(evt) {
                             var tooltipSize = _this.tooltip.node().getBoundingClientRect();
                             _this.tooltip
                                 .style("top", (evt.pageY - tooltipSize.height) + 'px')

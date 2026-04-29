@@ -36,6 +36,9 @@ class D3Layer extends Layer {
         // layer tooltip
         this.tooltip = options.tooltip.element;
         this.tooltipBody = options.tooltip.body;
+
+        // click event
+        this.onClick = options?.onClick
     }
 
     // convert coordinates to pixels
@@ -139,7 +142,6 @@ export class FlowLayer extends D3Layer {
                     .attr("stroke-linecap", "round")
                     .style("pointer-events", 'stroke')
                     .on("pointerover", function() {
-                        console.log("mouseover")
                         d3.select(this).node().parentNode.appendChild(this);
                         d3.select(this).style("cursor", "pointer");
                         path.attr("stroke-opacity", 1);
@@ -151,17 +153,18 @@ export class FlowLayer extends D3Layer {
                             .style("visibility", "visible")
                     })
                     .on("pointermove", function(evt) {
-                        console.log("mousemove")
                         var tooltipSize = _this.tooltip.node().getBoundingClientRect();
                         _this.tooltip
                             .style("top", (evt.y - tooltipSize.height) + 'px')
                             .style("left", (evt.x - (tooltipSize.width / 2)) + 'px');
                     })
                     .on("mouseout", function() {
-                        console.log("mouseout")
                         path.attr("stroke-opacity", gradRef ? 1 : 0.5);
                         path.attr("stroke", gradRef || color);
                         _this.tooltip.style("visibility", "hidden")
+                    })
+                    .on("pointerup", function (event) {
+                        _this?.onClick(d)
                     })
                     .attr("fill", 'none')
                     .classed('flow', true)

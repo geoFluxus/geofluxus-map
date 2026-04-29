@@ -16,6 +16,7 @@ const map1 = new FlowMap({
     target: "root1",
     data: data,
     groupBy: 'ewc',
+    onClick: (d) => console.log(d)
 })
 
 

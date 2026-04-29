@@ -32,6 +32,9 @@ export default class FlowMap extends Map {
         }
         super(options);
 
+        // activate click event
+        this.onClick = options?.onClick || (() => {});
+
         // change button & logo style
         this.buttonColor = 'white';
         this.stylizeButtons({color: this.buttonColor});
@@ -488,7 +491,8 @@ export default class FlowMap extends Map {
             tooltip: {
                 element: this.tooltip,
                 body: this.tooltipBody
-            }
+            },
+            onClick: this.onClick
         });
         this.map.addLayer(flowLayer);
 

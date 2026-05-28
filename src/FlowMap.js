@@ -118,6 +118,9 @@ export default class FlowMap extends Map {
         this.renderFlows = true;
         this.renderNodes = false;
         this._render();
+
+        // selected flow
+        this.selected = null;
     }
 
     // render
@@ -492,7 +495,11 @@ export default class FlowMap extends Map {
                 element: this.tooltip,
                 body: this.tooltipBody
             },
-            onClick: this.onClick
+            onClick: this.onClick,
+            selected: this.selected,
+            onSelect: (d) => {
+                this.selected = d?._id;
+            },
         });
         this.map.addLayer(flowLayer);
 

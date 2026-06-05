@@ -180,11 +180,11 @@ export default class FlowMap extends Map {
         return colors;
     }
 
-    function nodeKey(node) {
-        return [
-            Number(node.lat).toFixed(6),
-            Number(node.lon).toFixed(6)
-        ].join('|');
+    nodeKey(node) {
+        return JSON.stringify({
+            lat: Number(node.lat).toFixed(6),
+            lon: Number(node.lon).toFixed(6)
+        });
     }
 
     // convert data to links & nodes
@@ -198,8 +198,8 @@ export default class FlowMap extends Map {
         // split data to nodes & links
         this.data.forEach(function(flow) {
             // load unique nodes
-            var source = nodeKey(flow.source),
-                target = nodeKey(flow.target);
+            var source = _this.nodeKey(flow.source),
+                target = _this.nodeKey(flow.target);
             nodes.add(source);
             nodes.add(target);
 
@@ -215,8 +215,8 @@ export default class FlowMap extends Map {
         })
         links.forEach(function(l, i) {
             l._id = l._id ?? i;
-            l._source = idx[nodeKey(l.source)];
-            l._target = idx[nodeKey(l.target)];
+            l._source = idx[_this.nodeKey(l.source)];
+            l._target = idx[_this.nodeKey(l.target)];
         })
 
         // source / target -> link

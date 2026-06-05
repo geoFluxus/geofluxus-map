@@ -141,6 +141,15 @@ export default class FlowMap extends Map {
         if (this.renderNodes) this._drawNodes();
     }
 
+    setSelected(id = null) {
+        this.selected = id;
+        this._render();
+    }
+
+    getSelected() {
+        return this.selected;
+    }
+
     // define colors based on groupby property
     _getColors() {
         var _this = this,

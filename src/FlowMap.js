@@ -180,6 +180,13 @@ export default class FlowMap extends Map {
         return colors;
     }
 
+    function nodeKey(node) {
+        return [
+            Number(node.lat).toFixed(6),
+            Number(node.lon).toFixed(6)
+        ].join('|');
+    }
+
     // convert data to links & nodes
     // get link layers
     _transformToLinksAndNodes() {
@@ -191,8 +198,8 @@ export default class FlowMap extends Map {
         // split data to nodes & links
         this.data.forEach(function(flow) {
             // load unique nodes
-            var source = JSON.stringify(flow.source),
-                target = JSON.stringify(flow.target);
+            var source = nodeKey(flow.source),
+                target = nodeKey(flow.target);
             nodes.add(source);
             nodes.add(target);
 
@@ -207,9 +214,9 @@ export default class FlowMap extends Map {
             idx[n] = i;
         })
         links.forEach(function(l, i) {
-            l._id = i;
-            l._source = idx[JSON.stringify(l.source)];
-            l._target = idx[JSON.stringify(l.target)];
+            l._id = l._id ?? i;
+            l._source = idx[nodeKey(l.source)];
+            l._target = idx[nodeKey(l.target)];
         })
 
         // source / target -> link
